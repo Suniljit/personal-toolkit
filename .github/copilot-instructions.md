@@ -22,16 +22,7 @@ applyTo: "**"
     - Use `collections.abc` for `Callable` or `Iterable`.
     - **Never use `Any`.**
 
-## 4. Explaining Logic to the User
-- **Contextual Summary:** Provide a one-sentence summary of a code block's role before explaining internal logic.
-- **Block-by-Block:** Provide concise, simple breakdowns outside of the code.
-- **Example-Driven Logic:** For transformations, use this exact format:
-    - **Input:** [Raw state]
-    - **Transformation:** [Specific operation]
-    - **Output:** [Resulting state]
-- **Constraint:** Never use em dashes (—) in any explanation.
-
-## 5. Error Handling & Testing
+## 4. Error Handling & Testing
 - **Resilience:** Use specific `try/except` blocks for I/O and APIs. Log errors with context; never swallow exceptions.
 - **Validation:** Account for empty inputs and invalid types.
 - **Testing:** Core logic requires `pytest` with mocked external dependencies. Write unit tests for all functions.
