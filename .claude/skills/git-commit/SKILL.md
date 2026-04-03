@@ -11,17 +11,23 @@ Helps the user stage files, generate a meaningful commit message from a diff, co
  
 ### Step 1: Locate the repository
  
-Identify the git repo root from the file paths the user provided:
+If the user provided file or folder paths, find the repo root from them:
  
 ```bash
 git -C <dir-containing-files> rev-parse --show-toplevel
+```
+ 
+If the user provided **no files or folders**, use the current working directory:
+ 
+```bash
+git rev-parse --show-toplevel
 ```
  
 If files span multiple repos, handle each repo separately.
  
 ### Step 2: Inspect the changes
  
-For each file the user mentioned, get the diff relative to the repo's HEAD (or the index if already staged):
+**If the user specified files**, diff only those:
  
 ```bash
 # Unstaged changes
@@ -34,7 +40,27 @@ git -C <repo-root> diff --no-index /dev/null <file>
 git -C <repo-root> diff --cached -- <file>
 ```
  
-Also check the current status so you understand the full picture:
+**If the user specified no files**, discover everything changed in the repo:
+ 
+```bash
+# See all changed, staged, and untracked files
+git -C <repo-root> status --short
+ 
+# Diff all tracked changes (staged + unstaged)
+git -C <repo-root> diff HEAD
+ 
+# List untracked files
+git -C <repo-root> ls-files --others --exclude-standard
+```
+ 
+For any untracked files found, also run:
+```bash
+git -C <repo-root> diff --no-index /dev/null <untracked-file>
+```
+ 
+If there are no changes at all, tell the user and stop.
+ 
+Always check status for the full picture:
  
 ```bash
 git -C <repo-root> status --short
@@ -86,8 +112,11 @@ If the user suggests edits, update the message and confirm once more before comm
 Once confirmed:
  
 ```bash
-# Stage only the files the user specified
+# If user specified files — stage only those
 git -C <repo-root> add -- <file1> <file2> ...
+ 
+# If no files were specified — stage everything shown in the diff
+git -C <repo-root> add -A
  
 # Commit with the agreed message
 git -C <repo-root> commit -m "<subject>" -m "<body>"
@@ -114,6 +143,6 @@ git -C <repo-root> log --oneline -1
 ## Important constraints
  
 - **Never commit without explicit user confirmation of the message.**
-- **Only stage the files the user specified** — do not `git add .` or add unrelated files.
+- **Only stage the files the user specified.** If no files were specified, stage all changes (`git add -A`) — but always show the full file list in the confirmation step so the user knows exactly what is going in.
 - Do not push. Committing locally only unless the user explicitly asks to push.
 - Do not modify `.gitignore` or any other file as part of this workflow.

@@ -1,30 +1,37 @@
 "chat.tools.terminal.autoApprove": {
-  // Safe git inspection
-  "/^git\\s+-C\\s+.+\\s+(rev-parse|status|diff|log|show|branch(\\s+--show-current)?|remote\\s+-v)\\b/": true,
-
   // Block risky git actions
-  "/^git\\s+reset\\b/": false,
-  "/^git\\s+checkout\\b/": false,
-  "/^git\\s+switch\\b/": false,
-  "/^git\\s+restore\\b/": false,
-  "/^git\\s+clean\\b/": false,
-  "/^git\\s+rebase\\b/": false,
-  "/^git\\s+cherry-pick\\b/": false,
-  "/^git\\s+merge\\b/": false,
-  "/^git\\s+commit\\b/": false,
-  "/^git\\s+push\\b/": false,
-  "/^git\\s+tag\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?reset\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?checkout\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?switch\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?restore\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?clean\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?rebase\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?cherry-pick\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?merge\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?commit\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?push\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?tag\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?stash\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?am\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?apply\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?revert\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?branch\\s+.*-D\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?branch\\s+.*--delete\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?update-ref\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?filter-branch\\b/": false,
+  "/^git\\s+(-C\\s+\\S+\\s+)?worktree\\s+(remove|move|prune)\\b/": false,
 
-  // Safe-ish uv commands
-  "/^uv\\s+(--version|version)\\b/": true,
-  "/^uv\\s+python\\s+list\\b/": true,
-  "/^uv\\s+tree\\b/": true,
-  "/^uv\\s+pip\\s+list\\b/": true,
-  "/^uv\\s+run\\s+(ruff|ty|pytest)\\b/": true,
+  // Allow all other git commands
+  "/^git\\b/": true,
 
-  // Require approval for package/environment changing uv commands
-  "/^uv\\s+(add|remove|sync|lock|publish)\\b/": false,
+  // Block unsafe uv commands
+  "/^uv\\s+(add|remove|sync|lock|publish|init)\\b/": false,
+  "/^uv\\s+venv\\b/": false,
+  "/^uv\\s+python\\s+(install|uninstall|pin)\\b/": false,
   "/^uv\\s+pip\\s+(install|uninstall|compile|sync)\\b/": false,
+
+  // Allow all other uv commands
+  "/^uv\\b/": true,
 
   // Never broadly auto-approve shell interpreters
   "/^bash\\b/": false,
