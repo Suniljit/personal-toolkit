@@ -1,0 +1,32 @@
+"chat.tools.terminal.autoApprove": {
+  // Safe git inspection
+  "/^git\\s+-C\\s+.+\\s+(rev-parse|status|diff|log|show|branch(\\s+--show-current)?|remote\\s+-v)\\b/": true,
+
+  // Block risky git actions
+  "/^git\\s+reset\\b/": false,
+  "/^git\\s+checkout\\b/": false,
+  "/^git\\s+switch\\b/": false,
+  "/^git\\s+restore\\b/": false,
+  "/^git\\s+clean\\b/": false,
+  "/^git\\s+rebase\\b/": false,
+  "/^git\\s+cherry-pick\\b/": false,
+  "/^git\\s+merge\\b/": false,
+  "/^git\\s+commit\\b/": false,
+  "/^git\\s+push\\b/": false,
+  "/^git\\s+tag\\b/": false,
+
+  // Safe-ish uv commands
+  "/^uv\\s+(--version|version)\\b/": true,
+  "/^uv\\s+python\\s+list\\b/": true,
+  "/^uv\\s+tree\\b/": true,
+  "/^uv\\s+pip\\s+list\\b/": true,
+  "/^uv\\s+run\\s+(ruff|ty|pytest)\\b/": true,
+
+  // Require approval for package/environment changing uv commands
+  "/^uv\\s+(add|remove|sync|lock|publish)\\b/": false,
+  "/^uv\\s+pip\\s+(install|uninstall|compile|sync)\\b/": false,
+
+  // Never broadly auto-approve shell interpreters
+  "/^bash\\b/": false,
+  "/^zsh\\b/": false
+}
