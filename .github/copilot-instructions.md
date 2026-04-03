@@ -6,7 +6,6 @@ applyTo: "**"
 ## Core Rules
 - No emojis, no meta-commentary, no filler.
 - Write clean, self-explanatory code.
-- Comment only for non-obvious logic. No redundant comments.
 - All functions require docstrings.
 
 ## Code Quality
@@ -43,7 +42,7 @@ applyTo: "**"
 - Fix bugs autonomously.
 
 ## Improvement
-- Record lessons in `lessons/lessons.md` after mistakes.
+- Record lessons in `_lessons/lessons.md` after mistakes.
 
 ## Principles
 - Simplicity first.
