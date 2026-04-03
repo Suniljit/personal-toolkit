@@ -1,0 +1,100 @@
+---
+name: python-code-quality-agent
+description: >
+  A two-stage Python code quality agent. Triggers only on explicit requests like "run the code agent",
+  "run the quality agent", or "run code quality on this". First performs a full code review (bugs,
+  reuse, simplification, SRP, reduction) and applies all changes, then runs ruff and ty for linting
+  and type checking and fixes any remaining issues. Do NOT trigger for general code questions or
+  passive review requests — only trigger when the user explicitly invokes the agent.
+---
+
+# Python Code Quality Agent
+
+A two-stage agent that sequentially runs a full code review followed by lint and type checking,
+applying all fixes directly to the files.
+
+---
+
+## Trigger Conditions
+
+Only activate when the user explicitly says something like:
+- "run the code agent"
+- "run the quality agent"
+- "run code quality on [path]"
+- "use the code quality agent"
+
+Do **not** activate for passive phrasings like "review my code" or "check for issues" — those
+trigger the individual `code-review` skill directly.
+
+---
+
+## Prerequisites
+
+Before starting, confirm with the user:
+1. **Target path** — which file(s) or directory to process (ask if not provided)
+2. **Project root** — location of `pyproject.toml` (needed for Stage 2; ask if ambiguous)
+
+---
+
+## Stage 1 — Code Review
+
+Follow the full `code-review` SKILL.md instructions.
+
+Key points:
+- Run all 5 passes: bug detection, reuse, simplification, SRP, code reduction
+- Use subagents for files >100 lines or >2 files
+- Apply **all** changes directly to the files before proceeding to Stage 2
+- Show the Code Review Summary and Changes Applied sections to the user
+
+> ⚠️ Do not proceed to Stage 2 until all Stage 1 changes have been written to disk.
+
+---
+
+## Stage 2 — Lint & Type Check
+
+Follow the full `py-lint-typecheck` SKILL.md instructions on the **same target path**.
+
+Key points:
+- Locate `pyproject.toml` and install `ruff`/`ty` if missing
+- Run `ruff check --fix` and `ruff format`
+- Run `ty check`
+- Fix any remaining issues manually
+- Re-run until both tools exit cleanly
+
+> Note: Stage 2 operates on the already-modified files from Stage 1, so ruff/ty are catching
+> anything the code review introduced or missed — not the original source.
+
+---
+
+## Final Report
+
+After both stages complete, show a unified summary:
+
+```
+## Code Quality Agent — Complete
+
+### Stage 1: Code Review
+- Files modified: <list>
+- Bugs fixed: N
+- Reuse extractions: N
+- Simplifications: N
+- SRP splits: N
+- Lines saved: N
+
+### Stage 2: Lint & Type Check
+- ruff issues auto-fixed: N
+- ruff issues manually fixed: N
+- ty errors fixed: N
+- Final status: ✅ Clean / ⚠️ Remaining issues (list them)
+
+### Files touched
+<list of all files modified across both stages>
+```
+
+---
+
+## Error Handling
+
+- If Stage 1 produces no changes (already clean), note it and proceed to Stage 2.
+- If Stage 2 cannot find `pyproject.toml`, pause and ask the user for the project root before continuing.
+- If either stage encounters an unresolvable issue, report it clearly and stop rather than guessing.
