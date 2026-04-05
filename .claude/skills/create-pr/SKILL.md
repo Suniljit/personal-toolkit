@@ -1,5 +1,5 @@
 ---
-name: pr-creator
+name: create-pr
 description: >
   Creates GitHub Pull Requests by analyzing branch changes and generating a concise PR summary for user approval. Use this skill whenever the user wants to open a PR, create a pull request, submit a PR, or push their branch for review. Also trigger when the user mentions "stacked branches", "PR to a specific branch", or "PR summary". The skill inspects git diffs, summarizes changes clearly, waits for user confirmation, then creates the PR via the GitHub CLI.
 ---

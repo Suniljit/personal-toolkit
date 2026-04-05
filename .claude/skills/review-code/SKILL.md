@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: review-code
 description: >
   Perform a thorough code review that checks for bugs and issues, identifies opportunities for code reuse,
   simplifies over-engineered logic, enforces the Single Responsibility Principle (SRP) by breaking large
