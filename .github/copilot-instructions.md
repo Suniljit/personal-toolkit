@@ -71,20 +71,21 @@ Universal coding standards applicable across Python projects.
 - Prefer dataclasses or structured types over raw dictionaries
 
 ## Workflow
-- Default to plan mode unless trivial.
-- Break work into steps before coding.
-- Use subagents liberally.
-- Verify before completion, tests, behavior, outputs.
-- Prefer elegant solutions.
-- Fix bugs autonomously.
+
+- Default to planning before coding unless the task is trivial
+- Break work into clear steps before implementation
+- Verify outputs, behavior, and tests before completion
+- Fix bugs proactively when discovered
+- Prefer simple, elegant solutions over complex ones
 
 ## Improvement
-- Record lessons in `_lessons/lessons.md` after mistakes.
+
+- Record lessons in `_lessons/lessons.md` after mistakes
 
 ## Logging
 
-- Use logging instead of print. 
-- Prefer the `loguru` library for structured logging.
+- Use logging instead of print
+- Prefer the `loguru` library for structured logging
 - Avoid logging sensitive data
 
 ## Performance
@@ -112,6 +113,7 @@ Universal coding standards applicable across Python projects.
 - ruff for linting and formatting
 - ty for type checking
 - pyproject.toml as single source of truth
+- uv for dependency and environment management
 
 ## General Rules
 
@@ -120,4 +122,89 @@ Universal coding standards applicable across Python projects.
 - Avoid wildcard imports
 - Keep functions small and focused
 
-**Remember**: Clear, maintainable Python code enables faster development and safer changes.
+## Python Environment and Dependency Management
+
+All Python work follows a deterministic setup to minimize environment drift and dependency conflicts.
+
+### Tooling
+
+Use `uv` for all environment and dependency operations. Do not use `pip`, `poetry`, or `conda` directly.
+
+### Python Version
+
+Default to Python 3.12 for all new projects and environments unless explicitly specified otherwise.
+
+### Project Root (Default)
+
+- Default project root is the current working directory (cwd)
+- In monorepos, use the subdirectory if it contains dependency files
+
+### Dependency Declaration
+
+A project declares dependencies if any of the following exist:
+
+- pyproject.toml
+- requirements.txt
+- requirements-dev.txt
+- requirements.lock
+
+### Environment Rules
+
+1. Prefer a project-local virtual environment in .venv
+2. Create it only if dependency files exist
+3. Reuse existing .venv if present
+4. Otherwise use the shared global environment
+
+### Setup Flow
+
+If pyproject.toml exists:
+
+    uv venv .venv --python 3.12
+    uv sync
+    source .venv/bin/activate
+
+If requirements.txt exists:
+
+    uv venv .venv --python 3.12
+    uv pip install -r requirements.txt
+    source .venv/bin/activate
+
+If only requirements-dev.txt exists:
+
+    uv venv .venv --python 3.12
+    uv pip install -r requirements-dev.txt
+    source .venv/bin/activate
+
+Otherwise:
+
+    source ~/personal/bin/activate
+
+### Activation Rule
+
+Always activate the environment before:
+
+- Running scripts
+- Installing dependencies
+- Running tests
+
+    source .venv/bin/activate
+
+### Global Environment
+
+If no dependency files exist:
+
+    source ~/personal/bin/activate
+
+- Use uv pip only
+- Do not install dependencies unless necessary
+
+### Non-Negotiables
+
+- Do not mix environments
+- Do not install dependencies implicitly
+- Do not assume system Python
+- Do not create ad-hoc environments
+- Always use Python 3.12 unless specified
+- Use uv sync for pyproject-based projects
+
+**Remember:** Clear, maintainable Python code enables faster development and safer changes.
