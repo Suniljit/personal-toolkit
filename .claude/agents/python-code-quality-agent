@@ -24,7 +24,7 @@ Only activate when the user explicitly says something like:
 - "use the code quality agent"
 
 Do **not** activate for passive phrasings like "review my code" or "check for issues" — those
-trigger the individual `code-review` skill directly.
+trigger the individual `review-code` skill directly.
 
 ---
 
@@ -38,7 +38,7 @@ Before starting, confirm with the user:
 
 ## Stage 1 — Code Review
 
-Follow the full `code-review` SKILL.md instructions.
+Follow the full `review-code` SKILL.md instructions.
 
 Key points:
 - Run all 5 passes: bug detection, reuse, simplification, SRP, code reduction
