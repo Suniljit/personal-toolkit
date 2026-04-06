@@ -15,13 +15,22 @@ First, let me ask you a few focused questions about this feature:
 
 4. **Constraints**: Any technical, time, or dependency constraints I should know about?
 
-Once I have these answers, I'll generate your spec in the format ready for Plan Mode and save it to `_specs/`.
+Once I have these answers, I'll generate your spec in the format ready for Plan Mode and save it to the project's `_specs/` folder.
 
 Ask one question at a time, wait for your answers, then produce a spec that maps to:
 - Summary
+- Suggested Git Branch Name (e.g. `feat/short-description`)
 - Functional Requirements
 - Possible Edge Cases
 - Acceptance Criteria
 - Testing Guidelines
 
-Then ask you to confirm it before saving to `_specs/`.
+Then ask you to confirm it before saving.
+
+---
+
+## Saving the spec
+
+- Detect the **project root** by looking for markers like `package.json`, `pyproject.toml`, `.git`, or similar in the current working directory.
+- Save the spec to `<project_root>/_specs/<feature-name>.md`.
+- The skill itself lives in `~/.claude/` — do **not** save specs there.
