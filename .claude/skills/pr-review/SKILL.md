@@ -1,21 +1,31 @@
 ---
 name: pr-review
-description: Reviews a pull request from another contributor using git. Trigger whenever the user says "review this PR", "review this branch", "review branch <name>", "check this PR", or just "review PR". Also trigger if the user says "review" with no further context — assume they mean the current branch. Uses git to fetch the latest code and diff against origin/main. Explains what the code does AND flags any issues, bugs, or concerns.
+description: Reviews a pull request using git. Trigger when the user says "review PR /#<number>", "review PR /#<number> against <branch>", "review this PR", "review this branch", "review branch <name>", "check this PR", or just "review PR". Also trigger if the user says "review" with no further context — assume they mean the current branch. Uses git (and gh CLI if available) to fetch branch info and diff. Explains what the code does AND flags any issues, bugs, or concerns.
 ---
 
 # PR Review Skill
+
+## Step 0: Resolve the PR number (if given)
+
+If the user said "review PR #<number>", use the `gh` CLI to get the branch name:
+```bash
+gh pr view <number> --json headRefName,title,body
+```
+
+Extract `headRefName` as the branch to review. If `gh` isn't available or fails, ask the user for the branch name directly.
+
+If no PR number was given, use `HEAD` (current branch).
+
+---
 
 ## Step 1: Get the diff
 
 Always run `git fetch origin` first to ensure you have the latest remote state.
 
-**Determine the branch to review:**
-- If the user specified a branch name → use that
-- If the user didn't specify → use `HEAD` (current branch)
-
 **Determine the base branch:**
 - Default: `origin/main`
-- If the user says "diff against X" or "compare to X" → use `origin/X`
+- If the user said "review PR #xx against branch xyz" → use `origin/xyz`
+- If the user said "diff against X" or "compare to X" → use `origin/X`
 
 **Run the diff:**
 ```bash
