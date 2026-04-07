@@ -9,6 +9,44 @@ Helps the user stage files, generate a meaningful commit message from a diff, co
  
 ## Workflow
  
+### Step 0: Determine what to commit (when no files are explicitly specified in text)
+
+If the user runs the skill **with no text input** (e.g., just types `/git-commit` or sends a blank invocation):
+
+1. **Check for attached files** — look at the conversation for any file attachments (uploaded files, file paths mentioned via attachment, etc.).
+   - If attached files are found → treat those files as the target files and proceed to Step 1 with them.
+   - If no attached files → proceed to discover changed files in the repo (see below).
+
+2. **Discover changed files** — if there are no attached files, run:
+
+```bash
+git rev-parse --show-toplevel
+git status --short
+```
+
+Then present a **numbered list** of all changed/untracked files to the user:
+
+```
+I found the following changed files in your repo:
+
+  1. src/auth.py             (modified)
+  2. src/models/user.py      (modified)
+  3. tests/test_auth.py      (modified)
+  4. README.md               (untracked)
+
+Which files would you like to commit? You can reply with numbers (e.g. "1, 3"), "all", or a range like "1-3".
+```
+
+Wait for the user to reply with their selection before continuing. Accept responses like:
+- `all` → commit everything listed
+- `1, 3` or `1 3` → commit items 1 and 3
+- `1-3` → commit items 1 through 3
+- `2` → commit just item 2
+
+Once the user has selected, proceed to Step 1 with those specific files.
+
+---
+
 ### Step 1: Locate the repository
  
 If the user provided file or folder paths, find the repo root from them:
@@ -139,6 +177,8 @@ git -C <repo-root> log --oneline -1
 | Repo is in detached HEAD state | Warn the user before committing |
 | Nothing to commit after staging | Tell the user nothing changed |
 | User wants to amend last commit | Use `git commit --amend` — still confirm the new message first |
+| User selects from numbered list | Map the numbers back to the correct file paths before staging |
+| User selects a number that doesn't exist | Point out the invalid selection and ask them to re-select |
  
 ## Important constraints
  
@@ -146,3 +186,4 @@ git -C <repo-root> log --oneline -1
 - **Only stage the files the user specified.** If no files were specified, stage all changes (`git add -A`) — but always show the full file list in the confirmation step so the user knows exactly what is going in.
 - Do not push. Committing locally only unless the user explicitly asks to push.
 - Do not modify `.gitignore` or any other file as part of this workflow.
+- Do not use any third-party git libraries or tools — interact with git directly via the command line to ensure maximum compatibility and control.
