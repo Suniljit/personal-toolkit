@@ -2,13 +2,11 @@
   // Block risky git actions
   "/^git\\s+(-C\\s+\\S+\\s+)?reset\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?checkout\\b/": false,
-  "/^git\\s+(-C\\s+\\S+\\s+)?switch\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?restore\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?clean\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?rebase\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?cherry-pick\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?merge\\b/": false,
-  "/^git\\s+(-C\\s+\\S+\\s+)?commit\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?push\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?tag\\b/": false,
   "/^git\\s+(-C\\s+\\S+\\s+)?stash\\b/": false,
