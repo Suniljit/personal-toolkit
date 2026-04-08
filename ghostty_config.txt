@@ -1,0 +1,28 @@
+# --- Theme & Colors ---
+theme = Atom One Dark
+background-opacity = 1.0
+background-blur-radius = 0
+
+# Optimized for MacBook Pro M3 Display
+window-colorspace = "display-p3"
+
+# --- Font & Icons ---
+# Ensure quotes are used for font names with spaces
+font-family = "MesloLGS NF"
+font-size = 13
+
+# Standard Ghostty way to improve text clarity on macOS
+font-thicken = true
+
+# Adjustments for p10k icon alignment
+adjust-cell-height = 20%
+adjust-font-baseline = 1
+
+# --- Integration ---
+macos-option-as-alt = left
+window-save-state = always
+mouse-hide-while-typing = true
+
+cursor-style = bar
+cursor-style-blink = false
+shell-integration-features = no-cursor

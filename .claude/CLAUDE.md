@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 This file contains guidelines and best practices for using agents in Python projects.
 

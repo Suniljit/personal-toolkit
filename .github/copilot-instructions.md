@@ -206,5 +206,6 @@ If no dependency files exist:
 - Do not create ad-hoc environments
 - Always use Python 3.12 unless specified
 - Use uv sync for pyproject-based projects
+- Always set a default `max_tokens` limit in code when calling any LLM API.
 
 **Remember:** Clear, maintainable Python code enables faster development and safer changes.
