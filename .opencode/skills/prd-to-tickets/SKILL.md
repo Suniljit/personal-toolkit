@@ -49,7 +49,7 @@ Iterate until the user approves the breakdown.
 
 ### 5. Create the tickets
 
-For each approved slice, create a ticket in Markdown format in the `tickets` directory. Use the ticket body template below.
+For each approved slice, create a ticket in Markdown format in the `_docs/tickets/` directory. Use the ticket body template below.
 
 Create tickets in dependency order (blockers first) so you can reference real ticket numbers in the "Blocked by" field.
 
@@ -84,3 +84,33 @@ Reference by number from the parent PRD:
 </issue-template>
 
 Do NOT close or modify the parent PRD issue.
+
+### 6. Create ticket_summary.md
+
+After all tickets are created, generate a `_docs/tickets/ticket_summary.md` file that gives a bird's-eye view of the full ticket set.
+
+The summary must contain:
+
+1. **A summary table** with columns: `#`, `Ticket` (linked to the ticket file), `Type`, `Blocked by`
+2. **An execution order section** that groups tickets into parallel batches, showing which can start immediately, and which unlock after each dependency is resolved
+
+Use this template:
+
+```markdown
+# <Feature/PRD Name> — Ticket Summary
+
+| # | Ticket | Type | Blocked by |
+|---|--------|------|------------|
+| 01 | [Ticket Title](01-ticket-slug.md) | HITL/AFK | — |
+| 02 | [Ticket Title](02-ticket-slug.md) | AFK | #01 |
+...
+
+## Execution order
+
+- **Start immediately (parallel):** #01, #02
+- **Unblocked after #01:** #03
+- **Unblocked after #01 + #02 (all parallel):** #04, #05
+...
+```
+
+Use zero-padded two-digit ticket numbers (01, 02, … 14). Use `—` for tickets with no blockers in the "Blocked by" column. Group the execution order section by dependency wave, not by ticket number.
