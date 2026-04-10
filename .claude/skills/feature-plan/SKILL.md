@@ -122,6 +122,26 @@ Known edge cases and how they're handled.
 Things explicitly not part of this plan. Not implied to be future work — just not in scope here.
 
 - ...
+
+---
+
+## 7. Testing Guidelines
+
+Create test file(s) under `./tests/` named after the feature (e.g., `tests/test_<feature>.py`
+or `tests/<feature>.test.ts`). Write meaningful tests for the following cases — don't go heavy,
+just cover what matters:
+
+- **Happy path** — the core use case works end-to-end as expected
+- **Edge cases from Section 5** — each named edge case should have at least one corresponding test
+- **Invalid / bad input** — verify the feature fails gracefully (correct error type, message, or
+  fallback behavior) when given malformed or unexpected input
+- **Boundary conditions** — empty collections, zero values, max limits, or other boundary inputs
+  relevant to this feature
+- **Integration point** — if the feature touches an external service, DB, or module boundary,
+  include at least one test that exercises that integration (can use a mock/stub)
+
+Keep tests focused and readable. One assertion per test where practical. Avoid testing
+implementation details — test observable behavior.
 ```
 
 ---
