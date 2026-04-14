@@ -1,12 +1,12 @@
 ---
 name: create-pr
 description: >
-  Creates GitHub Pull Requests by analyzing branch changes and generating a concise PR summary for user approval. Use this skill whenever the user wants to open a PR, create a pull request, submit a PR, or push their branch for review. Also trigger when the user mentions "stacked branches", "PR to a specific branch", or "PR summary". The skill inspects git diffs, summarizes changes clearly, waits for user confirmation, then creates the PR via the GitHub CLI.
+  Creates GitHub Pull Requests by analyzing branch changes and generating a concise PR summary for user approval. Use this skill whenever the user wants to open a PR, create a pull request, submit a PR, or push their branch for review. Also trigger when the user mentions "stacked branches", "PR to a specific branch", or "PR summary". The skill inspects git diffs, summarizes changes clearly, waits for user confirmation, then pushes the branch and creates the PR via the GitHub CLI.
 ---
 
 # PR Creator Skill
 
-Creates a PR from the current branch: analyzes changes, shows a summary for approval, then creates it.
+Creates a PR from the current branch: analyzes changes, shows a summary for approval, pushes the branch, then creates it.
 
 ## Prerequisites
 
@@ -67,9 +67,28 @@ Then ask: **"Does this look good? Say OK to create the PR, or let me know what t
 
 ---
 
-## Step 3: Create the PR
+## Step 3: Push the branch
 
-Once the user approves (says "ok", "yes", "looks good", "create it", etc.):
+Once the user approves (says "ok", "yes", "looks good", "create it", etc.), push the branch to origin first:
+
+```bash
+# Check if the branch already has an upstream set
+git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null
+
+# If upstream exists, a plain push is enough:
+git push
+
+# If no upstream is set (command above failed or returned nothing), set it:
+git push -u origin <current-branch>
+```
+
+If the push fails (e.g. non-fast-forward), report the error to the user and stop — do not attempt to create the PR.
+
+---
+
+## Step 4: Create the PR
+
+After a successful push:
 
 ```bash
 gh pr create \
@@ -95,3 +114,5 @@ Print the resulting PR URL to the user.
 **Draft PR:** If the user says "draft PR" or "WIP PR", add `--draft` flag to the `gh pr create` command.
 
 **Existing PR:** If `gh pr view` shows a PR already exists for this branch, tell the user and offer to update the description instead.
+
+**Push rejected:** If `git push` fails, show the error and ask the user how they want to proceed (e.g. rebase, force-push). Never force-push automatically.
