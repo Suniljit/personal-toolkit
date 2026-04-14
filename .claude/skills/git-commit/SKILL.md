@@ -122,8 +122,11 @@ Rules:
 - If multiple logical changes are present, note them in the body or suggest splitting into separate commits
 - Do NOT mention file names in the subject unless they are the whole point (e.g., `docs: update README`)
  
-### Step 4: Confirm with the user
- 
+### Step 4: Confirm with the user — MANDATORY STOP
+
+> ⛔ **DO NOT run any `git add` or `git commit` commands until the user explicitly approves the message in this step.**
+> This confirmation is required every time, no exceptions — even if the user previously said "just commit" or "go ahead" in an earlier turn.
+
 Present the proposed commit message clearly and ask for approval **before touching git**:
  
 ```
@@ -142,8 +145,11 @@ Adds corresponding unit tests for expiry and rotation edge cases.
 Shall I go ahead, or would you like to change the message?
 ```
  
-Wait for the user to explicitly confirm (e.g. "yes", "go ahead", "looks good") or request changes.
-If the user suggests edits, update the message and confirm once more before committing.
+**Wait for an explicit affirmative response** from the user in this conversation turn — e.g. "yes", "go ahead", "looks good", "ship it". Anything ambiguous or that doesn't clearly approve the message counts as a "no" — ask again.
+
+If the user suggests edits, update the message and **show it again and wait for re-confirmation** before committing.
+
+Only after receiving explicit approval may you proceed to Step 5.
  
 ### Step 5: Stage and commit
  
@@ -182,7 +188,7 @@ git -C <repo-root> log --oneline -1
  
 ## Important constraints
  
-- **Never commit without explicit user confirmation of the message.**
+- **Never commit without explicit user confirmation of the message in Step 4.** This is the most important rule in this skill. Do not skip or abbreviate the confirmation step under any circumstances.
 - **Only stage the files the user specified.** If no files were specified, stage all changes (`git add -A`) — but always show the full file list in the confirmation step so the user knows exactly what is going in.
 - Do not push. Committing locally only unless the user explicitly asks to push.
 - Do not modify `.gitignore` or any other file as part of this workflow.
