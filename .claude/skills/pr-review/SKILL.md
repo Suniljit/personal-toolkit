@@ -62,6 +62,22 @@ Rate each issue by severity:
 
 If nothing stands out: say "No issues found — looks good to merge." Don't invent problems.
 
+### 👁️ Manual Review Required
+Flag specific code that automated review cannot fully assess and that the human reviewer must personally inspect. Use this section for:
+- **Business logic** — Rules or calculations that only make sense in context (e.g. pricing formulas, eligibility checks, access control rules). Quote the exact lines and explain what assumption you can't verify.
+- **External integrations** — API calls, webhooks, or third-party SDKs where correctness depends on provider-specific behaviour or contracts not visible in this diff.
+- **Security-sensitive paths** — Auth checks, permission gates, input sanitisation, or anything touching credentials/secrets. Even if it looks right, flag it for a human to confirm.
+- **Migrations & data mutations** — Schema migrations, backfill scripts, or destructive DB operations that cannot be undone. State what data could be affected and what to verify before running in production.
+- **Environment/config dependencies** — Code whose behaviour changes based on env vars, feature flags, or config values that aren't in the diff.
+- **Tests that need human judgement** — Test coverage gaps for critical paths, or tests that pass but may not actually validate the right thing.
+
+Format each item as:
+> 📍 `path/to/file.ext` line X–Y
+> **Why**: one sentence on why this needs a human eye.
+> **What to check**: the specific thing the reviewer should verify or confirm.
+
+If there's nothing requiring manual review, say so explicitly: "Nothing flagged for manual review — automated analysis covers the full scope of this diff."
+
 ### ⚠️ Gotcha
 The one thing a reviewer could easily miss — a hidden assumption, a subtle side effect, or something that might break later.
 
