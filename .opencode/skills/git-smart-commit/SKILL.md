@@ -1,6 +1,6 @@
 ---
 name: git-smart-commit
-description: Intelligently group changed file hunks into multiple logical commits by sub-feature, generate a commit message for each group, confirm with the user, then execute commits sequentially using hunk-level staging. Use this skill whenever the user wants to commit multiple files intelligently, stage changes into grouped commits, auto-group files by feature or concern, or says things like "smart commit", "group my changes", "commit my changes into logical groups", "multi-commit", or "commit related files together". Also trigger when the user says "commit all my changes" or "commit everything" and there are multiple changed files — grouping is almost always better than one big commit. Always use this skill — don't try to handle multi-commit grouping from scratch without it.
+description: "Intelligently group changed file hunks into multiple logical commits by sub-feature, generate a commit message for each group, confirm with the user, then execute commits sequentially using hunk-level staging. Use this skill whenever the user wants to commit multiple files intelligently, stage changes into grouped commits, auto-group files by feature or concern, or says things like \"smart commit\", \"group my changes\", \"commit my changes into logical groups\", \"multi-commit\", or \"commit related files together\". Also trigger when the user says \"commit all my changes\" or \"commit everything\" and there are multiple changed files — grouping is almost always better than one big commit. Always use this skill — don't try to handle multi-commit grouping from scratch without it. IMPORTANT: When this skill triggers, do NOT ask the user what they want to do or request clarification — immediately begin Step 1 by locating the repository and discovering changed files. The skill is self-directing; jump straight in."
 ---
 
 # Git Smart Commit Skill
@@ -14,6 +14,8 @@ A single file may appear in multiple commits. For example, `config.py` touched b
 ---
 
 ## Workflow
+
+> **Start immediately.** When this skill is invoked, do not ask the user what they want — go straight to Step 1.
 
 ### Step 1: Locate the repository
 
@@ -94,11 +96,23 @@ Group hunks (not files) into logical sub-feature commits. Each commit should rep
 **Grouping heuristics:**
 - Group by sub-feature: all hunks implementing the same behaviour belong together, even across files
 - Configuration/dependency changes (e.g. `pyproject.toml`, `config.py`) belong with the sub-feature that introduced them
-- Tests belong with the source they test
 - Shared utility changes that serve multiple sub-features: assign to the most dominant sub-feature, or make a separate `refactor`/`chore` commit
 - Documentation belongs with the feature it documents, or grouped together if generic
 
-**Present the proposal as a compact, scannable list:**
+**Commit ordering — follow this sequence strictly:**
+
+```
+1. Planning / spec docs     (plan.md, DESIGN.md, spec files, ADRs, etc.)
+2. Sub-feature 1            (implementation + its config/deps)
+3. Sub-feature 2            (implementation + its config/deps)
+   ... (additional sub-features in logical dependency order)
+N-1. Tests                  (all test files, regardless of which sub-feature they cover)
+N.   README / docs          (README.md and other doc-only changes, always last)
+```
+
+If no planning doc or README is present, simply omit those slots. Never place tests before the implementation they test, and never place README changes before tests.
+
+**First, generate a commit message for each group** before showing the proposal. Apply Conventional Commits format (see below) to every group, then present the full plan as a compact, scannable list:
 
 ```
 Proposed commits (3):
@@ -124,9 +138,11 @@ Note: a file appearing in multiple commits is expected and correct.
 
 ---
 
-### Step 6: Iterate on feedback
+### Step 6: Confirm or iterate
 
 > ⛔ Do NOT run any `git add`, `git apply`, or `git commit` commands until Step 7.
+
+The user should review the full list of commit messages and their associated files before anything is executed. Wait for explicit approval or edit requests.
 
 Accept and apply these requests:
 - Move a hunk from one commit to another ("move the config.py hunk to #1")
@@ -136,52 +152,54 @@ Accept and apply these requests:
 - Reorder commits
 - Remove a hunk from all commits (exclude it)
 
-Re-present the full updated plan after every change. Keep iterating until the user approves.
+Re-present the **complete updated list** (all commits, all messages, all files) after every change. Keep iterating until the user approves with "go ahead", "yes", "ship it", or equivalent.
 
 ---
 
 ### Step 7: Execute commits sequentially
 
-Once the user says "go ahead" / "yes" / "ship it" or equivalent — that is the confirmation. Do not ask again.
+Once the user approves in Step 6 — that is the confirmation. Do not ask again.
 
 Process each commit **in order**:
 
 #### For each commit:
 
-**1. Build a patch file containing only the approved hunks for this commit:**
+**1. Determine staging strategy per file:**
 
-```bash
-# Start from the full diff of each involved file
-git -C <repo-root> diff HEAD -- <file> > /tmp/full_<file_slug>.patch
+For each file contributing to this commit, check whether **all** of that file's hunks are assigned to this commit (i.e. none of its hunks appear in other commits).
 
-# Then filter to only the hunks assigned to this commit.
-# Write the filtered patch to a temp file:
-# /tmp/commit_<n>_<file_slug>.patch
-```
+- **Whole-file staging** (all hunks belong to this commit):
+  ```bash
+  git -C <repo-root> add -- <file>
+  ```
+  Use this whenever possible — it's simpler and less error-prone.
 
-To filter hunks, parse the patch file and extract only the `@@` blocks assigned to this commit, preserving the file header lines (`---`, `+++`). Reconstruct a valid unified diff.
+- **Hunk-level staging** (only some hunks belong to this commit):
+  ```bash
+  # Extract the full diff for this file
+  git -C <repo-root> diff HEAD -- <file> > /tmp/full_<file_slug>.patch
 
-**2. Stage the filtered patch:**
+  # Filter to only the hunks assigned to this commit,
+  # preserving the file header lines (---, +++)
+  # Write to: /tmp/commit_<n>_<file_slug>.patch
 
-```bash
-git -C <repo-root> apply --cached /tmp/commit_<n>_<file_slug>.patch
-```
+  git -C <repo-root> apply --cached /tmp/commit_<n>_<file_slug>.patch
+  ```
+  Only use patch filtering when the file genuinely splits across commits.
 
-Do this for each file contributing hunks to this commit.
-
-**3. For entirely new (untracked) files assigned to this commit:**
+**2. For entirely new (untracked) files assigned to this commit:**
 
 ```bash
 git -C <repo-root> add -- <file>
 ```
 
-**4. Commit:**
+**3. Commit:**
 
 ```bash
 git -C <repo-root> commit -m "<subject>" -m "<body if any>"
 ```
 
-**5. Confirm:**
+**4. Confirm:**
 
 ```bash
 git -C <repo-root> log --oneline -1
