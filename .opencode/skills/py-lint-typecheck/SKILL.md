@@ -31,8 +31,8 @@ The user must specify a folder or file to run this on. If they haven't, ask:
 Locate the `pyproject.toml` by searching the target path and walking up to parent directories:
 
 ```bash
-# search from target path upward
-path=<target_path>; while [ "$path" != "/" ]; do [ -f "$path/pyproject.toml" ] && echo "$path/pyproject.toml" && break; path=$(dirname "$path"); done
+# search from target path upward (uses only shell builtins — no dirname needed)
+path=<target_path>; while [ "$path" != "/" ] && [ "$path" != "." ]; do [ -f "$path/pyproject.toml" ] && echo "$path/pyproject.toml" && break; path="${path%/*}"; [ -z "$path" ] && path="/"; done
 ```
 
 **Case A — No `pyproject.toml` found:**
