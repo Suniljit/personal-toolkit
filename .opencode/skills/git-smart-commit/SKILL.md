@@ -1,224 +1,180 @@
 ---
 name: git-smart-commit
-description: "Intelligently group changed file hunks into multiple logical commits by sub-feature, generate a commit message for each group, confirm with the user, then execute commits sequentially using hunk-level staging. Use this skill whenever the user wants to commit multiple files intelligently, stage changes into grouped commits, auto-group files by feature or concern, or says things like \"smart commit\", \"group my changes\", \"commit my changes into logical groups\", \"multi-commit\", or \"commit related files together\". Also trigger when the user says \"commit all my changes\" or \"commit everything\" and there are multiple changed files — grouping is almost always better than one big commit. Always use this skill — don't try to handle multi-commit grouping from scratch without it. IMPORTANT: When this skill triggers, do NOT ask the user what they want to do or request clarification — immediately begin Step 1 by locating the repository and discovering changed files. The skill is self-directing; jump straight in."
+description: Intelligently group all changed files in a branch into logically sequenced commits, each with a meaningful commit message. Use this skill when the user wants to commit multiple files at once with smart grouping, says things like "smart commit", "group my changes into commits", "git-smart-commit", "batch commit my changes", "commit everything intelligently", or "organise my changes into commits". Also trigger when the user has many changed files and wants them committed in a logical order following developer workflow conventions (plans → config → core logic → tests → docs). Always use this skill — don't try to handle multi-file grouped commits from scratch without it.
 ---
 
 # Git Smart Commit Skill
 
-Stages and commits changed hunks across one or more logical sub-feature commits, each with its own commit message. Designed for AI-agent-generated codebases where a single file is often modified for multiple independent reasons, making file-level grouping insufficient — hunk-level staging is the default.
-
-## Key concept: hunk-level staging
-
-A single file may appear in multiple commits. For example, `config.py` touched by both a database sub-feature and an auth sub-feature will contribute different hunks to each commit. This is done using `git apply --cached` with filtered patch files — not interactive `git add -p`.
+Scans all changed files in the current branch, presents them for selection, reads each file to understand its purpose, groups them into logically sequenced commits, confirms the full plan with the user, then executes the commits one by one.
 
 ---
 
 ## Workflow
 
-> **Start immediately.** When this skill is invoked, do not ask the user what they want — go straight to Step 1.
+### Step 1: Discover changed files
 
-### Step 1: Locate the repository
+Find the repo root and list all changed/untracked files relative to HEAD (or the branch base):
 
 ```bash
 git rev-parse --show-toplevel
-# or
-git -C <dir> rev-parse --show-toplevel
+git status --short
 ```
 
----
-
-### Step 2: Discover all changed files
+Also check for changes vs the branch base (files changed since branching off):
 
 ```bash
-git -C <repo-root> status --short
-git -C <repo-root> diff HEAD --name-only
-git -C <repo-root> ls-files --others --exclude-standard
+git diff --name-status $(git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null || echo HEAD) 2>/dev/null || git status --short
 ```
 
-If there are no changes, tell the user and stop.
+Present a **numbered list** of all changed/untracked files to the user:
+
+```
+I found the following changed files:
+
+  1. src/auth/jwt.py              (modified)
+  2. src/auth/refresh.py          (new file)
+  3. src/models/user.py           (modified)
+  4. tests/test_auth.py           (new file)
+  5. config/settings.py           (modified)
+  6. docs/auth.md                 (new file)
+  7. README.md                    (modified)
+
+Which files would you like to include? Reply with numbers (e.g. "1, 3"), "all", or a range like "1-3".
+```
+
+Wait for the user's selection. Accept:
+- `all` → include every file listed
+- `1, 3, 5` or `1 3 5` → specific items
+- `1-5` → a range
+- `2` → just one file
+
+If a number doesn't exist, point it out and ask the user to re-select.
 
 ---
 
-### Step 3: Present the file list and ask for selection
+### Step 2: Read and understand each selected file
 
-Show a numbered list with status:
-
-```
-Changed files:
-
-  1. src/auth/login.py          (modified)
-  2. src/auth/logout.py         (modified)
-  3. src/config.py              (modified)
-  4. src/models/user.py         (modified)
-  5. tests/test_auth.py         (modified)
-  6. pyproject.toml             (modified)
-
-Which files to include? Reply with "all", numbers like "1, 3, 5", or a range like "1-4".
-```
-
-Wait for reply. Validate selections — flag out-of-range numbers and re-ask.
-
----
-
-### Step 4: Extract and parse diffs into hunks
-
-For each selected file, extract the full diff and parse it into individual hunks:
+For each selected file, read its content to understand what it does:
 
 ```bash
-# Modified files
+# For modified tracked files — show the diff
 git -C <repo-root> diff HEAD -- <file>
 
-# Staged files
+# For new untracked files — show full content
+cat <file>
+
+# For staged files
 git -C <repo-root> diff --cached -- <file>
-
-# New untracked files (treat entire file as one hunk)
-git -C <repo-root> diff --no-index /dev/null <file>
 ```
 
-Parse each diff into hunks using the `@@` markers. Each hunk should be understood in terms of:
-- What it does (read the actual lines changed)
-- Which sub-feature or concern it likely belongs to
-
-**Flagging mixed hunks:** If a hunk appears to touch two unrelated concerns within the same block of lines (e.g., an AI agent interleaved two features in one function), flag it explicitly to the user:
-
-```
-⚠️  src/config.py hunk @@ -45,12 +45,18 @@ appears to mix database config
-    and logging config changes. I'll assign it to the most dominant concern,
-    but you may want to review it manually.
-```
+Also check file paths and names for context (e.g. `migrations/`, `tests/`, `*.config.js`, `README.md`).
 
 ---
 
-### Step 5: Propose commit groups
+### Step 3: Group files into logical commits
 
-Group hunks (not files) into logical sub-feature commits. Each commit should represent one coherent unit of change.
+Using the file content and paths, group files into commits following this **sequencing convention** (order from first to last commit):
 
-**Grouping heuristics:**
-- Group by sub-feature: all hunks implementing the same behaviour belong together, even across files
-- Configuration/dependency changes (e.g. `pyproject.toml`, `config.py`) belong with the sub-feature that introduced them
-- Shared utility changes that serve multiple sub-features: assign to the most dominant sub-feature, or make a separate `refactor`/`chore` commit
-- Documentation belongs with the feature it documents, or grouped together if generic
+| Priority | Group type | Examples |
+|---|---|---|
+| 1 | **Plans / specs / scaffolding** | `PLAN.md`, `SPEC.md`, `TODO.md`, `architecture.*`, `schema.*` |
+| 2 | **Configuration & environment** | `*.config.*`, `.env.*`, `settings.*`, `constants.*`, `pyproject.toml`, `package.json`, `Dockerfile`, `*.yaml`/`*.yml` (non-CI) |
+| 3 | **Database / data models** | `models/`, `migrations/`, `schema.sql`, ORM model files |
+| 4 | **Core logic / features** | Business logic, services, controllers, utilities — grouped by sub-feature |
+| 5 | **API / interfaces** | Routes, endpoints, views, serializers — grouped by sub-feature |
+| 6 | **Tests** | Unit tests, integration tests — grouped with the feature they test if closely related, otherwise as a batch |
+| 7 | **CI / build / tooling** | `.github/`, `Makefile`, `scripts/`, `*.sh` |
+| 8 | **Documentation** | `docs/`, `*.md` (non-README) |
+| 9 | **README** | `README.md` always last |
 
-**Commit ordering — follow this sequence strictly:**
+**Grouping rules:**
+- Files that belong to the **same sub-feature or task** go in the **same commit** (e.g. `auth/jwt.py` + `auth/refresh.py` are both auth features)
+- **Configuration changes** that are required by a feature should be committed just before or alongside that feature, not lumped with all other config
+- **Tests** for a specific feature can be grouped with that feature's commit, or batched together if they span multiple features
+- **Plans and specs** always go first — they describe intent before implementation
+- **README** always goes last — it documents the finished state
 
-```
-1. Planning / spec docs     (plan.md, DESIGN.md, spec files, ADRs, etc.)
-2. Sub-feature 1            (implementation + its config/deps)
-3. Sub-feature 2            (implementation + its config/deps)
-   ... (additional sub-features in logical dependency order)
-N-1. Tests                  (all test files, regardless of which sub-feature they cover)
-N.   README / docs          (README.md and other doc-only changes, always last)
-```
-
-If no planning doc or README is present, simply omit those slots. Never place tests before the implementation they test, and never place README changes before tests.
-
-**First, generate a commit message for each group** before showing the proposal. Apply Conventional Commits format (see below) to every group, then present the full plan as a compact, scannable list:
-
-```
-Proposed commits (3):
-
-  #1  feat(auth): add JWT refresh token support
-      src/auth/login.py        add refresh() method
-      src/auth/logout.py       invalidate refresh token on logout
-      src/models/user.py       add refresh_token field
-      src/config.py            add JWT_REFRESH_SECRET config
-      pyproject.toml           add PyJWT dependency
-
-  #2  test(auth): add unit tests for JWT refresh flow
-      tests/test_auth.py       new test class for refresh flow
-
-  #3  chore: update project metadata
-      pyproject.toml           bump version
-      README.md                update auth section
-
-Edit a commit, move a hunk, split or merge groups, or say "go ahead" to commit.
-```
-
-Note: a file appearing in multiple commits is expected and correct.
+If a file doesn't obviously fit a group, use its path and content to make the best judgment call.
 
 ---
 
-### Step 6: Confirm or iterate
+### Step 4: Present the full commit plan — MANDATORY STOP
 
-> ⛔ Do NOT run any `git add`, `git apply`, or `git commit` commands until Step 7.
+> ⛔ **DO NOT run any `git add` or `git commit` commands until the user explicitly approves the plan in this step.**
 
-The user should review the full list of commit messages and their associated files before anything is executed. Wait for explicit approval or edit requests.
+Present the proposed commit sequence clearly:
 
-Accept and apply these requests:
-- Move a hunk from one commit to another ("move the config.py hunk to #1")
-- Rewrite a commit message
-- Split a commit into two
-- Merge two commits into one
-- Reorder commits
-- Remove a hunk from all commits (exclude it)
+```
+Here's my proposed commit plan (6 commits, in order):
 
-Re-present the **complete updated list** (all commits, all messages, all files) after every change. Keep iterating until the user approves with "go ahead", "yes", "ship it", or equivalent.
+──────────────────────────────────────
+Commit 1 of 6
+  Files: config/settings.py
+  
+  chore(config): add JWT token expiry and refresh settings
+──────────────────────────────────────
+Commit 2 of 6
+  Files: src/models/user.py
+
+  feat(models): add refresh_token field to User model
+──────────────────────────────────────
+Commit 3 of 6
+  Files: src/auth/jwt.py, src/auth/refresh.py
+
+  feat(auth): implement JWT issuance and refresh token rotation
+
+  Introduces stateless JWT auth with short-lived access tokens.
+  Refresh tokens rotate on use to limit exposure window.
+──────────────────────────────────────
+Commit 4 of 6
+  Files: tests/test_auth.py
+
+  test(auth): add unit tests for JWT issuance and token rotation
+──────────────────────────────────────
+Commit 5 of 6
+  Files: docs/auth.md
+
+  docs: add authentication flow documentation
+──────────────────────────────────────
+Commit 6 of 6
+  Files: README.md
+
+  docs: update README with auth setup instructions
+──────────────────────────────────────
+
+Does this plan look good? You can say "ok" to proceed, or give me feedback to adjust the groupings or messages.
+```
+
+**Wait for an explicit "ok" or clear approval** before proceeding. Any feedback, questions, or partial responses count as a "no" — update the plan and show it again.
+
+If the user asks to:
+- **Merge commits** → combine the files and write a new message covering both
+- **Split a commit** → separate into two entries with distinct messages
+- **Reorder commits** → renumber and re-present
+- **Change a message** → update and re-present the full plan
+
+Always re-present the **full updated plan** and wait for fresh approval after any change.
 
 ---
 
-### Step 7: Execute commits sequentially
+### Step 5: Execute commits sequentially
 
-Once the user approves in Step 6 — that is the confirmation. Do not ask again.
+Once the user says "ok":
 
-Process each commit **in order**:
-
-#### For each commit:
-
-**1. Determine staging strategy per file:**
-
-For each file contributing to this commit, check whether **all** of that file's hunks are assigned to this commit (i.e. none of its hunks appear in other commits).
-
-- **Whole-file staging** (all hunks belong to this commit):
-  ```bash
-  git -C <repo-root> add -- <file>
-  ```
-  Use this whenever possible — it's simpler and less error-prone.
-
-- **Hunk-level staging** (only some hunks belong to this commit):
-  ```bash
-  # Extract the full diff for this file
-  git -C <repo-root> diff HEAD -- <file> > /tmp/full_<file_slug>.patch
-
-  # Filter to only the hunks assigned to this commit,
-  # preserving the file header lines (---, +++)
-  # Write to: /tmp/commit_<n>_<file_slug>.patch
-
-  git -C <repo-root> apply --cached /tmp/commit_<n>_<file_slug>.patch
-  ```
-  Only use patch filtering when the file genuinely splits across commits.
-
-**2. For entirely new (untracked) files assigned to this commit:**
+For each commit in order, without pausing between them:
 
 ```bash
-git -C <repo-root> add -- <file>
+# Stage only the specific files for this commit
+git -C <repo-root> add -- <file1> <file2> ...
+
+# Commit with the agreed message
+git -C <repo-root> commit -m "<subject>" -m "<body>"
 ```
 
-**3. Commit:**
+After all commits are done, show a summary:
 
 ```bash
-git -C <repo-root> commit -m "<subject>" -m "<body if any>"
-```
-
-**4. Confirm:**
-
-```bash
-git -C <repo-root> log --oneline -1
-```
-
-Show the one-line confirmation before moving to the next commit.
-
----
-
-### Step 8: Final summary
-
-After all commits:
-
-```
-Done! Created 3 commits:
-
-  a1b2c3d  feat(auth): add JWT refresh token support
-  e4f5g6h  test(auth): add unit tests for JWT refresh flow
-  i7j8k9l  chore: update project metadata
+git -C <repo-root> log --oneline -<n>   # show all commits just made
 ```
 
 ---
@@ -230,15 +186,15 @@ Follow Conventional Commits:
 ```
 <type>(<optional scope>): <short summary>
 
-<optional body — explain WHY, not WHAT>
+<optional body — explain WHY, not WHAT, if non-obvious>
 ```
 
-**Types:** `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`, `build`
+**Types**: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`, `build`
 
 Rules:
-- Subject ≤ 72 characters, imperative mood ("add", not "added")
-- Be specific — avoid "update files" or "fix stuff"
-- Body is optional but useful for non-obvious changes
+- Subject line ≤ 72 characters, imperative mood ("add", not "added")
+- Be specific — avoid vague messages like "update files"
+- Body only when the WHY is non-obvious
 
 ---
 
@@ -246,25 +202,21 @@ Rules:
 
 | Situation | How to handle |
 |---|---|
-| A hunk spans two concerns | Flag it to the user; assign to dominant concern |
-| Entire new file | Treat as a single hunk; assign to the sub-feature that introduced it |
-| Only one logical group | Still follow the full workflow — one commit |
-| Binary file | Note it's binary; write message based on filename/context; stage with `git add` |
-| File has no diff vs HEAD | Exclude it; tell the user |
-| Repo in detached HEAD state | Warn the user before proceeding |
-| Nothing staged after apply | Tell the user and skip that commit |
-| `git apply --cached` fails | Show the error; ask user whether to skip this hunk or assign it elsewhere |
-| User wants to amend last commit | Out of scope; suggest `git commit --amend` manually |
-| Files span multiple repos | Handle each repo as a separate session |
+| File has no diff vs HEAD | Tell the user, don't include it silently |
+| Only one file selected | Still present the plan with a single commit for confirmation |
+| All files belong to one logical unit | Single commit is fine — say so |
+| Binary files (images, pdfs) | Note it's binary; write message from filename/context |
+| Repo in detached HEAD state | Warn the user before committing |
+| File appears in multiple logical groups | Use its content to assign it to the most dominant group |
+| User selects a number that doesn't exist | Point out the invalid selection and ask to re-select |
+| Merge conflict markers present | Warn the user — don't commit files with unresolved conflicts |
 
 ---
 
 ## Important constraints
 
-- **Never commit without explicit user approval at Step 7.** No exceptions.
-- **Never use `git add -A` or `git add .`** — always stage explicitly by patch or path.
-- **Commits execute in the approved order.** Do not reorder during execution.
-- Do not push. Local commits only unless the user explicitly asks.
-- Do not modify `.gitignore` or any file outside the user's selected set.
-- Do not use third-party git libraries — use git CLI directly.
-- Clean up all `/tmp/` patch files after execution completes.
+- **Never commit without explicit user "ok" in Step 4.** This is the most important rule. Do not skip or abbreviate the confirmation step.
+- **Only stage the files the user selected.** Never stage additional files not in the plan.
+- Do not push. Commit locally only unless the user explicitly asks to push.
+- Do not modify `.gitignore` or any other file as part of this workflow.
+- Do not use any third-party git libraries — interact with git directly via the command line.
