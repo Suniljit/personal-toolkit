@@ -69,7 +69,7 @@ One or two sentences describing what this slice delivers end-to-end. Focus on ob
 
 ## Branch name
 
-`feature/<slug>` — e.g. `feature/add-user-invite-api`
+`feat/<slug>` — e.g. `feat/add-user-invite-api`
 
 ## What to build
 

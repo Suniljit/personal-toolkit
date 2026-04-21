@@ -82,6 +82,7 @@ Output each ticket as a Markdown block. Use this structure:
 **Type:** Feature | Bug | Chore | Spike  
 **Component:** [Affected module, service, or area — inferred from codebase if possible]  
 **Priority:** High | Medium | Low  
+**Suggested Git Branch:** `[type]/[short-kebab-case-description]` *(e.g. `feat/dark-mode-toggle`, `fix/session-logout-bug`)*  
 
 ### Description
 
@@ -151,5 +152,6 @@ Before outputting tickets, verify:
 - [ ] Description is self-contained (readable without prior context)
 - [ ] Acceptance criteria are concrete and testable
 - [ ] Component/area is accurate (cross-checked with codebase if available)
+- [ ] Suggested git branch follows `type/short-kebab-case` convention and matches ticket type
 - [ ] Notes section omitted if nothing meaningful to add
 - [ ] No ticket is trying to do too many things at once
