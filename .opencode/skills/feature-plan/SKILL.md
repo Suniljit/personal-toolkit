@@ -53,6 +53,7 @@ Rules:
 - If a ticket was provided, use it as the baseline — focus questions on gaps, ambiguities,
   and decisions not yet made in the ticket
 - Track all decisions made, especially any that **deviate from the ticket** (needed in Step 5)
+- Always use your question tool. 
 
 Continue until the design feels fully resolved. When ready to move on, ask:
 
