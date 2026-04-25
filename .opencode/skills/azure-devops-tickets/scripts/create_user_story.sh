@@ -3,14 +3,16 @@
 # Creates an Azure DevOps User Story via REST API using a PAT token.
 # Config is loaded from config.env in the skill root directory.
 #
-# Content is passed through exactly as provided — no conversion or modification.
+# --description and --acceptance-criteria are written in Markdown.
+# They are converted to HTML before sending so Azure DevOps renders them properly.
+# All other content (title, tags) is passed through exactly as provided.
 #
 # Usage:
 #   ./scripts/create_user_story.sh \
 #     --title "Your story title" \
-#     --description "Your description" \
-#     --acceptance-criteria "Your acceptance criteria" \
-#     --tag "your-tag"
+#     --description "Description in **Markdown**" \
+#     --acceptance-criteria "- [ ] Criterion one" \
+#     [--tag "your-tag"]
 #
 # --title, --description, and --acceptance-criteria are required. --tag is optional.
 
@@ -38,11 +40,16 @@ for var in AZURE_DEVOPS_PAT AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT; do
 done
 
 # ── Check required tools ─────────────────────────────────────────────────────
-if ! command -v jq &>/dev/null; then
-  echo "ERROR: 'jq' is required but not installed."
-  echo "  macOS: brew install jq  |  Linux: sudo apt-get install jq"
-  exit 1
-fi
+for tool in jq pandoc; do
+  if ! command -v "$tool" &>/dev/null; then
+    echo "ERROR: '$tool' is required but not installed."
+    case "$tool" in
+      jq)     echo "  macOS: brew install jq      | Linux: sudo apt-get install jq" ;;
+      pandoc) echo "  macOS: brew install pandoc  | Linux: sudo apt-get install pandoc" ;;
+    esac
+    exit 1
+  fi
+done
 
 # ── Parse arguments ──────────────────────────────────────────────────────────
 TITLE=""
@@ -73,6 +80,17 @@ for arg_name in TITLE DESCRIPTION ACCEPTANCE_CRITERIA; do
   fi
 done
 
+# ── Convert Markdown → HTML for rich-text fields ─────────────────────────────
+# Title and tags are plain text — passed through as-is.
+# Description and Acceptance Criteria are Markdown — converted to HTML so
+# Azure DevOps renders them properly (bold, lists, checkboxes, etc.).
+md_to_html() {
+  printf '%s' "$1" | pandoc --from=markdown --to=html --no-highlight 2>/dev/null
+}
+
+DESCRIPTION_HTML=$(md_to_html "$DESCRIPTION")
+AC_HTML=$(md_to_html "$ACCEPTANCE_CRITERIA")
+
 # ── Build the API URL ────────────────────────────────────────────────────────
 ENCODED_PROJECT="${AZURE_DEVOPS_PROJECT// /%20}"
 API_URL="https://dev.azure.com/${AZURE_DEVOPS_ORG}/${ENCODED_PROJECT}/_apis/wit/workitems/\$User%20Story?api-version=7.1"
@@ -83,8 +101,8 @@ AUTH_HEADER=$(printf '%s' ":${AZURE_DEVOPS_PAT}" | base64)
 # ── Build the JSON patch document ────────────────────────────────────────────
 PAYLOAD=$(jq -n \
   --arg title "$TITLE" \
-  --arg desc  "$DESCRIPTION" \
-  --arg ac    "$ACCEPTANCE_CRITERIA" \
+  --arg desc  "$DESCRIPTION_HTML" \
+  --arg ac    "$AC_HTML" \
   --arg tag   "$TAG" \
   '[
     {"op": "add", "path": "/fields/System.Title",                             "value": $title},
