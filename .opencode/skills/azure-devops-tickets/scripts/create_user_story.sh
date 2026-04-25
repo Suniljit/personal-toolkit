@@ -5,14 +5,15 @@
 #
 # --description and --acceptance-criteria are written in Markdown.
 # They are converted to HTML before sending so Azure DevOps renders them properly.
-# All other content (title, tags) is passed through exactly as provided.
+# Title is passed through exactly as provided.
+# --tag is optional; omit it and no tag is set on the work item.
 #
 # Usage:
 #   ./scripts/create_user_story.sh \
 #     --title "Your story title" \
 #     --description "Description in **Markdown**" \
 #     --acceptance-criteria "- [ ] Criterion one" \
-#     [--tag "your-tag"]
+#     [--tag "DS"]
 #
 # --title, --description, and --acceptance-criteria are required. --tag is optional.
 
@@ -81,9 +82,6 @@ for arg_name in TITLE DESCRIPTION ACCEPTANCE_CRITERIA; do
 done
 
 # ── Convert Markdown → HTML for rich-text fields ─────────────────────────────
-# Title and tags are plain text — passed through as-is.
-# Description and Acceptance Criteria are Markdown — converted to HTML so
-# Azure DevOps renders them properly (bold, lists, checkboxes, etc.).
 md_to_html() {
   printf '%s' "$1" | pandoc --from=markdown --to=html --no-highlight 2>/dev/null
 }
@@ -99,17 +97,31 @@ API_URL="https://dev.azure.com/${AZURE_DEVOPS_ORG}/${ENCODED_PROJECT}/_apis/wit/
 AUTH_HEADER=$(printf '%s' ":${AZURE_DEVOPS_PAT}" | base64)
 
 # ── Build the JSON patch document ────────────────────────────────────────────
-PAYLOAD=$(jq -n \
-  --arg title "$TITLE" \
-  --arg desc  "$DESCRIPTION_HTML" \
-  --arg ac    "$AC_HTML" \
-  --arg tag   "$TAG" \
-  '[
-    {"op": "add", "path": "/fields/System.Title",                             "value": $title},
-    {"op": "add", "path": "/fields/System.Description",                       "value": $desc},
-    {"op": "add", "path": "/fields/Microsoft.VSTS.Common.AcceptanceCriteria", "value": $ac},
-    {"op": "add", "path": "/fields/System.Tags",                              "value": $tag}
-  ]')
+# Always include title, description, and AC.
+# Only include the Tags field if a tag was provided.
+if [[ -n "$TAG" ]]; then
+  PAYLOAD=$(jq -n \
+    --arg title "$TITLE" \
+    --arg desc  "$DESCRIPTION_HTML" \
+    --arg ac    "$AC_HTML" \
+    --arg tag   "$TAG" \
+    '[
+      {"op": "add", "path": "/fields/System.Title",                             "value": $title},
+      {"op": "add", "path": "/fields/System.Description",                       "value": $desc},
+      {"op": "add", "path": "/fields/Microsoft.VSTS.Common.AcceptanceCriteria", "value": $ac},
+      {"op": "add", "path": "/fields/System.Tags",                              "value": $tag}
+    ]')
+else
+  PAYLOAD=$(jq -n \
+    --arg title "$TITLE" \
+    --arg desc  "$DESCRIPTION_HTML" \
+    --arg ac    "$AC_HTML" \
+    '[
+      {"op": "add", "path": "/fields/System.Title",                             "value": $title},
+      {"op": "add", "path": "/fields/System.Description",                       "value": $desc},
+      {"op": "add", "path": "/fields/Microsoft.VSTS.Common.AcceptanceCriteria", "value": $ac}
+    ]')
+fi
 
 # ── Make the API call ────────────────────────────────────────────────────────
 echo "Creating User Story in project: ${AZURE_DEVOPS_PROJECT} (org: ${AZURE_DEVOPS_ORG})"

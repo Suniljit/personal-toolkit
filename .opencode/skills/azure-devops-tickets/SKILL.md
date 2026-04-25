@@ -5,9 +5,9 @@ description: >
   Use this skill whenever the user wants to create, generate, push, fetch, read, or look up
   a task ticket, user story, or work item in Azure DevOps — including phrases like "log a ticket",
   "create a story in ADO", "add a work item", "get ticket #1234", "fetch that story", or
-  "show me work item 99". All ticket content (title, description, acceptance criteria, tags)
-  is passed through exactly as provided by the user — Claude must not reword, reformat, or
-  otherwise modify any field values. Config (PAT, org, project) lives in config.env.
+  "show me work item 99". Title is passed through verbatim. Description and Acceptance Criteria
+  are provided in Markdown and converted to HTML so Azure DevOps renders them properly.
+  Config (PAT, org, project) lives in config.env.
 ---
 
 # Azure DevOps Ticket Skill
@@ -16,7 +16,7 @@ Two scripts sharing one config:
 
 | Script | What it does |
 |--------|-------------|
-| `scripts/create_user_story.sh` | Creates a User Story — passes all fields through verbatim |
+| `scripts/create_user_story.sh` | Creates a User Story with Title, Description, Acceptance Criteria |
 | `scripts/get_work_item.sh` | Fetches any work item by ID and prints it as Markdown |
 
 ## Skill file layout
@@ -50,39 +50,61 @@ azure-devops-tickets/
    chmod +x scripts/create_user_story.sh scripts/get_work_item.sh
    ```
 
-3. **Install `jq`** (only dependency):
+3. **Install dependencies** (`jq` and `pandoc`):
 
    ```bash
    # macOS
-   brew install jq
+   brew install jq pandoc
    # Ubuntu/Debian
-   sudo apt-get install jq
+   sudo apt-get install jq pandoc
    ```
 
 ---
 
 ## Creating a User Story
 
-### CRITICAL: Pass content through exactly as given
+### Fields
 
-Claude must pass the user's title, description, acceptance criteria, and tag **verbatim** to the script — no rewording, no reformatting, no converting. Whatever the user provides is what goes into Azure DevOps.
+| Flag | Required | Behaviour |
+|------|----------|-----------|
+| `--title` | ✅ | Passed through verbatim |
+| `--description` | ✅ | Markdown → converted to HTML for rendering in ADO |
+| `--acceptance-criteria` | ✅ | Markdown → converted to HTML for rendering in ADO |
+
+### How Claude should populate fields
+
+- **Title**: use the title exactly as provided by the user
+- **Description**: everything the user provides that is not the title or acceptance criteria
+- **Acceptance Criteria**: only the acceptance criteria items as provided by the user
+
+### Example
 
 ```bash
-./scripts/create_user_story.sh \
+DESC=$(cat << 'MARKDOWN'
+**Type:** Feature
+**Priority:** Medium
+
+## Description
+Users should be able to self-serve password resets via email link.
+
+## Notes
+* Reset link expires after 30 minutes
+* Link is single-use only
+MARKDOWN
+)
+
+AC=$(cat << 'MARKDOWN'
+- [ ] User receives reset email within 60 seconds
+- [ ] Link expires after 30 minutes
+- [ ] Reusing the link shows an error
+MARKDOWN
+)
+
+bash scripts/create_user_story.sh \
   --title "As a user, I want to reset my password" \
-  --description "Users should be able to self-serve password resets via email link." \
-  --acceptance-criteria "- Given the user clicks Forgot password, when they enter their email, then they receive a reset link within 60 seconds" \
-  --tag "auth"
+  --description "$DESC" \
+  --acceptance-criteria "$AC"
 ```
-
-### Flags
-
-| Flag | Required | Notes |
-|------|----------|-------|
-| `--title` | ✅ | Passed through as-is |
-| `--description` | ✅ | Passed through as-is |
-| `--acceptance-criteria` | ✅ | Passed through as-is |
-| `--tag` | ✅ | Passed through as-is; semicolon-separated for multiple: `"auth; sprint-3"` |
 
 ### Successful output
 
@@ -100,62 +122,10 @@ Title: As a user, I want to reset my password
 ## Fetching a work item
 
 ```bash
-./scripts/get_work_item.sh --id 4821
+bash scripts/get_work_item.sh --id 4821
 ```
 
-Fetches the work item and prints all key fields to stdout.
-
-### Successful output
-
-```
-# [#4821] As a user, I want to reset my password
-
-| Field        | Value          |
-|--------------|----------------|
-| **Type**     | User Story     |
-| **State**    | Active         |
-| ...          | ...            |
-
-## Description
-...
-
-## Acceptance Criteria
-...
-```
-
----
-
-## How Claude should use this skill
-
-**To create:** take the user's fields exactly as given and pass them straight to `create_user_story.sh`. Do not paraphrase, clean up, reformat, or improve the content in any way.
-
-**To fetch:** run `get_work_item.sh --id <N>` and present the output to the user.
-
-### Passing multi-line content in bash_tool
-
-Use a heredoc to safely pass multi-line values without shell interpretation:
-
-```bash
-DESC=$(cat << 'MARKDOWN'
-Users need CSV export from the reports screen.
-
-- Max 10,000 rows
-- Comma-delimited format
-MARKDOWN
-)
-
-AC=$(cat << 'MARKDOWN'
-- Export button visible on all report pages
-- File downloads as .csv with correct headers
-MARKDOWN
-)
-
-bash scripts/create_user_story.sh \
-  --title "Export reports to CSV" \
-  --description "$DESC" \
-  --acceptance-criteria "$AC" \
-  --tag "reports; export"
-```
+Fetches the work item and prints all key fields to stdout as Markdown.
 
 ---
 
@@ -165,6 +135,7 @@ bash scripts/create_user_story.sh \
 |-------|-----|
 | `config.env not found` | Ensure `config.env` is in the skill root alongside `SKILL.md` |
 | `AZURE_DEVOPS_PAT is not set` | Replace the placeholder in `config.env` with your actual PAT |
+| `pandoc: command not found` | `brew install pandoc` or `sudo apt-get install pandoc` |
 | `jq: command not found` | `brew install jq` or `sudo apt-get install jq` |
 | `401 Unauthorized` | PAT expired or missing Work Items scope — regenerate it |
 | `404 Not Found` | Check org/project spelling in `config.env`; verify the work item ID exists |
