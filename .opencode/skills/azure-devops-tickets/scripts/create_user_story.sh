@@ -3,17 +3,16 @@
 # Creates an Azure DevOps User Story via REST API using a PAT token.
 # Config is loaded from config.env in the skill root directory.
 #
-# Description and Acceptance Criteria are written in Markdown and
-# automatically converted to HTML before sending to Azure DevOps.
+# Content is passed through exactly as provided — no conversion or modification.
 #
 # Usage:
 #   ./scripts/create_user_story.sh \
 #     --title "Your story title" \
-#     --description "Story description in **Markdown**" \
-#     --acceptance-criteria "- [ ] Criterion one\n- [ ] Criterion two" \
+#     --description "Your description" \
+#     --acceptance-criteria "Your acceptance criteria" \
 #     --tag "your-tag"
 #
-# All four flags are required.
+# --title, --description, and --acceptance-criteria are required. --tag is optional.
 
 set -euo pipefail
 
@@ -39,16 +38,11 @@ for var in AZURE_DEVOPS_PAT AZURE_DEVOPS_ORG AZURE_DEVOPS_PROJECT; do
 done
 
 # ── Check required tools ─────────────────────────────────────────────────────
-for tool in jq pandoc; do
-  if ! command -v "$tool" &>/dev/null; then
-    echo "ERROR: '$tool' is required but not installed."
-    case "$tool" in
-      jq)     echo "  macOS: brew install jq      | Linux: sudo apt-get install jq" ;;
-      pandoc) echo "  macOS: brew install pandoc  | Linux: sudo apt-get install pandoc" ;;
-    esac
-    exit 1
-  fi
-done
+if ! command -v jq &>/dev/null; then
+  echo "ERROR: 'jq' is required but not installed."
+  echo "  macOS: brew install jq  |  Linux: sudo apt-get install jq"
+  exit 1
+fi
 
 # ── Parse arguments ──────────────────────────────────────────────────────────
 TITLE=""
@@ -64,44 +58,33 @@ while [[ $# -gt 0 ]]; do
     --tag)                 TAG="$2";                 shift 2 ;;
     *)
       echo "Unknown argument: $1"
-      echo "Usage: $0 --title '...' --description '...' --acceptance-criteria '...' --tag '...'"
+      echo "Usage: $0 --title '...' --description '...' --acceptance-criteria '...' [--tag '...']"
       exit 1
       ;;
   esac
 done
 
 # ── Validate required arguments ──────────────────────────────────────────────
-for arg_name in TITLE DESCRIPTION ACCEPTANCE_CRITERIA TAG; do
+for arg_name in TITLE DESCRIPTION ACCEPTANCE_CRITERIA; do
   if [[ -z "${!arg_name}" ]]; then
     echo "ERROR: --$(echo "${arg_name}" | tr '[:upper:]_' '[:lower:]-') is required"
-    echo "Usage: $0 --title '...' --description '...' --acceptance-criteria '...' --tag '...'"
+    echo "Usage: $0 --title '...' --description '...' --acceptance-criteria '...' [--tag '...']"
     exit 1
   fi
 done
 
-# ── Convert Markdown → HTML (pandoc, no wrapping document) ──────────────────
-md_to_html() {
-  printf '%s' "$1" | pandoc --from=markdown --to=html --no-highlight 2>/dev/null
-}
-
-DESCRIPTION_HTML=$(md_to_html "$DESCRIPTION")
-AC_HTML=$(md_to_html "$ACCEPTANCE_CRITERIA")
-
 # ── Build the API URL ────────────────────────────────────────────────────────
-# URL-encode the project name (replace spaces with %20)
 ENCODED_PROJECT="${AZURE_DEVOPS_PROJECT// /%20}"
 API_URL="https://dev.azure.com/${AZURE_DEVOPS_ORG}/${ENCODED_PROJECT}/_apis/wit/workitems/\$User%20Story?api-version=7.1"
 
 # ── Build the Basic Auth header ──────────────────────────────────────────────
-# Azure DevOps PAT auth: empty username, PAT as password, Base64-encoded
 AUTH_HEADER=$(printf '%s' ":${AZURE_DEVOPS_PAT}" | base64)
 
 # ── Build the JSON patch document ────────────────────────────────────────────
-# Tags use semicolons as separator for multiple tags.
 PAYLOAD=$(jq -n \
   --arg title "$TITLE" \
-  --arg desc  "$DESCRIPTION_HTML" \
-  --arg ac    "$AC_HTML" \
+  --arg desc  "$DESCRIPTION" \
+  --arg ac    "$ACCEPTANCE_CRITERIA" \
   --arg tag   "$TAG" \
   '[
     {"op": "add", "path": "/fields/System.Title",                             "value": $title},
