@@ -72,9 +72,14 @@ Flag specific code that automated review cannot fully assess and that the human 
 - **Tests that need human judgement** — Test coverage gaps for critical paths, or tests that pass but may not actually validate the right thing.
 
 Format each item as:
+
+```
+---------------------------------------------------------
 > 📍 `path/to/file.ext` line X–Y
 > **Why**: one sentence on why this needs a human eye.
 > **What to check**: the specific thing the reviewer should verify or confirm.
+---------------------------------------------------------
+```
 
 If there's nothing requiring manual review, say so explicitly: "Nothing flagged for manual review — automated analysis covers the full scope of this diff."
 
