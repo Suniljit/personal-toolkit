@@ -13,18 +13,61 @@ Scans all changed files in the current branch, presents them for selection, read
 
 ### Step 1: Discover changed files
 
-Find the repo root and list all changed/untracked files relative to HEAD (or the branch base):
+Find the repo root and list all changed/untracked files.
 
 ```bash
 git rev-parse --show-toplevel
 git status --short
 ```
 
-Also check for changes vs the branch base (files changed since branching off):
+**Finding the correct branch base (stacked branch safe):**
+
+Use the upstream tracking branch if set, otherwise fall back to detecting the closest ancestor branch:
 
 ```bash
-git diff --name-status $(git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null || echo HEAD) 2>/dev/null || git status --short
+# Preferred: use the upstream of the current branch (works for stacked branches)
+git merge-base HEAD @{upstream} 2>/dev/null
+
+# Fallback: find the closest ancestor among all local/remote branches
+# (excludes HEAD itself, picks the branch whose tip is closest to HEAD)
+git log --oneline HEAD | tail -1  # just for context
+
+# Reliable fallback that works for stacked branches:
+# List all branch tips except the current one, find the one with the most
+# recent common ancestor with HEAD — that's the parent branch.
+PARENT=$(git log --oneline HEAD --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "$(git symbolic-ref HEAD)") 2>/dev/null | tail -1 | awk '{print $1}')
+# Then use: git diff --name-status $PARENT
 ```
+
+In practice, run this sequence and use the first that succeeds:
+
+```bash
+# 1. If upstream is set, use it
+BASE=$(git merge-base HEAD @{upstream} 2>/dev/null)
+
+# 2. Otherwise, find the nearest ancestor branch tip
+if [ -z "$BASE" ]; then
+  CURRENT=$(git rev-parse --abbrev-ref HEAD)
+  BASE=$(git log --oneline HEAD \
+    --not $(git for-each-ref --format='%(objectname)' refs/heads/ \
+            | grep -v $(git rev-parse HEAD)) 2>/dev/null \
+    | tail -1 | awk '{print $1}')
+fi
+
+# 3. Final fallback: just diff against working tree (unstaged+staged only)
+if [ -z "$BASE" ]; then
+  git status --short
+fi
+```
+
+Then get changed files relative to that base:
+
+```bash
+git diff --name-status $BASE HEAD   # committed changes on this branch only
+git status --short                  # uncommitted changes on top
+```
+
+Combine and deduplicate both lists to get the full set of files touched on this branch (and not yet committed, or committed since branching).
 
 Present a **numbered list** of all changed/untracked files to the user:
 
@@ -57,8 +100,8 @@ If a number doesn't exist, point it out and ask the user to re-select.
 For each selected file, read its content to understand what it does:
 
 ```bash
-# For modified tracked files — show the diff
-git -C <repo-root> diff HEAD -- <file>
+# For modified tracked files — show only the diff against the branch base
+git -C <repo-root> diff $BASE -- <file>
 
 # For new untracked files — show full content
 cat <file>
@@ -113,11 +156,13 @@ Commit 1 of 6
   
   chore(config): add JWT token expiry and refresh settings
 ──────────────────────────────────────
+
 Commit 2 of 6
   Files: src/models/user.py
 
   feat(models): add refresh_token field to User model
 ──────────────────────────────────────
+
 Commit 3 of 6
   Files: src/auth/jwt.py, src/auth/refresh.py
 
@@ -126,16 +171,19 @@ Commit 3 of 6
   Introduces stateless JWT auth with short-lived access tokens.
   Refresh tokens rotate on use to limit exposure window.
 ──────────────────────────────────────
+
 Commit 4 of 6
   Files: tests/test_auth.py
 
   test(auth): add unit tests for JWT issuance and token rotation
 ──────────────────────────────────────
+
 Commit 5 of 6
   Files: docs/auth.md
 
   docs: add authentication flow documentation
 ──────────────────────────────────────
+
 Commit 6 of 6
   Files: README.md
 
@@ -202,7 +250,7 @@ Rules:
 
 | Situation | How to handle |
 |---|---|
-| File has no diff vs HEAD | Tell the user, don't include it silently |
+| File has no diff vs branch base | Tell the user, don't include it silently |
 | Only one file selected | Still present the plan with a single commit for confirmation |
 | All files belong to one logical unit | Single commit is fine — say so |
 | Binary files (images, pdfs) | Note it's binary; write message from filename/context |
@@ -210,6 +258,8 @@ Rules:
 | File appears in multiple logical groups | Use its content to assign it to the most dominant group |
 | User selects a number that doesn't exist | Point out the invalid selection and ask to re-select |
 | Merge conflict markers present | Warn the user — don't commit files with unresolved conflicts |
+| **Stacked branches** | Use `@{upstream}` or nearest ancestor branch as the diff base — never `main`/`master` directly. Only show files changed on the *current* branch, not the entire stack. |
+| No upstream set and branch detection is ambiguous | Show the user which base commit was detected and ask them to confirm before proceeding |
 
 ---
 
