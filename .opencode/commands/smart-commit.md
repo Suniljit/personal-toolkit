@@ -1,0 +1,1 @@
+Run /smart-git-commit on all the changes in my repo.
