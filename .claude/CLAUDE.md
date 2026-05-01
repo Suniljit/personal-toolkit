@@ -1,50 +1,64 @@
 # CLAUDE.md
 
-This file contains guidelines and best practices for using agents in Python projects.
+Behavioral guidelines to reduce common LLM coding mistakes.
 
-## Core Principles
+## 1. Think Before Coding
 
-- **Readability over cleverness** — write for a junior engineer, not to impress
-- **KISS** — simplest solution that works; avoid over-engineering
-- **DRY** — extract repeated logic into functions
-- **YAGNI** — don't build what isn't needed yet
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-## Python Standards
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-- `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_CASE` for constants
-- Type hints on all public functions and classes; always include return types
-- Return new objects instead of mutating inputs; avoid mutable default arguments
-- Raise meaningful exceptions with context (`raise ... from`)
-- Prefer early returns over deep nesting
+## 2. Simplicity First
 
-## Comments & Documentation
+**Minimum code that solves the problem. Nothing speculative.**
 
-Write for a junior engineer who can read code but may not follow non-obvious logic.
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
 
-- **Comment the why, and the non-obvious how** — skip comments on dead-obvious code, but add them wherever a junior might pause and wonder what's happening
-- Docstrings on all functions, classes, and modules
-- No banner-style comments (no `# ===`, `# ---`, `# ***` dividers)
-- No emojis or meta-commentary in comments
-- Keep comments short and inline where possible; avoid walls of text above a function
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
-```python
-# Good — explains non-obvious behaviour
-timeout = base * (2 ** attempt)  # exponential backoff; each retry waits longer
+## 3. Surgical Changes
 
-# Bad — states the obvious
-x = x + 1  # increment x by 1
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
 ```
 
-## Data & Structure
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-- Prefer `dataclasses` over raw dicts for structured data
-- Avoid magic numbers — assign them to named constants
-
-## Workflow
-
-- Plan before coding unless the task is trivial
-- Fix bugs proactively when discovered
-- Record lessons in `_lessons/lessons.md` after mistakes
+---
 
 ## Logging
 
@@ -65,9 +79,9 @@ x = x + 1  # increment x by 1
 | `ty` | Type checking |
 | `pyproject.toml` | Single source of truth |
 
-## Environment Setup
+## Python Environment Usage Setup
 
-Default Python: **3.13**. Prefer `uv run` over activating the environment and calling `python` directly.
+Prefer `uv run` over activating the environment and calling `python` directly.
 
 **pyproject.toml present:**
 ```bash
@@ -88,10 +102,6 @@ source ~/personal/bin/activate  # fallback only
 
 Reuse an existing `.venv` if present. Never mix environments or assume system Python.
 
-## Non-Negotiables
+## LLM API Usage
 
-- Always set a token limit when calling any LLM API, using the correct parameter name for that SDK (e.g. `max_tokens` for Anthropic, `max_completion_tokens` for OpenAI)
-- No wildcard imports
-- Use f-strings
-- Keep functions small and focused
-- Follow PEP 8
+- Always set a token limit when coding any LLM API calls, using the correct parameter name for that SDK (e.g. `max_tokens` for Anthropic, `max_completion_tokens` for OpenAI)
