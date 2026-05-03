@@ -72,7 +72,7 @@ class Config:
     # ... 20 more setters/getters
 ```
 
-**Fix:** Use a dataclass or a plain dict/namespace. Getters/setters for simple values are Java thinking.
+**Fix:** Use a dataclass. Getters/setters for simple values are Java thinking.
 ```python
 from dataclasses import dataclass
 
@@ -120,7 +120,7 @@ except Exception as e:
     raise CustomError("Something went wrong") from None  # loses the original error
 ```
 
-**Fix:** Either handle specifically or re-raise with context:
+**Fix:** Handle specifically or re-raise with context:
 ```python
 try:
     result = do_thing()
@@ -163,7 +163,7 @@ def is_empty(lst):
     return len(lst) == 0
 ```
 
-**Fix:** Delete. These are trivial one-liners that everyone knows. Use `lst[0] if lst else None` inline.
+**Fix:** Delete. Use `lst[0] if lst else None` inline.
 
 ---
 
@@ -172,7 +172,7 @@ def is_empty(lst):
 **Slop:**
 ```python
 MAX_RETRIES = 3
-# ... later in the code:
+# ... later:
 MAX_RETRIES = user_config.get("retries", MAX_RETRIES)
 ```
 
@@ -190,7 +190,7 @@ if user is not None:
             formatted = user.name.strip().title()
 ```
 
-**Fix:** Structure code so values are what they say they are. Use type hints and validate at entry points.
+**Fix:** Validate at entry points. Use type hints. Trust your own data inside a module.
 
 ---
 
@@ -209,7 +209,7 @@ def process_order(order):
 
 ---
 
-## 12. Import * (Star Imports)
+## 12. Star Imports
 
 **Slop:**
 ```python
@@ -234,3 +234,25 @@ log.error("User not found")
 ```
 
 **Fix:** Define error messages as constants in one place, or use an enum.
+
+---
+
+## 14. Concerns Mixed in One File
+
+**Slop:**
+```python
+# main.py — 600 lines mixing HTTP handling, business logic, DB queries, and config
+def handle_request(req):
+    # parse request
+    # validate with business rules
+    # query the database directly
+    # format and return response
+```
+
+**Fix:** Split by concern. Each layer gets its own module.
+```python
+# api/handlers.py    — parse and delegate; no business logic
+# services/orders.py — business rules; no HTTP or DB awareness
+# db/queries.py      — data access; no business logic
+# config.py          — all config; imported by whoever needs it
+```
