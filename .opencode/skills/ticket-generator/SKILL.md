@@ -1,12 +1,14 @@
 ---
 name: ticket-generator
 description: >
-  Generate structured engineering or product tickets from one or more user inputs (feature requests, bug reports, vague ideas, user stories, or requirements). Use this skill whenever the user wants to create tickets, issues, tasks, or work items — even if they say "write a ticket", "make a Jira story", "create a GitHub issue", "draft a task", "break this into tickets", or describes a feature/bug without explicitly saying "ticket". The skill checks the codebase for context, asks clarifying questions when needed, and outputs each ticket in clean Markdown with a title and description. Always trigger this skill when ticket, issue, task, or story creation is implied.
+  Generate structured engineering or product tickets from one or more user inputs (feature requests, bug reports, vague ideas, user stories, or requirements). Use this skill whenever the user wants to create tickets, issues, tasks, or work items — even if they say "write a ticket", "make a Jira story", "create a GitHub issue", "draft a task", "break this into tickets", or describes a feature/bug without explicitly saying "ticket". The skill checks the codebase for context, asks clarifying questions when needed, and outputs each ticket as a raw markdown code block ready to copy-paste. Always trigger this skill when ticket, issue, task, or story creation is implied.
 ---
 
 # Ticket Generator Skill
 
-Generate well-structured engineering or product tickets from user inputs. Handles vague ideas, feature requests, bug reports, user stories, and full requirement specs — and produces clean Markdown tickets with a **Title** and **Description** for each.
+Generate well-structured engineering or product tickets from user inputs. Handles vague ideas, feature requests, bug reports, user stories, and full requirement specs — and outputs each ticket as a **raw markdown code block** so you can copy-paste it and it renders properly wherever you paste it.
+
+Tickets use plain, friendly language — clear enough for anyone on the team to understand, not just engineers.
 
 ---
 
@@ -72,41 +74,47 @@ Example clarifications:
 
 ### Step 4 — Generate the Tickets
 
-Output each ticket as a Markdown block. Use this structure:
+Output each ticket as a **raw markdown code block** (wrapped in triple backticks with `markdown` syntax hint). This way the user can copy-paste the contents and it will render as formatted markdown in Jira, GitHub, Notion, Linear, etc.
 
+Use this structure inside the code block:
+
+````
 ```markdown
 ---
 
 ## 🎫 Ticket [N]: [Short, imperative title]
 
 **Type:** Feature | Bug | Chore | Spike  
-**Component:** [Affected module, service, or area — inferred from codebase if possible]  
+**Component:** [Affected area — e.g. "Login page", "User settings", "Checkout flow"]  
 **Priority:** High | Medium | Low  
-**Suggested Git Branch:** `[type]/[short-kebab-case-description]` *(e.g. `feat/dark-mode-toggle`, `fix/session-logout-bug`)*  
+**Suggested branch:** `[type]/[short-kebab-case-description]`
 
-### Description
+### What's this about?
 
-[2–4 sentences. What needs to be done, why it matters, and any relevant context. Write for a developer picking this up cold.]
+[2–4 sentences written in plain language. Explain what needs to happen and why it matters — like you're describing it to a teammate over Slack, not writing a spec doc. Avoid jargon where possible.]
 
 ### Notes *(optional)*
 
-[Edge cases, dependencies, open questions, links to related code or tickets.]
+[Anything worth flagging — edge cases, things to watch out for, related tickets. Skip this section if there's nothing useful to say.]
 
-### Acceptance Criteria
+### Done when...
 
-- [ ] [Concrete, testable condition 1]
-- [ ] [Concrete, testable condition 2]
-- [ ] [Concrete, testable condition 3]
+- [ ] [Specific, testable thing that must be true — written in plain English]
+- [ ] [Another concrete outcome]
+- [ ] [And another]
 
 ---
 ```
+````
 
-**Formatting rules:**
-- Title: imperative verb phrase ("Add dark mode toggle", not "Dark mode")
-- Description: clear and self-contained — no assumed context
-- Acceptance criteria: specific and testable, not vague ("Users can toggle dark mode via Settings > Appearance", not "Dark mode works")
-- Notes: include only if there's something genuinely useful to flag
-- Omit empty sections (e.g. skip Notes if there's nothing to say)
+**Tone and language rules:**
+- Write like a human, not a robot. Casual but clear.
+- Avoid overly technical phrasing unless it's genuinely necessary (e.g. "the login page breaks" instead of "authentication flow fails to complete the OAuth handshake")
+- Use "you", "the user", "someone" — not "the end-user" or "the client"
+- "Done when..." replaces "Acceptance Criteria" — it's friendlier and just as clear
+- "What's this about?" replaces "Description" — more conversational
+- Keep titles short and action-oriented ("Add dark mode toggle", not "Implementation of dark mode feature")
+- Notes section: only include if there's something genuinely useful to flag — skip it otherwise
 
 ---
 
@@ -119,7 +127,7 @@ After outputting all tickets, offer to:
 - Generate additional tickets from follow-up inputs
 
 Example closing line:
-> "Let me know if you'd like to adjust any of these, split them further, or add more inputs."
+> "Let me know if you'd like to tweak any of these, split them up further, or add more."
 
 ---
 
@@ -128,30 +136,31 @@ Example closing line:
 ### Input: "add dark mode"
 
 → Ask: "Is this frontend-only, or does the preference need to be stored per user?"  
-→ Generate: 1–2 tickets (UI toggle + optional API/storage ticket)
+→ Generate: 1–2 tickets (UI toggle + optional storage ticket)
 
 ### Input: "fix the login bug where users get logged out randomly"
 
-→ Check codebase for auth module, session handling  
-→ Generate: 1 bug ticket with reproduction steps as acceptance criteria
+→ Check codebase for auth/session handling  
+→ Generate: 1 bug ticket written in plain language, with "done when..." conditions framed around what the user actually experiences
 
 ### Input: "we need search, filters, and pagination on the products page"
 
-→ Generate: 3 tickets (one per feature), each scoped to the products page component found in codebase
+→ Generate: 3 tickets (one per feature), scoped to the products page, written conversationally
 
 ### Input: "improve performance"
 
-→ Ask: "Which part of the app? Any specific metrics or complaints?" before generating
+→ Ask: "Which part of the app feels slow? Any specific pages or actions?" before generating
 
 ---
 
 ## Quality Checklist
 
 Before outputting tickets, verify:
-- [ ] Title is an imperative verb phrase
-- [ ] Description is self-contained (readable without prior context)
-- [ ] Acceptance criteria are concrete and testable
-- [ ] Component/area is accurate (cross-checked with codebase if available)
-- [ ] Suggested git branch follows `type/short-kebab-case` convention and matches ticket type
-- [ ] Notes section omitted if nothing meaningful to add
-- [ ] No ticket is trying to do too many things at once
+- [ ] Each ticket is wrapped in a ` ```markdown ``` ` code block so it can be copy-pasted
+- [ ] Title is short and action-oriented (imperative verb phrase)
+- [ ] "What's this about?" is written in plain, friendly language — no unnecessary jargon
+- [ ] "Done when..." items are concrete and testable, written in plain English
+- [ ] Component/area label is human-readable (e.g. "Checkout page", not "checkout_service_v2")
+- [ ] Suggested branch follows `type/short-kebab-case` convention
+- [ ] Notes section is omitted if there's nothing meaningful to add
+- [ ] No single ticket is trying to do too many things at once
