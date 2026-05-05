@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Reviews a pull request using git. Trigger when the user says "review PR /#<number>", "review PR /#<number> against <branch>", "review this PR", "review this branch", "review branch <name>", "check this PR", or just "review PR". Also trigger if the user says "review" with no further context — assume they mean the current branch. Uses git (and gh CLI if available) to fetch branch info and diff. Explains what the code does AND flags any issues, bugs, or concerns.
+description: Reviews a pull request using git. Trigger when the user says "review PR #<number>", "review PR #<number> against <branch>", "review this PR", "review this branch", "review branch <name>", "check this PR", or just "review PR". Also trigger if the user says "review" with no further context — assume they mean the current branch. Uses git (and gh CLI if available) to fetch branch info and diff. Explains what the code does, flags any issues or bugs, and shows how behavior has changed from before.
 ---
 
 # PR Review Skill
@@ -44,54 +44,99 @@ If the branch doesn't exist or the diff is empty, tell the user clearly and stop
 
 ## Step 2: Deliver the review
 
-Structure your response in this order:
+Structure your response in this order, using clean markdown headers. Do not use emoticons or icons anywhere in the review.
 
-### 🧾 TL;DR
-2-3 sentences: what does this PR do? What problem does it solve?
+---
 
-### 🗺️ How the code works
-- **Analogy**: Compare the approach to something from everyday life
-- **Diagram**: ASCII art showing data flow, structure, or relationships between changed files
-- **Walkthrough**: Step-by-step explanation of the key changes
+### Summary
 
-### 🔍 Issues Found
-Rate each issue by severity:
-- 🔴 **Critical** — Bug, security hole, data loss risk. Should block merge.
-- 🟡 **Warning** — Code smell, edge case, performance or maintainability concern.
-- 🟢 **Suggestion** — Minor improvement or style. Nice to have.
+2–3 sentences: what does this PR do and what problem does it solve?
 
-If nothing stands out: say "No issues found — looks good to merge." Don't invent problems.
+---
 
-### 👁️ Manual Review Required
-Flag specific code that automated review cannot fully assess and that the human reviewer must personally inspect. Use this section for:
-- **Business logic** — Rules or calculations that only make sense in context (e.g. pricing formulas, eligibility checks, access control rules). Quote the exact lines and explain what assumption you can't verify.
-- **External integrations** — API calls, webhooks, or third-party SDKs where correctness depends on provider-specific behaviour or contracts not visible in this diff.
-- **Security-sensitive paths** — Auth checks, permission gates, input sanitisation, or anything touching credentials/secrets. Even if it looks right, flag it for a human to confirm.
-- **Migrations & data mutations** — Schema migrations, backfill scripts, or destructive DB operations that cannot be undone. State what data could be affected and what to verify before running in production.
-- **Environment/config dependencies** — Code whose behaviour changes based on env vars, feature flags, or config values that aren't in the diff.
-- **Tests that need human judgement** — Test coverage gaps for critical paths, or tests that pass but may not actually validate the right thing.
+### How It Works
 
-Format each item as:
+**The approach in plain terms**
+Briefly compare the implementation approach to something from everyday life or a familiar concept — one sentence that grounds the reader before diving into code.
 
+**Data flow / structure**
+ASCII diagram showing how the key changed components relate to each other — data flow, call sequence, or file relationships, whichever is most useful.
+
+**Walkthrough**
+Step-by-step explanation of the key changes, written conversationally as if explaining to a teammate.
+
+---
+
+### Behavioral & Functional Changes
+
+For every meaningful change in behavior, output, or user-facing functionality, show the before and after explicitly. If there is no behavioral change (e.g., pure refactor or docs-only), say so clearly.
+
+Format each change as:
+
+**[Short label describing what changed]**
+
+Before:
 ```
----------------------------------------------------------
-> 📍 `path/to/file.ext` line X–Y
-> **Why**: one sentence on why this needs a human eye.
-> **What to check**: the specific thing the reviewer should verify or confirm.
----------------------------------------------------------
+[What the old code did — be specific about inputs, outputs, side effects, or user experience]
 ```
 
-If there's nothing requiring manual review, say so explicitly: "Nothing flagged for manual review — automated analysis covers the full scope of this diff."
+After:
+```
+[What the new code does — same specificity]
+```
 
-### ⚠️ Gotcha
-The one thing a reviewer could easily miss — a hidden assumption, a subtle side effect, or something that might break later.
+Impact: one sentence explaining what this means for callers, users, or downstream systems.
 
-### ❓ Questions for the Author
-1–3 questions worth raising if anything is unclear, undocumented, or seems like a deliberate trade-off.
+---
+
+### Issues Found
+
+Rate each issue by severity. If nothing stands out, say "No issues found — looks good to merge." Do not invent problems.
+
+CRITICAL   — Bug, security hole, or data loss risk. Should block merge.
+WARNING    — Code smell, edge case, or performance/maintainability concern.
+SUGGESTION — Minor improvement or style. Nice to have.
+
+Quote the file name and approximate line number for each issue.
+
+---
+
+### Manual Review Checklist
+
+List items that automated review cannot fully assess and that a human must personally verify. Only include items that genuinely require human judgment — do not pad this section.
+
+For each item, use this format:
+
+  File: path/to/file.ext (lines X–Y)
+  Why it needs a human: one sentence.
+  What to verify: the specific thing to check or confirm.
+
+Categories to consider:
+- Business logic whose correctness depends on context not visible in the diff
+- External API or third-party integrations where provider behavior matters
+- Auth, permissions, input sanitization, or anything touching credentials
+- Migrations or destructive DB operations that cannot be undone
+- Behavior gated on env vars or feature flags not present in the diff
+- Test coverage gaps for critical paths
+
+If nothing requires manual review, say: "Nothing flagged — automated analysis covers the full scope of this diff."
+
+---
+
+### Watch Out For
+
+The one thing a reviewer could easily miss — a hidden assumption, a subtle side effect, or something that might break later. One short paragraph.
+
+---
+
+### Questions for the Author
+
+1–3 questions worth raising if anything is unclear, undocumented, or seems like a deliberate trade-off. Skip this section if everything is self-explanatory.
 
 ---
 
 ## Tone & style
-- Be direct and specific — quote file names and line numbers when calling out issues
-- Don't pad with generic praise
-- Keep the walkthrough conversational, like you're explaining to a teammate over a quick call
+- Be direct and specific — cite file names and line numbers when calling out issues
+- Do not pad with generic praise
+- Write conversationally, like you're explaining to a teammate over a quick call
+- No emoticons or icons anywhere in the output
