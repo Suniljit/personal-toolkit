@@ -2,4 +2,4 @@
 description: Runs the create-pr skill by pointing to the correct branch.
 ---
 
-Create a PR from this branch to
+Use the /create-pr skill to create a PR from this branch to
