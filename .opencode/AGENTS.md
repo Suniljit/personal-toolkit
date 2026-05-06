@@ -60,6 +60,10 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+## Documentation
+
+Project docs live in `docs/`. Refer to `INDEX.md` in the project root to understand the docs folder structure and navigate it. After any code changes, update relevant docs to reflect the new state. For any key architectural decision made, create an ADR in `docs/adr/`.
+
 ## Logging
 
 - Use `loguru` for structured logging; no `print` statements
