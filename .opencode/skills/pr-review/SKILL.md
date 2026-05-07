@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Reviews a pull request using git. Trigger when the user says "review PR #<number>", "review PR #<number> against <branch>", "review this PR", "review this branch", "review branch <name>", "check this PR", or just "review PR". Also trigger if the user says "review" with no further context — assume they mean the current branch. Uses git (and gh CLI if available) to fetch branch info and diff. Explains what the code does, flags any issues or bugs, and shows how behavior has changed from before.
+description: Reviews a pull request using git. Trigger when the user says "review PR #<number>", "review PR #<number> against <branch>", "review this PR", "review this branch", "review branch <name>", "check this PR", or just "review PR". Also trigger if the user says "review" with no further context — assume they mean the current branch. Uses git (and gh CLI if available) to fetch branch info and diff. Explains what the code does, flags any issues or bugs, shows how behavior has changed from before, and gives a clear merge recommendation.
 ---
 
 # PR Review Skill
@@ -132,6 +132,28 @@ The one thing a reviewer could easily miss — a hidden assumption, a subtle sid
 ### Questions for the Author
 
 1–3 questions worth raising if anything is unclear, undocumented, or seems like a deliberate trade-off. Skip this section if everything is self-explanatory.
+
+---
+
+### Merge Recommendation
+
+Give a clear, direct verdict. Pick exactly one of these verdicts and lead with it on its own line:
+
+  APPROVE — Safe to merge as-is.
+  APPROVE WITH NOTES — Safe to merge, but flag the notes to the author first.
+  REQUEST CHANGES — Do not merge until issues are resolved.
+  BLOCK — Do not merge. Critical issue that must be fixed.
+
+Then answer these three questions in plain sentences (one each):
+
+**Is it safe to approve?**
+State yes or no, and why in one sentence. Reference any CRITICAL or WARNING issues if present, or confirm there are none.
+
+**What could break if this is merged?**
+Be specific — name the system, feature, or user flow at risk. If nothing is at risk, say so. Do not hedge with generic disclaimers.
+
+**What needs to happen before this merges?** (skip if verdict is APPROVE)
+List only the blockers — issues the author must address. Omit suggestions and style nits.
 
 ---
 
