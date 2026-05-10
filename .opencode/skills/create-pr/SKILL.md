@@ -1,118 +1,72 @@
 ---
 name: create-pr
 description: >
-  Creates GitHub Pull Requests by analyzing branch changes and generating a concise PR summary for user approval. Use this skill whenever the user wants to open a PR, create a pull request, submit a PR, or push their branch for review. Also trigger when the user mentions "stacked branches", "PR to a specific branch", or "PR summary". The skill inspects git diffs, summarizes changes clearly, waits for user confirmation, then pushes the branch and creates the PR via the GitHub CLI.
+  Creates GitHub Pull Requests via the GitHub CLI. Trigger when the user wants to open/create/submit a PR, push a branch for review, or mentions "stacked branches", "PR to a specific branch", or "PR summary". Analyzes git diffs, shows a summary for approval, pushes the branch, then creates the PR.
 ---
 
 # PR Creator Skill
 
-Creates a PR from the current branch: analyzes changes, shows a summary for approval, pushes the branch, then creates it.
-
-## Prerequisites
-
-- `git` must be available and the working directory must be a git repo
-- `gh` (GitHub CLI) must be installed and authenticated (`gh auth status`)
-
----
-
 ## Step 1: Gather context
 
-Run these commands to understand the branch situation:
-
 ```bash
-# Current branch
 git branch --show-current
-
-# Default base branch (usually main or master)
 git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
-
-# If user specified a target branch, use that. Otherwise default to main/master.
-
-# Commits on this branch vs target
-git log <target_branch>..HEAD --oneline
-
-# Files changed
-git diff <target_branch>...HEAD --name-status
-
-# Full diff for reading (limit to avoid overwhelming context)
-git diff <target_branch>...HEAD --stat
-git diff <target_branch>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
+git log <target>..HEAD --oneline
+git diff <target>...HEAD --name-status
+git diff <target>...HEAD --stat
+git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 ```
 
-If the user specified a target branch (e.g. "PR to `feature/auth`"), use that. Otherwise use `main` or `master` (whichever exists on origin).
+Use the user-specified target branch if given; otherwise default to `main`/`master`.
 
 ---
 
 ## Step 2: Generate PR summary
 
-Read through the diffs and commits. Then produce a summary in this format:
+Show this and ask: **"Does this look good? Say OK to create the PR, or tell me what to change."**
 
----
-**Branch:** `<current-branch>` → `<target-branch>`
-
-**Title:** <one-line summary, imperative mood, ~50 chars>
-
-**Description:**
-<2-5 sentences covering: what changed, why, any notable decisions or caveats>
-
+```
+**Branch:** `<current>` → `<target>`
+**Title:** <imperative, ~50 chars>
+**Description:** <2–5 sentences: what changed, why, notable decisions>
 **Changes:**
-- <file or area>: <what changed>
-- <file or area>: <what changed>
-...
----
-
-Keep it concise and developer-friendly. Focus on *what* and *why*, not *how*.
-
-Then ask: **"Does this look good? Say OK to create the PR, or let me know what to change."**
+- <file/area>: <what changed>
+```
 
 ---
 
 ## Step 3: Push the branch
 
-Once the user approves (says "ok", "yes", "looks good", "create it", etc.), push the branch to origin first:
+On user approval ("ok", "yes", "looks good", "create it"):
 
 ```bash
-# Check if the branch already has an upstream set
 git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null
-
-# If upstream exists, a plain push is enough:
-git push
-
-# If no upstream is set (command above failed or returned nothing), set it:
-git push -u origin <current-branch>
+# If upstream exists: git push
+# If not: git push -u origin <current-branch>
 ```
 
-If the push fails (e.g. non-fast-forward), report the error to the user and stop — do not attempt to create the PR.
+Stop and report if push fails — never force-push.
 
 ---
 
 ## Step 4: Create the PR
 
-After a successful push:
-
 ```bash
-gh pr create \
-  --base <target_branch> \
-  --title "<title>" \
-  --body "<description + change list as markdown>"
+gh pr create --base <target> --title "<title>" --body "<description + changes>"
 ```
 
-Print the resulting PR URL to the user.
+Print the PR URL.
 
 ---
 
 ## Edge cases
 
-**No commits ahead of target:** Tell the user there's nothing to PR — the branch has no new commits vs `<target>`.
-
-**Uncommitted changes:** Note them but proceed with committed changes only. Mention the uncommitted files to the user.
-
-**Large diffs (500+ lines):** Summarize by directory/module rather than file-by-file. Focus on high-level areas changed.
-
-**Stacked branches:** If the user says "PR to `feature/x`" (a non-main branch), use that as the base without question. This is intentional for stacked branch workflows.
-
-**Draft PR:** If the user says "draft PR" or "WIP PR", add `--draft` flag to the `gh pr create` command.
-
-**Existing PR:** If `gh pr view` shows a PR already exists for this branch, tell the user and offer to update the description instead.
-
-**Push rejected:** If `git push` fails, show the error and ask the user how they want to proceed (e.g. rebase, force-push). Never force-push automatically.
+| Situation | Action |
+|---|---|
+| No commits ahead of target | Tell user, stop |
+| Uncommitted changes | Note them, proceed with committed only |
+| Large diff (500+ lines) | Summarize by directory/module |
+| Stacked branch (`PR to feature/x`) | Use specified branch as base |
+| Draft PR | Add `--draft` to `gh pr create` |
+| PR already exists | Tell user, offer to update description |
+| Push rejected | Show error, ask how to proceed |
