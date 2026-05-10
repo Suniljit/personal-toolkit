@@ -1,133 +1,106 @@
 ---
 name: diagnose
 description: >
-  Use this skill to diagnose and fix bugs, errors, or unexpected behavior in code.
-  Trigger whenever a user reports something is broken, not working, throwing an error,
-  behaving unexpectedly, or when they say things like "help me debug", "fix this bug",
-  "something's wrong with my code", "why is this failing", "it's broken", "I'm getting
-  an error", or "this isn't working". Also trigger when the user pastes a stack trace,
-  error message, or describes incorrect output. Always use this skill — don't try to
-  diagnose and fix ad hoc without it, even for seemingly simple bugs.
+  Debug and fix broken code. Use when a user reports errors, unexpected behavior,
+  or pastes a stack trace — including "fix this bug", "why is this failing",
+  "something's wrong", "help me debug", or "it's broken". Always use this skill
+  rather than debugging ad hoc.
 ---
 
 # Diagnose Skill
 
-A structured workflow for diagnosing and fixing bugs. Follow all phases in order.
-Never apply code changes without explicit user approval.
+Structured workflow for diagnosing and fixing bugs. Follow phases in order. Never apply changes without user approval.
 
 ---
 
-## Phase 1: Explore the Codebase
+## Phase 1: Explore
 
-Before asking any questions, build context independently:
+Before asking anything, build context independently:
 
-1. **Locate relevant files** — identify entry points, configs, the file mentioned in the error, and its dependencies.
-2. **Read the code** — understand structure, data flow, and recent changes if discernible.
-3. **Check for obvious red flags** — typos, wrong imports, missing awaits, off-by-one errors, mismatched types.
-4. **Note what you still don't know** — gaps that only the user can fill (reproduction steps, environment, what changed recently).
+1. Locate relevant files — entry points, configs, the file in the error, its dependencies.
+2. Read the code — structure, data flow, recent changes.
+3. Flag obvious red flags — wrong imports, missing awaits, type mismatches, off-by-ones.
+4. Note remaining unknowns — gaps only the user can fill.
 
-Use `bash_tool` freely to explore: `find`, `grep`, `cat`, `ls`, `git log`, `git diff`, etc. Be thorough — the more context you gather here, the better your hypotheses.
-
----
-
-## Phase 2: Interview the User
-
-After exploring, use the `ask_user_input_v0` tool to ask targeted questions. Keep it to 1–3 questions maximum — don't overwhelm. Prioritize the highest-value unknowns first.
-
-**Good questions to consider:**
-- When did this start? (after a specific change, always, randomly?)
-- Is it reproducible 100% of the time or intermittent?
-- What's the expected vs. actual behavior?
-- What environment / OS / version?
-- What was the last thing changed before this broke?
-
-**After each round of questions**, reassess whether you need more info or can proceed. Max 2 rounds of questions — don't over-interview.
-
-For each question where you have a strong opinion, **state your best guess first**, then ask for confirmation. Example:
-> "My guess is this started after the recent auth refactor — does that match?"
+Use `bash_tool` freely: `find`, `grep`, `cat`, `git log`, `git diff`, etc.
 
 ---
 
-## Phase 3: Generate Ranked Hypotheses
+## Phase 2: Interview
 
-Present **3–5 hypotheses**, ranked by likelihood. For each:
+Use `ask_user_input_v0` to ask 1–3 targeted questions. Prioritize highest-value unknowns. Max 2 rounds.
+
+For each question, **state your best guess first**, then ask for confirmation:
+> "My guess is this started after the auth refactor — does that match?"
+
+Good questions: when did it start? reproducible or intermittent? expected vs. actual behavior? last change made?
+
+---
+
+## Phase 3: Hypotheses
+
+Present **3–5 hypotheses**, ranked by likelihood:
 
 ```
-## Hypothesis [N] — [Short Title] (Confidence: High/Medium/Low)
-**What**: [What is going wrong]
-**Why**: [Evidence from the code that supports this]
-**Smoking gun**: [The specific line/pattern that makes this suspicious]
+## Hypothesis [N] — [Title] (Confidence: High/Medium/Low)
+**What**: [What's going wrong]
+**Why**: [Supporting evidence]
+**Smoking gun**: [Specific suspicious line/pattern]
 ```
 
 End with: **"My top hypothesis is [N]."**
 
 ---
 
-## Phase 4: Build the Fix Plan
+## Phase 4: Fix Plan
 
-Design a concrete fix for your top hypothesis (and note alternative fixes for lower-ranked ones if the top hypothesis turns out to be wrong).
-
-Present the fix plan clearly:
+Design a concrete fix for the top hypothesis; note alternatives for lower-ranked ones.
 
 ```
 ## Fix Plan
-
-**Target**: [File(s) and line(s) to change]
-
+**Target**: [File(s) and line(s)]
 **Changes**:
-1. [Describe change 1 — be specific about what replaces what]
-2. [Describe change 2]
-...
-
-**Cleanup**:
-- [Any dead code, unused imports, stale configs to remove]
-
+1. [Specific change — what replaces what]
+2. ...
+**Cleanup**: [Dead code, unused imports to remove]
 **Why this works**: [Brief explanation]
-
-**Risk**: [Low/Medium/High — and why]
+**Risk**: [Low/Medium/High — why]
 ```
 
-Then ask:
+Ask: > "Does this look right? Say **yes** to proceed, or let me know what to adjust."
 
-> "Does this fix plan look right to you? Say **yes** to proceed, or let me know what to adjust."
-
-**Do not touch any files until the user approves.**
+**Do not touch files until approved.**
 
 ---
 
-## Phase 5: Implement the Fix
+## Phase 5: Implement
 
-Only after explicit approval ("yes", "go ahead", "looks good", "proceed", etc.):
+Only after explicit approval ("yes", "go ahead", "looks good"):
 
-1. Apply all changes from the fix plan using `str_replace` (preferred for surgical edits) or `create_file`.
-2. **Clean up** — remove any dead code, commented-out blocks, unused imports, or obsolete logic that the fix made redundant.
-3. After all changes, do a final review pass of the modified files to check for obvious issues introduced.
+1. Apply changes using `str_replace` (preferred) or `create_file`.
+2. Remove dead code, commented-out blocks, unused imports made redundant by the fix.
+3. Do a final review pass of modified files.
 
 ---
 
 ## Phase 6: Report
 
-After implementing, give the user a concise summary:
-
 ```
 ## Done ✓
-
-**Fixed**: [What was changed and why it fixes the bug]
+**Fixed**: [What changed and why it works]
 **Files modified**: [List]
-**Cleaned up**: [What was removed, if anything]
-
-**To verify**: [How the user can confirm the fix works — a command to run, a test to check, etc.]
-
-**If this doesn't fix it**: [What to try next — the next hypothesis to investigate]
+**Cleaned up**: [What was removed]
+**To verify**: [Command or test to confirm]
+**If this doesn't fix it**: [Next hypothesis to investigate]
 ```
 
 ---
 
 ## Key Principles
 
-- **Never guess blindly** — explore first, then hypothesize.
-- **Never make changes without approval** — even small ones. Always show the plan first.
-- **State your confidence** — don't present guesses as certainties.
-- **Prefer surgical edits** — change the minimum necessary to fix the bug.
-- **Clean up as you go** — don't leave dead code behind.
-- **Offer a path forward** — if the fix doesn't work, say what to try next.
+- Explore first, then hypothesize — never guess blindly.
+- Always show the plan before touching files.
+- State confidence; don't present guesses as certainties.
+- Prefer surgical edits — minimum change to fix the bug.
+- Clean up as you go.
+- Always offer a path forward if the fix doesn't work.
