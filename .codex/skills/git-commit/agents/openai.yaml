@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit"
+  short_description: "Stage and commit local git changes"
+  default_prompt: "Use $git-commit to review my changed files, draft a commit message, and ask for approval before committing."

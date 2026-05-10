@@ -1,0 +1,4 @@
+interface:
+  display_name: "Improve Codebase Architecture"
+  short_description: "Plan and execute approved codebase refactors"
+  default_prompt: "Use $improve-codebase-architecture to inspect this project, interview me on goals, and produce an approval-gated refactoring plan."

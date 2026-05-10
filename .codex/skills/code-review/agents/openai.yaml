@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "Structured Python code review"
+  default_prompt: "Use $code-review to review this Python code for correctness, security, tests, and design."

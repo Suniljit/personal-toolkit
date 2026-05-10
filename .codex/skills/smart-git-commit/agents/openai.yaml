@@ -1,0 +1,4 @@
+interface:
+  display_name: "Smart Git Commit"
+  short_description: "Group changed files into clean commits"
+  default_prompt: "Use $smart-git-commit to group my changed files into logical local commits."
