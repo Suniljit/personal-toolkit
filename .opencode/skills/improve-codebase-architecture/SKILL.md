@@ -22,7 +22,7 @@ Make the code easy for a human to read and navigate — this is always in scope,
 not explicitly requested. Never assume — explore first, interview second, plan third,
 execute last.
 
-**Outputs**: (1) a PR-ready plan the user approves, (2) refactored code per the plan.
+**Outputs**: (1) a PR-ready plan saved as a markdown file, which the user approves, (2) refactored code per the plan.
 
 ---
 
@@ -90,15 +90,27 @@ Always give your recommended answer with brief rationale. Never ask what you can
 
 ## Phase 3: Plan
 
-After the interview, present a plan for explicit approval. Use this template exactly.
-**Keep it brief** — one line per item is the target. Add extra detail only where it
-genuinely aids understanding (a non-obvious rationale, a risky change). The plan should
-be fast to scan, not exhaustive.
+After the interview, draft the plan using the template below. Then:
+
+1. **Ask where to save it.** Suggest a sensible default (e.g. `docs/refactor-plan.md`
+   or `REFACTOR_PLAN.md` at the repo root). Wait for the user to confirm or redirect.
+2. **Save the file** to that path immediately.
+3. **Present the plan in chat** for approval.
+4. **Wait for explicit approval before editing any code.**
+
+If the user wants modifications, update the saved file and re-present before proceeding.
+
+Use this template exactly. **Keep it brief** — one line per item is the target. Add
+extra detail only where it genuinely aids understanding (a non-obvious rationale, a
+risky change). The plan should be fast to scan, not exhaustive.
 
 ---
 
 ```markdown
 ## Refactoring Plan
+
+**Branch**: `refactor/<short-slug>`
+<!-- e.g. refactor/separate-auth-concerns or refactor/split-god-module -->
 
 ### Architecture Description
 [2–4 paragraphs: what layers/modules exist, what each owns, why this is better,
@@ -133,11 +145,6 @@ For each file, specific changes:
 ### What Will Not Change
 - [Reassure the user about preserved behavior and interfaces]
 ```
-
----
-
-**Wait for explicit approval before editing anything.**
-If the user wants modifications, revise and re-present before proceeding.
 
 ---
 

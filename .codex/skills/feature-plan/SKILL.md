@@ -40,7 +40,7 @@ Ask for anything missing in a single message.
 
 ## Step 2: Grill the User
 
-Interview the user until you have a shared, unambiguous understanding of the feature.
+Interview the user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
 Rules:
 - Ask every question through the best available user-input mechanism. In Codex, use `request_user_input` only when the active mode/tooling exposes it; otherwise ask directly in chat.

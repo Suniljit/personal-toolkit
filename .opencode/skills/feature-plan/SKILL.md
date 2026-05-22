@@ -20,23 +20,19 @@ Two entry points — same workflow, different starting context:
 
 ## Step 1 — Gather inputs
 
-You need two things before starting:
+You need one thing before starting:
 
-**1. Feature description** — what are we building or fixing?
+**Feature description** — what are we building or fixing?
 - If a ticket/brief path was given, read those files
 - If no description exists, ask: *"What are you trying to build or fix?"*
 
-**2. Save location** — where should the plan file go?
-- If not provided, suggest: *"I'll save it to `_features/plans/` — OK with that?"*
-- Wait for confirmation before proceeding
-
-Ask for anything missing in a single message.
+Don't ask about save location yet — that's resolved in Step 5.
 
 ---
 
 ## Step 2 — Grill the user
 
-Interview the user until you have a shared, unambiguous understanding of the feature.
+Interview the user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
 Rules:
 - Use the question tool for every question. One question (or tight cluster) at a time.
@@ -67,11 +63,14 @@ Synthesize the ticket (if any), brief (if any), and discussion into the template
 One or two sentences. What does this do, and why now?
 
 ## Decisions
-Only include decisions that were non-obvious or had real alternatives.
+Two-tier table. **Constraints** are pre-existing and non-negotiable (ticket requirements, infra
+limits, existing conventions). **Choices** were made during planning and had real alternatives.
+Omit rows that are obvious from the codebase.
 
-| Decision | Choice | Why |
-|---|---|---|
-| ... | ... | ... |
+| Type | Decision | Choice | Why |
+|---|---|---|---|
+| Constraint | ... | ... | ... |
+| Choice | ... | ... | ... |
 
 ## Architecture
 ASCII diagram — what changes, what it touches, how data flows.
@@ -97,6 +96,29 @@ ASCII diagram — what changes, what it touches, how data flows.
 | File | What changes |
 |---|---|
 | `path/to/file.ts` | Add new handler |
+
+## Code Shape
+_Optional — include only when interface design is non-obvious or worth locking in early._
+
+Key types, interfaces, or function signatures. Sketch-level only — not full implementation.
+
+```ts
+// Example: port interface
+export interface MyRepository {
+  findById(id: string): Promise<MyRecord | null>;
+}
+
+// Example: request/response shape
+type MyRequest = { id: string };
+type MyResponse = { result: string | null };
+```
+
+## Validation Rules
+_Optional — include only when there are non-trivial input constraints._
+
+- `fieldName`: constraint (e.g. non-empty string, integer 2000–2100, valid ISO code)
+- Normalize: trim, uppercase, deduplicate before processing
+- Reject: what invalid input looks like and the expected error response
 
 ## Implementation Plan
 Phases small enough to be a single commit.
@@ -140,13 +162,18 @@ If no `INDEX.md` exists, note it and skip.
 
 ## Step 5 — Save the file
 
+**Resolve save location first** — explore the repo before asking:
+- Look for an existing plans directory (e.g. `_features/plans/`, `docs/plans/`, `.plans/`)
+- If found, use it without asking
+- If not found, propose `_features/plans/` and confirm with the user before creating it
+
 Derive a git slug from the feature title:
 - lowercase, hyphen-separated, max ~50 chars
 - prefix with the right conventional type: `feat/`, `fix/`, `refactor/`, `chore/`, `spike/`, `test/`, `docs/`, `perf/`, `ci/`
 
 Filename: strip the prefix/slash — e.g. `feat/add-csv-export` → `feat-add-csv-export.md`
 
-Save to `<plans_dir>`. Create the directory if needed.
+Save to the resolved directory. Create it if needed.
 
 Confirm:
 > *"Saved to `<plans_dir>/feat-add-csv-export.md`. Recommended branch: `feat/add-csv-export`."*
@@ -172,4 +199,5 @@ If no deviations, say so explicitly.
 - **Phases = commits.** Don't invent sub-tasks if only high-level phases were discussed.
 - **Out of Scope ≠ Future Work.** It just means "not here."
 - **No placeholders.** Every section has real content or is explicitly noted as N/A.
+- **Code Shape and Validation Rules are optional.** Include them when they add real clarity; omit them for simple CRUD or UI-only changes.
 - **Don't write code.** Output is a plan doc only.
