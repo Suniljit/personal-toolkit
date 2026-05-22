@@ -109,3 +109,7 @@ Reuse an existing `.venv` if present. Never mix environments or assume system Py
 ## LLM API Usage
 
 - Always set a token limit when coding any LLM API calls, using the correct parameter name for that SDK (e.g. `max_tokens` for Anthropic, `max_completion_tokens` for OpenAI)
+
+## Sub-Agents
+
+- Use sub-agents liberally.
