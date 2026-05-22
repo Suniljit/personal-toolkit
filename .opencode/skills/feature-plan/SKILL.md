@@ -41,8 +41,13 @@ Rules:
 - If a ticket exists, focus on **gaps and unresolved decisions** — don't re-litigate what's settled
 - **Track every decision**, especially deviations from the ticket (needed in Step 5)
 
-When you feel the design is fully resolved:
-> *"I think we have enough to write the plan. Ready to save to `<plans_dir>`?"*
+When you feel the design is fully resolved, resolve the save location before confirming:
+- Look for an existing plans directory (e.g. `_features/plans/`, `docs/plans/`, `.plans/`)
+- If found, use it
+- If not found, propose `_features/plans/`
+
+Then confirm with the user:
+> *"I think we have enough to write the plan. I'll save it to `<plans_dir>` — ready to go?"*
 
 Wait for explicit confirmation.
 
@@ -162,18 +167,13 @@ If no `INDEX.md` exists, note it and skip.
 
 ## Step 5 — Save the file
 
-**Resolve save location first** — explore the repo before asking:
-- Look for an existing plans directory (e.g. `_features/plans/`, `docs/plans/`, `.plans/`)
-- If found, use it without asking
-- If not found, propose `_features/plans/` and confirm with the user before creating it
-
 Derive a git slug from the feature title:
 - lowercase, hyphen-separated, max ~50 chars
 - prefix with the right conventional type: `feat/`, `fix/`, `refactor/`, `chore/`, `spike/`, `test/`, `docs/`, `perf/`, `ci/`
 
 Filename: strip the prefix/slash — e.g. `feat/add-csv-export` → `feat-add-csv-export.md`
 
-Save to the resolved directory. Create it if needed.
+Save to the directory confirmed in Step 2. Create it if needed.
 
 Confirm:
 > *"Saved to `<plans_dir>/feat-add-csv-export.md`. Recommended branch: `feat/add-csv-export`."*
