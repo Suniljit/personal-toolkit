@@ -6,18 +6,32 @@ description: >
 
 # PR Creator Skill
 
+## Branch resolution
+
+**Source branch** = always the current checked-out branch (`git branch --show-current`). Never ask — just detect it.
+
+**Target/base branch** = where the PR will merge into:
+- If the user specified a branch in their message (e.g. "PR to feature/x", "PR into develop") → use that branch
+- Otherwise → default to `main`
+
+Do not ask the user to clarify which branch to use. Detect the current branch automatically and apply the rule above.
+
+---
+
 ## Step 1: Gather context
 
 ```bash
+# Detect source (current) branch
 git branch --show-current
-git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
+
+# Determine target branch from user message, or default to main
+# (use the resolved target branch in all commands below)
+
 git log <target>..HEAD --oneline
 git diff <target>...HEAD --name-status
 git diff <target>...HEAD --stat
 git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 ```
-
-Use the user-specified target branch if given; otherwise default to `main`/`master`.
 
 ---
 
