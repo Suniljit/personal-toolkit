@@ -48,6 +48,20 @@ Cite file and line. If none: "No issues found."
 `WARNING` — edge case, performance, maintainability.
 `SUGGESTION` — style or minor improvement.
 
+For each issue, write the explanation so that a junior engineer can immediately understand the problem and fix it:
+- **What**: State the problem in plain English. Avoid jargon unless you define it.
+- **Why it matters**: One sentence on the real-world consequence (crash, data loss, slowness, etc.).
+- **How to fix**: A concrete, actionable step or code snippet. Show the fix, don't just describe it.
+
+Example of a good issue explanation:
+> `WARNING` — `src/auth.js`, line 42
+> **What:** The password is compared using `==` instead of a constant-time comparison function.
+> **Why it matters:** Regular string comparison can leak timing information that attackers use to guess passwords byte-by-byte.
+> **Fix:** Replace `password == stored` with `crypto.timingSafeEqual(Buffer.from(password), Buffer.from(stored))`.
+
+Example of a bad issue explanation (too vague):
+> `WARNING` — `src/auth.js`, line 42: Insecure comparison.
+
 ### Manual Review Checklist
 Skip if nothing qualifies. For each item:
 ```

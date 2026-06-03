@@ -103,6 +103,14 @@ Wrap each ticket in a ` ```markdown ``` ` code block:
 - Use "the user" / "someone", not "the end-user" or "the client"
 - Titles: short and imperative ("Add dark mode toggle", not "Implementation of dark mode feature")
 
+**Clarity rules for technical content:**
+- **No jargon without explanation.** If a technical term must appear (e.g. "race condition", "null pointer", "debounce"), follow it immediately with a plain-English parenthetical. Example: "There's a race condition (two things happening at the same time that clash with each other) in the payment handler."
+- **Describe bugs as cause → effect, in plain English.** Don't just name the symptom — explain what's actually going wrong and why it matters. Example: instead of "NullPointerException on login", write "The app crashes on login because it tries to use the user's session data before it's been loaded — it's like trying to open a door before the key has been handed to you."
+- **Explain *where* in the code the problem lives, in human terms.** Don't just reference a file or function name — briefly say what that file/function does. Example: instead of "Bug in `authMiddleware.js`", write "Bug in `authMiddleware.js` (the code that checks whether someone is logged in before letting them through)."
+- **Use analogies for abstract concepts.** If explaining something like caching, async behaviour, or a DB constraint, a one-line analogy goes a long way. Example: "The cache isn't being cleared (think of it like a browser that keeps showing an old version of a page even after it's been updated)."
+- **Spell out acronyms on first use.** Write "API (the interface other apps use to talk to ours)" not just "API", unless it's already been defined earlier in the ticket.
+- **Keep sentences short.** If a sentence has more than two clauses, split it. Complexity hides in long sentences.
+
 ### Step 5 — Offer to Refine
 
 After output, offer to split tickets into subtasks, adjust priority/type/component, add detail, or generate more tickets.
@@ -119,6 +127,9 @@ After output, offer to split tickets into subtasks, adjust priority/type/compone
 - [ ] Title is short and imperative
 - [ ] No ticket number in the title
 - [ ] "What's this about?" is plain language, no unnecessary jargon
+- [ ] Technical terms are followed by a plain-English explanation in parentheses
+- [ ] Bugs are described as cause → effect, not just named by error type
+- [ ] Any file/function references include a brief description of what they do
 - [ ] "Done when..." is high-level (2–4 items), no unit test lists
 - [ ] Solution section omitted unless the approach is obvious
 - [ ] Component label is human-readable
