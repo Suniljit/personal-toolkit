@@ -54,7 +54,7 @@ Wrap each ticket in a ` ```markdown ``` ` code block:
 ```markdown
 ---
 
-## 🎫 Ticket [N]: [Short imperative title]
+## 🎫 [Short imperative title]
 
 **Type:** Feature | Bug | Chore | Spike  
 **Component:** [Human-readable area — e.g. "Login page", "Checkout flow"]  
@@ -112,6 +112,7 @@ After output, offer to split tickets into subtasks, adjust priority/type/compone
 - [ ] No assumptions were made — all details came from the user or codebase
 - [ ] Each ticket is in a ` ```markdown ``` ` code block
 - [ ] Title is short and imperative
+- [ ] No ticket number in the title
 - [ ] "What's this about?" is plain language, no unnecessary jargon
 - [ ] "Done when..." is high-level (2–4 items), no unit test lists
 - [ ] Solution section omitted unless the approach is obvious

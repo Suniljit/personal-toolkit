@@ -125,6 +125,21 @@ _Optional — include only when there are non-trivial input constraints._
 - Normalize: trim, uppercase, deduplicate before processing
 - Reject: what invalid input looks like and the expected error response
 
+## Logging
+What to capture and why — skip anything that doesn't help with observability, debugging, or auditing.
+
+| Event | Level | Fields | Why |
+|---|---|---|---|
+| Feature started | `info` | `userId`, `featureId` | Trace entry point |
+| Validation failed | `warn` | `field`, `reason`, `input` | Debug bad requests |
+| External call failed | `error` | `service`, `statusCode`, `duration` | Alert on degradation |
+
+Notes:
+- Prefer structured logs (JSON) over interpolated strings
+- Include a `correlationId` / `traceId` on every log line where possible
+- Never log PII, secrets, or raw request bodies unless explicitly scrubbed
+- Flag any log lines that should feed an alert or dashboard metric
+
 ## Implementation Plan
 Phases small enough to be a single commit.
 
@@ -200,4 +215,5 @@ If no deviations, say so explicitly.
 - **Out of Scope ≠ Future Work.** It just means "not here."
 - **No placeholders.** Every section has real content or is explicitly noted as N/A.
 - **Code Shape and Validation Rules are optional.** Include them when they add real clarity; omit them for simple CRUD or UI-only changes.
+- **Logging is always included.** Even simple features should document at minimum their entry/exit and error events.
 - **Don't write code.** Output is a plan doc only.
