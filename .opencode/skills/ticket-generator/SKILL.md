@@ -31,7 +31,7 @@ Use findings to infer tech stack, affected components, and context. Don't make a
 
 ### Step 3 — Interview the User
 
-Always interview before generating. The goal is to get precise details so the ticket doesn't contain guesses. Keep it conversational — ask 2–5 questions as a grouped list, not one at a time. Skip questions the codebase or input already answers clearly.
+Always interview before generating. The goal is to get precise details so the ticket doesn't contain guesses. Keep it conversational.
 
 **Always ask about:**
 - What's the exact desired behaviour / expected outcome?
@@ -43,6 +43,11 @@ Always interview before generating. The goal is to get precise details so the ti
 - Is this one ticket or should it be broken up?
 - What does "done" feel like — is there a specific user-facing change, metric, or signal?
 - Any related tickets or prior work to be aware of?
+
+Rules:
+- Use the question tool for every question. One question (or tight cluster) at a time.
+- Lead with your **recommended answer** with brief rationale — don't just ask open questions
+- If the codebase can answer a question, **explore it** instead of asking
 
 Don't ask questions you can answer from context. Don't ask about solutions or implementation — that's for the ticket reader to figure out (see Step 4).
 
