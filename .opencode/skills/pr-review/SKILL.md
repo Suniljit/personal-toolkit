@@ -64,11 +64,11 @@ Example of a bad issue explanation (too vague):
 
 ### Manual Review Checklist
 Skip if nothing qualifies. For each item:
-```
-File: path/to/file.ext (lines X–Y)
-Why: ...
-Check: ...
-```
+
+**File:** `path/to/file.ext` (lines X–Y)
+**Why:** ...
+**Check:** ...
+
 Consider: business logic needing external context, third-party APIs, auth/credentials, irreversible DB ops, feature flags, test coverage gaps.
 
 ### Watch Out For
