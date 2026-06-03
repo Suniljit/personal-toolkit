@@ -89,22 +89,34 @@ Config changes required by a feature go just before or with that feature. Tests 
 
 > ⛔ Do NOT run `git add` or `git commit` until the user explicitly approves.
 
+Each commit block **must** show the full proposed commit message — subject line, body, and files. Use this format exactly:
+
 ```
 Here's my proposed commit plan (N commits, in order):
 
 ──────────────────────────────────────
 Commit 1 of N
-  Files: config/settings.py
-  chore(config): add JWT token expiry and refresh settings
+  Subject:  chore(config): add JWT token expiry and refresh settings
+  Body:     Adds JWT_EXPIRY and REFRESH_TOKEN_TTL env vars read from the
+            environment. Fixes prompts_path resolution that was previously
+            ignoring the PROMPTS_DIR override.
+  Files:    config/settings.py
 ──────────────────────────────────────
 Commit 2 of N
-  Files: src/auth/jwt.py, src/auth/refresh.py
-  feat(auth): implement JWT issuance and refresh token rotation
+  Subject:  feat(auth): implement JWT issuance and refresh token rotation
+  Body:     Issues signed JWTs on login using the HS256 algorithm.
+            Refresh tokens are single-use and rotated on each redemption
+            to prevent replay attacks.
+  Files:    src/auth/jwt.py (new), src/auth/refresh.py (new)
 ──────────────────────────────────────
 ...
 
 Does this look good? Say "ok" to proceed, or give feedback to adjust.
 ```
+
+- `Subject:` — the single-line summary passed as the first `-m`. Conventional Commits format: `<type>(<scope>): <summary>` (≤ 72 chars, imperative mood).
+- `Body:` — one short paragraph explaining *why* this change is being made and any non-obvious details. Wrap at 72 chars. Omit only if the subject is fully self-explanatory (e.g. a `.gitignore` tweak). Passed as the second `-m`.
+- `Files:` — all files in this commit, with `(new)` / `(deleted)` annotations where relevant.
 
 Wait for explicit approval. Any feedback = revise and re-present the full plan. Accept merge/split/reorder/message-change requests and re-present before proceeding.
 
