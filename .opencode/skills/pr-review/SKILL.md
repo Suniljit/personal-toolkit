@@ -77,11 +77,12 @@ One paragraph: the thing a reviewer could easily miss.
 ### Questions for the Author
 Skip if everything is clear. Each question should be paste-ready — addressed to the author, with file, line, and snippet inline.
 
-> **`path/to/file.ext`, line N**
-> ```lang
-> [relevant snippet]
-> ```
-> [Question to the author.]
+**File:** `path/to/file.ext`, line N
+**Snippet:**
+```lang
+[relevant snippet]
+```
+**Question:** [Question to the author.]
 
 ### Merge Recommendation
 
