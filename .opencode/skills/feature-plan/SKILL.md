@@ -42,12 +42,12 @@ Rules:
 - **Track every decision**, especially deviations from the ticket (needed in Step 5)
 
 When you feel the design is fully resolved, resolve the save location before confirming:
-- Look for an existing plans directory (e.g. `_features/plans/`, `docs/plans/`, `.plans/`)
+- Look for an existing `_specs` directory
 - If found, use it
-- If not found, propose `_features/plans/`
+- If not found, propose `_specs/`
 
 Then confirm with the user:
-> *"I think we have enough to write the plan. I'll save it to `<plans_dir>` — ready to go?"*
+> *"I think we have enough to write the plan. I'll save it to `<specs_dir>` — ready to go?"*
 
 Wait for explicit confirmation.
 
@@ -133,11 +133,15 @@ What to capture and why — skip anything that doesn't help with observability, 
 | Feature started | `info` | `userId`, `featureId` | Trace entry point |
 | Validation failed | `warn` | `field`, `reason`, `input` | Debug bad requests |
 | External call failed | `error` | `service`, `statusCode`, `duration` | Alert on degradation |
+| Function entry/exit | `debug` | `functionName`, `args`, `returnValue` | Trace data flow through key functions |
+| LLM call request/response | `debug` | `model`, `prompt`, `completion`, `tokens` | Debug prompt/output issues |
+| DB query/result | `debug` | `query`, `params`, `rowCount`/`result` | Debug data access issues |
 
 Notes:
 - Prefer structured logs (JSON) over interpolated strings
 - Include a `correlationId` / `traceId` on every log line where possible
 - Never log PII, secrets, or raw request bodies unless explicitly scrubbed
+- DEBUG-level input/output logs (function args/returns, LLM calls, DB queries) must also be scrubbed of PII/secrets, and should be disabled or sampled in production if volume/cost is a concern
 - Flag any log lines that should feed an alert or dashboard metric
 
 ## Implementation Plan
@@ -191,7 +195,7 @@ Filename: strip the prefix/slash — e.g. `feat/add-csv-export` → `feat-add-cs
 Save to the directory confirmed in Step 2. Create it if needed.
 
 Confirm:
-> *"Saved to `<plans_dir>/feat-add-csv-export.md`. Recommended branch: `feat/add-csv-export`."*
+> *"Saved to `<specs_dir>/feat-add-csv-export.md`. Recommended branch: `feat/add-csv-export`."*
 
 ---
 
@@ -215,5 +219,5 @@ If no deviations, say so explicitly.
 - **Out of Scope ≠ Future Work.** It just means "not here."
 - **No placeholders.** Every section has real content or is explicitly noted as N/A.
 - **Code Shape and Validation Rules are optional.** Include them when they add real clarity; omit them for simple CRUD or UI-only changes.
-- **Logging is always included.** Even simple features should document at minimum their entry/exit and error events.
+- **Logging is always included.** Even simple features should document at minimum their entry/exit and error events. DEBUG-level input/output tracing (functions, LLM calls, DB queries) should be included for non-trivial features.
 - **Don't write code.** Output is a plan doc only.

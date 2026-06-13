@@ -71,7 +71,7 @@ Sequence commits in this order:
 
 | Priority | Group | Examples |
 |---|---|---|
-| 1 | Plans / specs | `PLAN.md`, `SPEC.md`, `architecture.*` |
+| 1 | Plans / specs | `PLAN.md`, `SPEC.md`, `architecture.*`, any file under a `specs/` (or similarly named specs/plans) directory — e.g. `specs/feat-add-csv-export.md` |
 | 2 | Config / environment | `*.config.*`, `settings.*`, `pyproject.toml`, `Dockerfile` |
 | 3 | Data models / migrations | `models/`, `migrations/`, `schema.sql` |
 | 4 | Core logic / features | Services, controllers, utilities — grouped by sub-feature |
@@ -80,6 +80,8 @@ Sequence commits in this order:
 | 7 | CI / build / tooling | `.github/`, `Makefile`, `scripts/` |
 | 8 | Docs | `docs/`, `*.md` (non-README) |
 | 9 | README | Always last |
+
+**Plans/specs detection rule:** any changed/new file whose path matches `*/specs/*.md`, `*/spec/*.md`, `*/plans/*.md`, or `*/plan/*.md` (regardless of repo location) is treated as Priority 1 — Plans/specs, and must always be the first commit in the plan. Filenames typically follow a `<type>-<slug>.md` pattern (e.g. `feat-add-csv-export.md`, `fix-login-timeout.md`), but the directory match takes precedence over the filename pattern.
 
 Config changes required by a feature go just before or with that feature. Tests for a specific feature can be grouped with it.
 

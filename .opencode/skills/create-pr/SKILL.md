@@ -29,7 +29,6 @@ git branch --show-current
 
 git log <target>..HEAD --oneline
 git diff <target>...HEAD --name-status
-git diff <target>...HEAD --stat
 git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 ```
 
@@ -39,12 +38,14 @@ git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 
 Show this and ask: **"Does this look good? Say OK to create the PR, or tell me what to change."**
 
+Focus on **what changed and why** from the actual code diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns.
+
 ```
 **Branch:** `<current>` → `<target>`
 **Title:** <imperative, ~50 chars>
 **Description:** <2–5 sentences: what changed, why, notable decisions>
 **Changes:**
-- <file/area>: <what changed>
+- <file/area>: <what changed, functionally>
 ```
 
 ---
@@ -79,7 +80,7 @@ Print the PR URL.
 |---|---|
 | No commits ahead of target | Tell user, stop |
 | Uncommitted changes | Note them, proceed with committed only |
-| Large diff (500+ lines) | Summarize by directory/module |
+| Large diff (500+ lines) | Summarize by directory/module, functionally |
 | Stacked branch (`PR to feature/x`) | Use specified branch as base |
 | Draft PR | Add `--draft` to `gh pr create` |
 | PR already exists | Tell user, offer to update description |
