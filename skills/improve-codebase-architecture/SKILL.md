@@ -1,208 +1,71 @@
 ---
 name: improve-codebase-architecture
-description: >
-  Refactor, clean up, and improve a codebase or specific folder. Use when the user asks
-  to improve code architecture, clean up AI-generated slop, refactor for readability,
-  make code more testable, reduce complexity, improve folder structure, apply clean
-  architecture principles, separate concerns, increase modularity, add comments, apply
-  DRY principles, split large files, or generally improve code quality. Also trigger for:
-  "clean up my code", "review my codebase", "make this more readable", "reduce complexity",
-  "refactor this", "improve my project structure", "audit my code", "restructure this
-  project", "make this more modular". Conducts a structured interview, produces a
-  PR-ready plan for approval, then delivers fully refactored code.
+description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+disable-model-invocation: true
 ---
 
 # Improve Codebase Architecture
 
-A structured, interview-driven skill to improve a codebase's architecture, readability,
-testability, and maintainability without breaking behavior.
+Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
 
-**Core philosophy**: Think like a senior engineer. Separate concerns. Increase modularity.
-Make the code easy for a human to read and navigate — this is always in scope, even if
-not explicitly requested. Never assume — explore first, interview second, plan third,
-execute last.
+This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
-**Outputs**: (1) a PR-ready plan saved as a markdown file, which the user approves, (2) refactored code per the plan.
+- Run the `/codebase-design` skill for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion — don't drift into "component," "service," "API," or "boundary."
+- The domain language in `CONTEXT.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
 
----
+## Process
 
-## Phase 1: Codebase Exploration
+### 1. Explore
 
-Explore silently before asking anything. Answer what you can from the code.
+**Scope before you scan — YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
 
-```bash
-find <target_dir> -type f | sort
-wc -l <target_dir>/**/*.* 2>/dev/null | sort -rn | head -40
-```
+- If the user named a direction — a module, a subsystem, a pain point — take it, and skip the inference below.
+- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots — the files and areas that keep coming up — and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
 
-Read all files if <30 files; otherwise read entry points, shared utilities, config, and
-largest files first. Also check for `INDEX.md` at the project root — note what
-documentation exists so you can flag what needs updating in the plan.
+Read the project's domain glossary (`CONTEXT.md`) and any ADRs in the area you're touching first.
 
-**What to identify:**
-- Separation of concerns violations (business logic mixed with I/O, config scattered)
-- Modularity issues (tight coupling, unclear interfaces)
-- Large files (>300 lines — split candidates)
-- Code duplication, long functions (>40 lines), inconsistent naming
-- Dead code, silent exception swallowing, hardcoded magic values
-- AI slop: unnecessary wrappers, pointless type aliases, over-commented obvious lines
-- Existing test structure
+Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
 
-> Read `references/ai-slop-patterns.md` now for a catalog of patterns to watch for.
+- Where does understanding one concept require bouncing between many small modules?
+- Where are modules **shallow** — interface nearly as complex as the implementation?
+- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
+- Where do tightly-coupled modules leak across their seams?
+- Which parts of the codebase are untested, or hard to test through their current interface?
 
----
+Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
 
-## Phase 2: Interview
+### 2. Present candidates as an HTML report
 
-Use the question tool for every question. One question (or tight cluster) at a time.
-Always give your recommended answer with brief rationale. Never ask what you can read.
+Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user — `xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows — and tell them the absolute path.
 
-**A. Scope & Goals**
-- Which files/folders are in scope? Any that must not be touched?
-- Primary pain points: readability? testability? size? separation of concerns? all?
+The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals — use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
 
-**B. Behavior Contract**
-- Confirm your understanding of what the codebase does.
-- Existing tests? Any behavior changes wanted, or purely structural?
+For each candidate, render a card with:
 
-**C. Architecture & Layering**
-- Walk through the concern violations you found. For each: how should it be separated?
-- Propose a layering model (e.g., API → service → data → models → config) with rationale.
-- Propose a folder structure if restructuring is warranted (show visually, get approval).
+- **Files** — which files/modules are involved
+- **Problem** — why the current architecture is causing friction
+- **Solution** — plain English description of what would change
+- **Benefits** — explained in terms of locality and leverage, and how tests would improve
+- **Before / After diagram** — side-by-side, custom-drawn, illustrating the shallowness and the deepening
+- **Recommendation strength** — one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
 
-**D. Module Boundaries**
-- Public vs. private interfaces per module? Circular dependencies to break?
-- Any modules to merge (too granular) or split (too broad)?
+End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
 
-**E. Code Quality & Readability**
-- Human readability: are file/function names, structure, and flow easy to navigate?
-- Constants/config: consolidate? Validate env vars at startup?
-- Naming: anything inconsistent or unclear?
-- Functions over 40 lines: extract sub-steps?
-- Duplicated logic: extract to shared module?
-- AI slop found: confirm removal/simplification for each instance.
+**Use CONTEXT.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
 
-**F. Comments & Testing**
-- Where are comments missing (explain *why*)? Where are they obvious (remove)?
-- Should the refactor improve testability (pure functions, dependency injection)?
+**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007 — but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
 
----
+See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
 
-## Phase 3: Plan
+Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
 
-After the interview, draft the plan using the template below. Then:
+### 3. Grilling loop
 
-1. **Ask where to save it.** Suggest a sensible default (e.g. `docs/refactor-plan.md`
-   or `REFACTOR_PLAN.md` at the repo root). Wait for the user to confirm or redirect.
-2. **Save the file** to that path immediately.
-3. **Present the plan in chat** for approval.
-4. **Wait for explicit approval before editing any code.**
+Once the user picks a candidate, run the `/grilling` skill to walk the decision tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
-If the user wants modifications, update the saved file and re-present before proceeding.
+Side effects happen inline as decisions crystallize — run the `/domain-modeling` skill to keep the domain model current as you go:
 
-Use this template exactly. **Keep it brief** — one line per item is the target. Add
-extra detail only where it genuinely aids understanding (a non-obvious rationale, a
-risky change). The plan should be fast to scan, not exhaustive.
-
----
-
-```markdown
-## Refactoring Plan
-
-**Branch**: `refactor/<short-slug>`
-<!-- e.g. refactor/separate-auth-concerns or refactor/split-god-module -->
-
-### Architecture Description
-[2–4 paragraphs: what layers/modules exist, what each owns, why this is better,
-how concerns are now separated. Should onboard a new engineer from scratch.]
-
-### New Folder Structure (if changed)
-project/
-├── module/     # [purpose]
-│   └── ...
-
-### Documentation Updates
-[Check INDEX.md and list any docs that describe the affected code and need updating.
-If no INDEX.md exists or no docs are affected, state that explicitly.]
-- `docs/foo.md` — needs update because [reason]
-
-### Files to Modify
-- `path/to/file.py` — [what changes and why]
-
-### Files to Create
-- `path/to/new.py` — [what it contains and why]
-
-### Files to Delete
-- `path/to/dead.py` — [why safe to remove]
-
-### Change Breakdown
-For each file, specific changes:
-1. [Change] — [rationale]
-
-### Behavior Changes (requires explicit approval)
-- [Any observable behavior changes, or "None"]
-
-### What Will Not Change
-- [Reassure the user about preserved behavior and interfaces]
-```
-
----
-
-## Phase 4: Execution
-
-> Read `references/language-conventions.md` now for import ordering, naming, and
-> layering conventions to apply during execution.
-
-Execute in dependency order: shared utilities and types before files that import them.
-
-- **Preserve behavior**: If in doubt, restructure only — keep logic identical.
-- **Human readability first**: Choose names, structure, and ordering that a reader can navigate without a map.
-- **One file at a time**: Complete all changes to a file before moving to the next.
-- **Only implement what was approved.**
-- **Comments**: Explain *why* and non-obvious *what*. Never restate what the code says.
-- **Target**: Files under 500 lines. Imports: stdlib → third-party → local.
-
-Narrate briefly as you go: "Now creating `services/user_service.py` — extracting
-business logic from `api/handlers.py` as agreed."
-
----
-
-## Phase 5: Summary
-
-```markdown
-## Changes Summary
-
-### Architecture Description
-[Full description suitable as onboarding documentation — layers, modules, responsibilities,
-interactions, and rationale for the structure.]
-
-### New Folder Structure
-[Visual tree with one-line descriptions per folder]
-
-### Documentation Updates Made
-- [Which docs were updated, or "None required"]
-
-### Files Modified (N)
-- `file.py`: [one-line summary]
-
-### Files Created (N) / Deleted (N)
-
-### Key Improvements
-- Architecture: [concern separation, layers introduced]
-- Readability / Testability / DRY / Complexity: [what improved]
-
-### Line Count
-- Before: ~X lines across N files → After: ~Y lines across M files
-
-### Behavior Preserved
-All original behavior intact. Approved behavior changes: [list or "None"]
-```
-
----
-
-## Reference Files
-
-- `references/ai-slop-patterns.md` — Read during **Phase 1** exploration. Catalog of
-  over-engineering patterns to identify and how to fix them.
-- `references/language-conventions.md` — Read during **Phase 4** execution. Python
-  conventions, import ordering, layering patterns, and the separation of concerns checklist.
+- **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md`. Create the file lazily if it doesn't exist.
+- **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
+- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing — skip ephemeral reasons ("not worth it right now") and self-evident ones.
+- **Want to explore alternative interfaces for the deepened module?** Run the `/codebase-design` skill and use its design-it-twice parallel sub-agent pattern.
