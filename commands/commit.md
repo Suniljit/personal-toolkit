@@ -1,5 +1,5 @@
 ---
-description: Runs the git-commit skill by pointing it to the files you want to commit.
+description: Runs the commit-git skill by pointing it to the files you want to commit.
 ---
 
-Run /git-commit for the following files: 
+Run /commit-git for the following files: 

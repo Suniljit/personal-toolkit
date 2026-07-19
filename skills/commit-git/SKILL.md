@@ -1,5 +1,5 @@
 ---
-name: git-commit
+name: commit-git
 description: Stage files and create git commits. Use when the user wants to commit, stage changes, or generate a commit message — even if they just say "commit this" or "save my changes."
 ---
 
@@ -7,20 +7,21 @@ description: Stage files and create git commits. Use when the user wants to comm
 
 ## Workflow
 
-### Step 1: Identify files (skip if files are explicit in the request)
+### Step 1: Locate the repo root
 
 ```bash
 git rev-parse --show-toplevel
-git status --short
+```
+
+All later commands run against `<root>`.
+
+### Step 2: Identify files (skip if files are explicit in the request)
+
+```bash
+git -C <root> status --short
 ```
 
 Show a numbered list of changed/untracked files and ask the user to select by number(s), range, or "all". Wait for their reply before continuing.
-
-### Step 2: Locate the repo root
-
-```bash
-git rev-parse --show-toplevel
-```
 
 ### Step 3: Inspect the changes
 
@@ -58,8 +59,7 @@ Avoid vague summaries ("update files"). Don't mention filenames in the subject u
 
 ### Step 5: Confirm — MANDATORY STOP ⛔
 
-**Do not run `git add` or `git commit` until the user explicitly approves.**
-This applies every time, even if they said "just commit" in a prior turn.
+Stage and commit only after the user explicitly approves the message below — every time, even if they said "just commit" earlier in the conversation.
 
 Present clearly:
 
@@ -99,7 +99,7 @@ git -C <root> log --oneline -1
 
 | Situation | Action |
 |---|---|
-| File has no changes vs HEAD | Tell the user; don't silently skip |
+| File has no changes vs HEAD | Tell the user |
 | Untracked / new file | Stage it; note "new file" in the message |
 | Relative path given | Resolve relative to working directory |
 | Binary file | Note it's binary; base message on filename/context |
@@ -110,8 +110,8 @@ git -C <root> log --oneline -1
 
 ## Constraints
 
-- Never commit without explicit confirmation in Step 5.
-- Stage only the files the user selected (or all changes if none specified — show the full list in Step 5).
-- Commit locally only; do not push unless explicitly asked.
-- Do not modify `.gitignore` or any other file as part of this workflow.
+- Commit only after the explicit approval gated in Step 5.
+- Stage exactly the files the user selected in Step 2 (or all changes if none specified).
+- Commit locally; push only when explicitly asked.
+- Touch only files that are part of the commit — leave `.gitignore` and anything else untouched.
 - Use `git` directly — no third-party libraries.
