@@ -60,51 +60,38 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+## Code Quality
+
+Required on every changed file:
+- Avoid security issues.
+- Keep logic understandable, safely typed, maintainable, covered by tests.
+
+Apply the scoped guidance below only when changed files match its scope:
+
+| Scope | File |
+|---|---|
+| Every changed file | [agents/security.md](agents/security.md) |
+| Every changed file | [agents/correctness-maintainability.md](agents/correctness-maintainability.md) |
+| API route handlers | [agents/architecture.md](agents/architecture.md) |
+| React components, Next.js routes/layouts/pages/hooks | [agents/react-nextjs.md](agents/react-nextjs.md) |
+| API routes, server actions, DB queries, external calls | [agents/backend.md](agents/backend.md) |
+| Component styling | [agents/tailwind-styling.md](agents/tailwind-styling.md) |
+| Hooks, utilities, API handlers, feature logic | [agents/solid.md](agents/solid.md) |
+| Any change | [agents/code-organization.md](agents/code-organization.md) |
+| `.ts` / `.tsx` files | [agents/typescript-patterns.md](agents/typescript-patterns.md) |
+| `.py` files, or `pyproject.toml`/`requirements.txt` present | [agents/python.md](agents/python.md) |
+
+Also align with any accepted ADRs in [docs/adr](docs/adr/) and domain user stories in [docs/user_stories](docs/user_stories/) when behavior changes.
+
+**How to apply:**
+1. Identify change scope from the table above.
+2. Read and apply the required guidelines plus every scoped file that matches.
+3. Make small, direct changes that satisfy the guidelines without speculative abstraction.
+4. Verify with tests or focused checks matching the change.
+
 ## Documentation
 
 Project docs live in `docs/`. Refer to `INDEX.md` in the project root to understand the docs folder structure and navigate it. After any code changes, update relevant docs to reflect the new state. For any key architectural decision made, create an ADR in `docs/adr/`.
-
-## Logging
-
-- Use `loguru` for structured logging; no `print` statements
-- Never log sensitive data
-
-## Testing
-
-- Use `pytest` with Arrange-Act-Assert pattern
-- Descriptive test names; keep tests isolated and deterministic
-
-## Tooling
-
-| Tool | Purpose |
-|------|---------|
-| `uv` | Dependency and environment management |
-| `ruff` | Linting and formatting |
-| `ty` | Type checking |
-| `pyproject.toml` | Single source of truth |
-
-## Python Environment Usage Setup
-
-Prefer `uv run` over activating the environment and calling `python` directly.
-
-**pyproject.toml present:**
-```bash
-uv venv .venv --python 3.13 && uv sync
-uv run python script.py   # preferred over activating + python
-```
-
-**requirements.txt present:**
-```bash
-uv venv .venv --python 3.13 && uv pip install -r requirements.txt
-uv run python script.py
-```
-
-**No dependency files:**
-```bash
-source ~/personal/bin/activate  # fallback only
-```
-
-Reuse an existing `.venv` if present. Never mix environments or assume system Python.
 
 ## LLM API Usage
 
