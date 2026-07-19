@@ -1,16 +1,13 @@
 ---
 name: feature-plan
 description: >
-  Plan a feature or fix before building it. Triggers on "feature-plan", "make a plan for X",
-  "spec this out", "plan this change", "grill me on this ticket", or "/plan-ticket". Works
-  with or without a formal ticket. Always interviews the user first, then saves a Markdown
-  plan to the repo. Use this skill any time a user wants to think through and document a
-  feature before writing code.
+  Document a feature or fix as an implementation-ready Markdown plan. 
+disable-model-invocation: true
 ---
 
 # Feature Plan
 
-Interview the user thoroughly, then save a tight **agent-ready Markdown plan** to the repo.
+Save a tight **agent-ready Markdown plan** to `.specs/`.
 
 Two entry points — same workflow, different starting context:
 - **With ticket + brief** — ticket is the spec, brief is background
@@ -26,34 +23,11 @@ You need one thing before starting:
 - If a ticket/brief path was given, read those files
 - If no description exists, ask: *"What are you trying to build or fix?"*
 
-Don't ask about save location yet — that's resolved in Step 5.
+If real open decisions remain (the ticket has gaps, or no discussion happened yet), stop and tell the user to run `grill-with-docs` first — don't interview inline.
 
 ---
 
-## Step 2 — Grill the user
-
-Interview the user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
-
-Rules:
-- Use the question tool for every question. One question (or tight cluster) at a time.
-- Lead with your **recommended answer** with brief rationale — don't just ask open questions
-- If the codebase can answer a question, **explore it** instead of asking
-- If a ticket exists, focus on **gaps and unresolved decisions** — don't re-litigate what's settled
-- **Track every decision**, especially deviations from the ticket (needed in Step 5)
-
-When you feel the design is fully resolved, resolve the save location before confirming:
-- Look for an existing `_specs` directory
-- If found, use it
-- If not found, propose `_specs/`
-
-Then confirm with the user:
-> *"I think we have enough to write the plan. I'll save it to `<specs_dir>` — ready to go?"*
-
-Wait for explicit confirmation.
-
----
-
-## Step 3 — Generate the plan
+## Step 2 — Generate the plan
 
 Synthesize the ticket (if any), brief (if any), and discussion into the template below.
 
@@ -97,10 +71,11 @@ ASCII diagram — what changes, what it touches, how data flows.
 ```
 
 ## Key Files
+Phase ties each file to the implementation phase that touches it — keeps commit grouping unambiguous for `ship-plan` later, without it needing to re-read diffs.
 
-| File | What changes |
-|---|---|
-| `path/to/file.ts` | Add new handler |
+| File | What changes | Phase |
+|---|---|---|
+| `path/to/file.ts` | Add new handler | Phase 1 |
 
 ## Code Shape
 _Optional — include only when interface design is non-obvious or worth locking in early._
@@ -173,7 +148,7 @@ What to test and why it matters — skip anything that just proves the language 
 
 ---
 
-## Step 4 — Check INDEX.md
+## Step 3 — Check INDEX.md
 
 Before saving, look for an `INDEX.md` at the project root. If it exists:
 1. Read it
@@ -184,7 +159,7 @@ If no `INDEX.md` exists, note it and skip.
 
 ---
 
-## Step 5 — Save the file
+## Step 4 — Save the file
 
 Derive a git slug from the feature title:
 - lowercase, hyphen-separated, max ~50 chars
@@ -192,16 +167,20 @@ Derive a git slug from the feature title:
 
 Filename: strip the prefix/slash — e.g. `feat/add-csv-export` → `feat-add-csv-export.md`
 
-Save to the directory confirmed in Step 2. Create it if needed.
+Save to `.specs/`. Create it if needed.
+
+Check the project's root `.gitignore` for a `.specs/` entry. If missing, append one — plans are never committed.
 
 Confirm:
-> *"Saved to `<specs_dir>/feat-add-csv-export.md`. Recommended branch: `feat/add-csv-export`."*
+> *"Saved to `.specs/feat-add-csv-export.md` (added `.specs/` to `.gitignore`). Recommended branch: `feat/add-csv-export`."*
+
+Omit the gitignore note if an entry already existed.
 
 ---
 
-## Step 6 — Patch the ticket (if one was provided)
+## Step 5 — Patch the ticket (if one was provided)
 
-Review decisions from Step 2. If any deviate from the ticket:
+Review the decisions reached in conversation (Step 1). If any deviate from the ticket:
 1. Re-read the ticket file
 2. Apply targeted edits via `str_replace` — only change what was actually decided differently
 3. Tell the user what changed and why
@@ -221,3 +200,4 @@ If no deviations, say so explicitly.
 - **Code Shape and Validation Rules are optional.** Include them when they add real clarity; omit them for simple CRUD or UI-only changes.
 - **Logging is always included.** Even simple features should document at minimum their entry/exit and error events. DEBUG-level input/output tracing (functions, LLM calls, DB queries) should be included for non-trivial features.
 - **Don't write code.** Output is a plan doc only.
+- **Not committed.** The plan lives in gitignored `.specs/` — `ship-plan` reads it later to generate commits and the PR description, so keep Key Files (including Phase) and Implementation Plan accurate; they drive that downstream automation.
