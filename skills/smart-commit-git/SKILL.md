@@ -1,5 +1,5 @@
 ---
-name: smart-git-commit
+name: smart-commit-git
 description: Group all changed files into logically sequenced commits with meaningful messages. Use when the user says "smart commit", "group my changes into commits", "commit everything intelligently", "batch commit", or has many changed files to commit in a logical order. Always use this skill for multi-file grouped commits — don't handle from scratch.
 ---
 
@@ -165,8 +165,6 @@ Types: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`
 
 ## Constraints
 
-- Never commit without explicit user "ok" in Step 4.
-- Only stage files the user selected.
 - Commit locally only — do not push unless explicitly asked.
 - Do not modify `.gitignore` or any unselected file.
 - Use git CLI directly — no third-party libraries.
