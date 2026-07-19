@@ -2,12 +2,7 @@
 name: feature-brief
 description: >
   Write a high-level requirements brief (PRD-style) for a feature, feature set, or new project.
-  Triggers on "feature-brief", "write a feature brief", "brief this", "plan this project",
-  "help me plan X", "what are we building", or any description of scope larger than a single
-  implementation task. Always interviews the user first, then saves a Markdown brief to the
-  repo. The brief captures *what* and *why* at a high level (problem, goals, requirements,
-  user stories) — it does NOT contain implementation details, file-level changes, or phased
-  task breakdowns.
+disable-model-invocation: true
 ---
 
 # Feature Brief
