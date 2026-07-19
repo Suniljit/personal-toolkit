@@ -70,16 +70,16 @@ Apply the scoped guidance below only when changed files match its scope:
 
 | Scope | File |
 |---|---|
-| Every changed file | [agents/security.md](agents/security.md) |
-| Every changed file | [agents/correctness-maintainability.md](agents/correctness-maintainability.md) |
-| API route handlers | [agents/architecture.md](agents/architecture.md) |
-| React components, Next.js routes/layouts/pages/hooks | [agents/react-nextjs.md](agents/react-nextjs.md) |
-| API routes, server actions, DB queries, external calls | [agents/backend.md](agents/backend.md) |
-| Component styling | [agents/tailwind-styling.md](agents/tailwind-styling.md) |
-| Hooks, utilities, API handlers, feature logic | [agents/solid.md](agents/solid.md) |
-| Any change | [agents/code-organization.md](agents/code-organization.md) |
-| `.ts` / `.tsx` files | [agents/typescript-patterns.md](agents/typescript-patterns.md) |
-| `.py` files, or `pyproject.toml`/`requirements.txt` present | [agents/python.md](agents/python.md) |
+| Every changed file | [guidelines/security.md](guidelines/security.md) |
+| Every changed file | [guidelines/correctness-maintainability.md](guidelines/correctness-maintainability.md) |
+| API route handlers | [guidelines/architecture.md](guidelines/architecture.md) |
+| React components, Next.js routes/layouts/pages/hooks | [guidelines/react-nextjs.md](guidelines/react-nextjs.md) |
+| API routes, server actions, DB queries, external calls | [guidelines/backend.md](guidelines/backend.md) |
+| Component styling | [guidelines/tailwind-styling.md](guidelines/tailwind-styling.md) |
+| Hooks, utilities, API handlers, feature logic | [guidelines/solid.md](guidelines/solid.md) |
+| Any change | [guidelines/code-organization.md](guidelines/code-organization.md) |
+| `.ts` / `.tsx` files | [guidelines/typescript-patterns.md](guidelines/typescript-patterns.md) |
+| `.py` files, or `pyproject.toml`/`requirements.txt` present | [guidelines/python.md](guidelines/python.md) |
 
 Also align with any accepted ADRs in [docs/adr](docs/adr/) and domain user stories in [docs/user_stories](docs/user_stories/) when behavior changes.
 
