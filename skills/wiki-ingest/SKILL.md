@@ -1,7 +1,7 @@
 ---
 name: wiki-ingest
 description: >
-  Ingest new or changed files from a project's raw/ folder into its LLM wiki,
+  Ingest new or changed files from a project's wiki/raw/ folder into its LLM wiki,
   synthesizing markdown pages and updating the index and log. Trigger on
   "/wiki-ingest", "ingest raw sources", "update the wiki from raw", "process
   new wiki sources".
@@ -9,19 +9,19 @@ description: >
 
 # Wiki Ingest
 
-Read [`../wiki-common/SCHEMA.md`](../wiki-common/SCHEMA.md) first — it defines the `raw/`/`wiki/` layout, page frontmatter, `index.md`/`log.md` formats, and the two shared scripts. This skill is the only one that writes wiki pages, `index.md`, and `log.md` directly; `wiki-add` and `wiki-query` both delegate here.
+Read [`../wiki-common/SCHEMA.md`](../wiki-common/SCHEMA.md) first — it defines the `wiki/raw/`/`wiki/` layout, page frontmatter, `index.md`/`log.md` formats, and the two shared scripts. This skill is the only one that writes wiki pages, `index.md`, and `log.md` directly; `wiki-add` and `wiki-query` both delegate here.
 
 ## Step 1 — Locate and scaffold
 
-Find `raw/` and `wiki/` at the project root. If `wiki/` is missing, create it with an empty `index.md`, `log.md`, and `manifest.json` (`{}`). If `raw/`, `wiki/`, and `wiki/manifest.json` aren't already in `.gitignore`, add them.
+Find `wiki/` at the project root, and `wiki/raw/` inside it. If `wiki/` or `wiki/raw/` is missing, create it, along with an empty `index.md`, `log.md`, and `manifest.json` (`{}`). If `wiki/` isn't already in `.gitignore`, add it (or, if the project already tracks `wiki/`, add `wiki/raw/` and `wiki/manifest.json` instead — those two stay ignored regardless).
 
 ## Step 2 — Find what's new
 
 ```bash
-python3 <path-to-wiki-common>/scripts/wiki_diff.py check --raw raw/ --manifest wiki/manifest.json
+python3 <path-to-wiki-common>/scripts/wiki_diff.py check --raw wiki/raw/ --manifest wiki/manifest.json
 ```
 
-This is a pure hash comparison — no LLM judgment involved in deciding what's new. If `new` and `changed` are both empty, report "wiki is up to date" and stop. Note any `removed` files in the report (files the manifest tracked that no longer exist in `raw/`) — don't touch pages for them without asking, a source going missing doesn't mean its wiki content is wrong.
+This is a pure hash comparison — no LLM judgment involved in deciding what's new. If `new` and `changed` are both empty, report "wiki is up to date" and stop. Note any `removed` files in the report (files the manifest tracked that no longer exist in `wiki/raw/`) — don't touch pages for them without asking, a source going missing doesn't mean its wiki content is wrong.
 
 ## Step 3 — Ingest each new/changed file
 
@@ -39,7 +39,7 @@ For every file in `new` + `changed`:
 6. **Append to `log.md`**: one entry per source file, tagged `ingest`, listing pages created/updated and any contradictions flagged.
 7. **Mark it done**:
    ```bash
-   python3 <path-to-wiki-common>/scripts/wiki_diff.py mark --raw raw/ --manifest wiki/manifest.json --file <relpath> --pages <comma-separated wiki page paths>
+   python3 <path-to-wiki-common>/scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <comma-separated wiki page paths>
    ```
    Mark per-file, immediately after that file's pages are written — so a failure partway through the batch doesn't falsely mark unprocessed files as done.
 

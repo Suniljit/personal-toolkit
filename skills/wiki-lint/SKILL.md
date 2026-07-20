@@ -3,8 +3,7 @@ name: wiki-lint
 description: >
   Health-check a project's LLM wiki for contradictions, orphaned pages, and
   stale claims — auto-fixing unambiguous cases and reporting the rest.
-  Trigger on "/wiki-lint", "check the wiki", "audit the wiki", "wiki health
-  check".
+disable-model-invocation: true
 ---
 
 # Wiki Lint
@@ -17,7 +16,7 @@ Find `wiki/` at the project root. If it's missing or has no pages, report "nothi
 
 ## Step 2 — Read everything
 
-Read `index.md` and every page under `wiki/`.
+Read `index.md` and every page under `wiki/`, excluding `wiki/raw/` (ingestion input, not a wiki page) and `wiki/manifest.json`.
 
 ## Step 3 — Detect issues
 

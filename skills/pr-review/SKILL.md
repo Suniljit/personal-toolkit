@@ -1,6 +1,7 @@
 ---
 name: pr-review
-description: Review a pull request or branch using git. Trigger on "review PR #N", "review this PR/branch", "check this PR", or just "review" with no context (assume current branch). Fetches diff via git + gh CLI, explains the changes, flags issues, and gives a merge recommendation.
+description: Review a pull request or branch using git.
+disable-model-invocation: true
 ---
 
 # PR Review Skill
@@ -21,7 +22,7 @@ Base defaults to `origin/main`; override if user said "against X". Stop if branc
 
 ## Step 2: Deliver the review
 
-No emoticons. Be as short as possible without losing signal. Skip sections that don't apply.
+Plain text, no emoticons. Direct and specific: cite file and line for every claim, skip sections that don't apply, and cut anything that doesn't carry signal.
 
 ### Summary
 1–2 sentences: what and why.
@@ -42,7 +43,7 @@ Impact: one sentence.
 Pure refactor or docs-only? Say so in one sentence, skip this section.
 
 ### Issues Found
-Cite file and line. If none: "No issues found."
+If none: "No issues found."
 
 `CRITICAL` — bug, security, data loss. Blocks merge.
 `WARNING` — edge case, performance, maintainability.
@@ -91,6 +92,3 @@ Skip if everything is clear. Each question should be paste-ready — addressed t
 **Safe to approve?** One sentence; call out any CRITICAL/WARNING issues.
 **What could break?** Specific system or flow. "Nothing" if clean.
 **Blockers:** (skip if APPROVE) What must be fixed before merge.
-
----
-*Direct and specific. Cite files and lines. No padding.*

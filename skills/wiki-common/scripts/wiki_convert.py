@@ -2,8 +2,8 @@
 """Convert a non-text raw source (PDF, DOCX, PPTX, XLSX, etc.) to Markdown via MarkItDown.
 
 Usage:
-  wiki_convert.py raw/report.pdf
-  wiki_convert.py raw/report.pdf --out /tmp/report.md
+  wiki_convert.py wiki/raw/report.pdf
+  wiki_convert.py wiki/raw/report.pdf --out /tmp/report.md
 """
 
 import argparse

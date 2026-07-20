@@ -2,9 +2,8 @@
 name: wiki-query
 description: >
   Answer a question from a project's LLM wiki with citations, optionally
-  filing the synthesized answer back as a wiki page. Trigger on
-  "/wiki-query", "ask the wiki", "what does the wiki say about...", "search
-  the wiki for...".
+  filing the synthesized answer back as a wiki page.
+disable-model-invocation: true
 ---
 
 # Wiki Query

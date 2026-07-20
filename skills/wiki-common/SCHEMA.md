@@ -7,15 +7,17 @@ Shared conventions for `wiki-ingest`, `wiki-add`, `wiki-query`, and `wiki-lint`.
 At the target project's root:
 
 ```
-raw/                        immutable source files — never edited by any skill
 wiki/
+  raw/                      immutable source files — never edited by any skill
   index.md                  flat catalog of every wiki page (see below)
   log.md                    append-only ingest history
-  manifest.json             {relpath: {hash, ingested_at, pages_touched}} for every raw/ file processed
+  manifest.json             {relpath: {hash, ingested_at, pages_touched}} for every wiki/raw/ file processed
   <topic>.md                wiki pages, flat, kebab-case filenames
 ```
 
-`raw/`, `wiki/manifest.json`, and `wiki/` itself are local working state, not source — add them to the project's `.gitignore` if not already present. `wiki/index.md`, `wiki/log.md`, and the pages under `wiki/` are the artifact worth keeping; whether those are committed is the user's call per project.
+`wiki/raw/` and `wiki/manifest.json` are local working state, not source — add them to the project's `.gitignore` if not already present, even if `wiki/` itself ends up tracked. `wiki/index.md`, `wiki/log.md`, and the pages under `wiki/` are the artifact worth keeping; whether those are committed is the user's call per project (default: the whole `wiki/` directory is gitignored until the user opts in).
+
+Querying and linting operate over `wiki/` but must never treat `wiki/raw/` as a page — it's ingestion input, not wiki content.
 
 No vector DB, no embeddings, no Obsidian, no graph viewer. Navigation is `index.md` plus grep.
 
@@ -108,8 +110,8 @@ Managed via `scripts/wiki_diff.py` — never hand-edit.
 
 ## Scripts
 
-- `scripts/wiki_diff.py check --raw <dir> --manifest <path>` — prints JSON `{"new": [...], "changed": [...], "removed": [...]}` for files in `raw/` not yet reflected in the manifest (new file, or hash changed since last ingest). Pure hash comparison — no LLM judgment involved in "what's new". Stdlib-only — run directly with `python3`, no venv needed.
-- `scripts/wiki_diff.py mark --raw <dir> --manifest <path> --file <relpath> --pages <page1,page2>` — call once a source file has actually been synthesized into pages, to update its manifest entry. Marking per-file (not per-batch) means a mid-run failure doesn't falsely mark unprocessed files as done. Also stdlib-only.
+- `scripts/wiki_diff.py check --raw wiki/raw/ --manifest wiki/manifest.json` — prints JSON `{"new": [...], "changed": [...], "removed": [...]}` for files in `wiki/raw/` not yet reflected in the manifest (new file, or hash changed since last ingest). Pure hash comparison — no LLM judgment involved in "what's new". Stdlib-only — run directly with `python3`, no venv needed.
+- `scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <page1,page2>` — call once a source file has actually been synthesized into pages, to update its manifest entry. Marking per-file (not per-batch) means a mid-run failure doesn't falsely mark unprocessed files as done. Also stdlib-only.
 - `scripts/wiki_convert.py <file> [--out <path>]` — converts a non-text source (PDF, DOCX, PPTX, XLSX, etc.) to Markdown via MarkItDown. Only needed for extensions that aren't already `.md`/`.txt`. This one has a real dependency, so it runs through `wiki-common`'s own `.venv` via `uv run --project <path-to-wiki-common> python scripts/wiki_convert.py <file>` — see the README's setup section for creating that venv once. If the venv or MarkItDown is missing, the command fails with an explicit setup instruction; don't attempt to parse binary formats without it.
 
 `wiki-common` carries its own `pyproject.toml` + `.venv`, isolated from any target project's own Python environment — the wiki-ingest pipeline never touches or assumes anything about the project it's ingesting into.
