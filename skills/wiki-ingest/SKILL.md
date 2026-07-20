@@ -2,9 +2,8 @@
 name: wiki-ingest
 description: >
   Ingest new or changed files from a project's wiki/raw/ folder into its LLM wiki,
-  synthesizing markdown pages and updating the index and log. Trigger on
-  "/wiki-ingest", "ingest raw sources", "update the wiki from raw", "process
-  new wiki sources".
+  synthesizing markdown pages and updating the index and log. 
+disable-model-invocation: true
 ---
 
 # Wiki Ingest
