@@ -10,13 +10,17 @@ disable-model-invocation: true
 
 If given a PR number: `gh pr view <number> --json headRefName,title,body` → use `headRefName`. If `gh` fails, ask. Otherwise use `HEAD`.
 
+Never check out or switch the current branch — work entirely off remote refs.
+
 ## Step 1: Get the diff
 
 ```bash
 git fetch origin
-git diff origin/main...<branch-or-HEAD>
-git log origin/main...<branch-or-HEAD> --oneline
+git diff origin/main...origin/<headRefName>
+git log origin/main...origin/<headRefName> --oneline
 ```
+
+If resolved from `HEAD` (no PR number given), diff `origin/main...HEAD` instead.
 
 Base defaults to `origin/main`; override if user said "against X". Stop if branch missing or diff empty.
 
