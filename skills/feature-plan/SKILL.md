@@ -7,29 +7,25 @@ disable-model-invocation: true
 
 # Feature Plan
 
-Save a tight **agent-ready Markdown plan** to `.specs/`.
+Save a tight **agent-ready Markdown plan** to `_specs/`.
 
-Two entry points — same workflow, different starting context:
-- **With ticket + brief** — ticket is the spec, brief is background
-- **No ticket** — user describes the feature directly
+The feature context comes from a completed `grill-with-docs` or `grill-me` session — decisions, constraints, and rationale should already be in the conversation.
 
 ---
 
-## Step 1 — Gather inputs
+## Step 1 — Check INDEX.md
 
-You need one thing before starting:
+Look for an `INDEX.md` at the project root. If it exists:
+1. Read it
+2. Identify which docs are affected by this feature
 
-**Feature description** — what are we building or fixing?
-- If a ticket/brief path was given, read those files
-- If no description exists, ask: *"What are you trying to build or fix?"*
-
-If real open decisions remain (the ticket has gaps, or no discussion happened yet), stop and tell the user to run `grill-with-docs` first — don't interview inline.
+If no `INDEX.md` exists, note it and skip — the plan's **Docs to Update** section will be empty.
 
 ---
 
 ## Step 2 — Generate the plan
 
-Synthesize the ticket (if any), brief (if any), and discussion into the template below.
+Synthesize the grilling session discussion, plus the affected docs from Step 1, into the template below.
 
 **Brevity principle:** Every section should be as short as possible while still being useful. Prefer bullet points over prose. Cut words that don't add meaning. Extra detail is only warranted when it genuinely helps a reader understand something non-obvious — not just to be thorough.
 
@@ -42,8 +38,8 @@ Synthesize the ticket (if any), brief (if any), and discussion into the template
 One or two sentences. What does this do, and why now?
 
 ## Decisions
-Two-tier table. **Constraints** are pre-existing and non-negotiable (ticket requirements, infra
-limits, existing conventions). **Choices** were made during planning and had real alternatives.
+Two-tier table. **Constraints** are pre-existing and non-negotiable (infra limits, existing
+conventions, prior decisions). **Choices** were made during planning and had real alternatives.
 Omit rows that are obvious from the codebase.
 
 | Type | Decision | Choice | Why |
@@ -71,7 +67,7 @@ ASCII diagram — what changes, what it touches, how data flows.
 ```
 
 ## Key Files
-Phase ties each file to the implementation phase that touches it — keeps commit grouping unambiguous for `ship-plan` later, without it needing to re-read diffs.
+Phase ties each file to the implementation phase that touches it — keeps commit grouping unambiguous later, without needing to re-read diffs.
 
 | File | What changes | Phase |
 |---|---|---|
@@ -148,18 +144,7 @@ What to test and why it matters — skip anything that just proves the language 
 
 ---
 
-## Step 3 — Check INDEX.md
-
-Before saving, look for an `INDEX.md` at the project root. If it exists:
-1. Read it
-2. Identify which docs are affected by this feature
-3. Fill in the **Docs to Update** section
-
-If no `INDEX.md` exists, note it and skip.
-
----
-
-## Step 4 — Save the file
+## Step 3 — Save the file
 
 Derive a git slug from the feature title:
 - lowercase, hyphen-separated, max ~50 chars
@@ -167,25 +152,10 @@ Derive a git slug from the feature title:
 
 Filename: strip the prefix/slash — e.g. `feat/add-csv-export` → `feat-add-csv-export.md`
 
-Save to `.specs/`. Create it if needed.
-
-Check the project's root `.gitignore` for a `.specs/` entry. If missing, append one — plans are never committed.
+Save to `_specs/`. Create it if needed.
 
 Confirm:
-> *"Saved to `.specs/feat-add-csv-export.md` (added `.specs/` to `.gitignore`). Recommended branch: `feat/add-csv-export`."*
-
-Omit the gitignore note if an entry already existed.
-
----
-
-## Step 5 — Patch the ticket (if one was provided)
-
-Review the decisions reached in conversation (Step 1). If any deviate from the ticket:
-1. Re-read the ticket file
-2. Apply targeted edits via `str_replace` — only change what was actually decided differently
-3. Tell the user what changed and why
-
-If no deviations, say so explicitly.
+> *"Saved to `_specs/feat-add-csv-export.md`. Recommended branch: `feat/add-csv-export`."*
 
 ---
 
@@ -200,4 +170,4 @@ If no deviations, say so explicitly.
 - **Code Shape and Validation Rules are optional.** Include them when they add real clarity; omit them for simple CRUD or UI-only changes.
 - **Logging is always included.** Even simple features should document at minimum their entry/exit and error events. DEBUG-level input/output tracing (functions, LLM calls, DB queries) should be included for non-trivial features.
 - **Don't write code.** Output is a plan doc only.
-- **Not committed.** The plan lives in gitignored `.specs/` — `ship-plan` reads it later to generate commits and the PR description, so keep Key Files (including Phase) and Implementation Plan accurate; they drive that downstream automation.
+- **Committed.** The plan lives in `_specs/` and is checked into git alongside the code it describes.

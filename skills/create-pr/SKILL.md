@@ -1,10 +1,14 @@
 ---
 name: create-pr
 description: >
-  Creates GitHub Pull Requests via the GitHub CLI. Trigger when the user wants to open/create/submit a PR, push a branch for review, or mentions "stacked branches", "PR to a specific branch", or "PR summary". Analyzes git diffs, shows a summary for approval, pushes the branch, then creates the PR.
+  Creates GitHub Pull Requests via the GitHub CLI. Trigger when the user wants to open/create/submit a PR, push a branch for review, or mentions "stacked branches", "PR to a specific branch", "PR summary", or provides a spec/ticket to PR against. Analyzes the git diff (always, regardless of whether specs are given), shows a summary for approval, pushes the branch, then creates the PR.
 ---
 
 # PR Creator Skill
+
+## Specs (optional)
+
+The user may hand you a spec, ticket, or plan doc alongside the PR request. This never replaces the diff — it's read once and folded in as extra context when writing the Step 2 summary (why a change was made, what decision it implements). No spec provided → proceed on the diff alone.
 
 ## Branch resolution
 
@@ -38,7 +42,7 @@ git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 
 Show this and ask: **"Does this look good? Say OK to create the PR, or tell me what to change."**
 
-Focus on **what changed and why** from the actual code diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns.
+Focus on **what changed and why** from the actual code diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns. If a spec was provided, use it to explain the *why* behind changes the diff shows; the diff still governs what's listed under Changes.
 
 ```
 **Branch:** `<current>` → `<target>`
