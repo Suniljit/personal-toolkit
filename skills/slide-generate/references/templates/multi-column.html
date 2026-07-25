@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Multi-Column Template</title>
+<link rel="stylesheet" href="deck.css">
+</head>
+<body>
+<!--
+  Set --cols to the number of columns per row (2–6). Add more .card items than --cols
+  and they wrap onto additional rows automatically — no extra markup needed. Column
+  order should match the deck's locked flow direction.
+-->
+<section class="slide">
+  <p class="eyebrow">[Section]</p>
+  <h2>[Slide Heading]</h2>
+  <div class="slide-body grid" style="--cols: 3">
+    <div class="card column">
+      <h3>[Item 1]</h3>
+      <ul class="bullets">
+        <li>[Point]</li>
+      </ul>
+    </div>
+    <div class="card column">
+      <h3>[Item 2]</h3>
+      <ul class="bullets">
+        <li>[Point]</li>
+      </ul>
+    </div>
+    <div class="card column">
+      <h3>[Item 3]</h3>
+      <ul class="bullets">
+        <li>[Point]</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="muted">[Deck Title]</span>
+    <span class="muted">[NN]</span>
+  </div>
+</section>
+</body>
+</html>

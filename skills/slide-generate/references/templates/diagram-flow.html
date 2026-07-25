@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diagram — Flow / Comparison Template</title>
+<link rel="stylesheet" href="deck.css">
+</head>
+<body>
+<!--
+  Full-slide flow diagram: parallel tracks of connected steps (1-3+ tracks — .tracks
+  distributes evenly), plus an optional callout row underneath for closing caveats.
+  Steps within a track are top-aligned in the order given; add/remove .node + .connector
+  pairs to shorten or lengthen a track independently of the others.
+
+  For a *partial* diagram embedded inside another slide instead of filling it: drop the
+  .tracks block (and callout .grid, if used) into that template's .slide-body, and skip
+  .diagram-banner — use the host template's own eyebrow/heading instead.
+
+  A one-off connector that crosses between tracks (an arrow jumping from track A into
+  the middle of track B) isn't part of this pattern — draw it as a positioned line/SVG
+  once the boxes' final positions are set; that's a per-diagram detail, not reusable.
+-->
+<section class="slide">
+  <div class="diagram">
+    <div class="diagram-banner">
+      <h2>[Diagram Title]</h2>
+      <p class="subtitle">[Optional one-line framing]</p>
+    </div>
+    <div class="tracks">
+      <div class="track">
+        <p class="track-label">[Approach A]</p>
+        <div class="node">[Step A1]</div>
+        <div class="connector">↓</div>
+        <div class="node">[Step A2]</div>
+      </div>
+      <div class="track">
+        <p class="track-label suggested">[Approach B — suggested]</p>
+        <div class="node accent">[Step B1]</div>
+        <div class="connector">↓</div>
+        <div class="node accent">[Step B2]</div>
+        <div class="connector">↓</div>
+        <div class="node accent">[Step B3]</div>
+      </div>
+    </div>
+    <div class="grid" style="--cols: 2">
+      <div class="card">
+        <h3>[Constraint A]</h3>
+        <p class="muted">[One-line explanation]</p>
+      </div>
+      <div class="card">
+        <h3>[Constraint B]</h3>
+        <p class="muted">[One-line explanation]</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span class="muted">[Deck Title]</span>
+    <span class="muted">[NN]</span>
+  </div>
+</section>
+</body>
+</html>

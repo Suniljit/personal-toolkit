@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Diagram — Convergence Template</title>
+<link rel="stylesheet" href="deck.css">
+</head>
+<body>
+<!--
+  Full-slide convergence diagram: parallel options funnel down into one synthesized
+  decision, plus a one-line principle/takeaway underneath. .tracks distributes evenly,
+  so 2+ options work without changing the pattern.
+
+  For a *partial* diagram embedded inside another slide instead of filling it: drop the
+  .tracks block and the .node.accent decision box into that template's .slide-body, and
+  skip .diagram-banner — use the host template's own eyebrow/heading instead.
+-->
+<section class="slide">
+  <div class="diagram">
+    <div class="diagram-banner">
+      <h2>[Diagram Title]</h2>
+      <p class="subtitle">[Optional one-line framing]</p>
+    </div>
+    <div class="tracks">
+      <div class="track">
+        <div class="card">
+          <h3>[Option A]</h3>
+          <p class="muted">[What it is, and where it matters most]</p>
+        </div>
+        <div class="connector">↓</div>
+      </div>
+      <div class="track">
+        <div class="card">
+          <h3>[Option B]</h3>
+          <p class="muted">[What it is, and where it matters most]</p>
+        </div>
+        <div class="connector">↓</div>
+      </div>
+    </div>
+    <div class="node accent">
+      <strong>[Proposed path forward]</strong>
+      <p class="muted">[The synthesized decision, in one or two lines]</p>
+    </div>
+    <p class="caption">[Principle: one-line takeaway tying the decision back to a general rule]</p>
+  </div>
+  <div class="slide-footer">
+    <span class="muted">[Deck Title]</span>
+    <span class="muted">[NN]</span>
+  </div>
+</section>
+</body>
+</html>
