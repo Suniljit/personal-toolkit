@@ -77,6 +77,7 @@ Apply the scoped guidance below only when changed files match its scope:
 | API routes, server actions, DB queries, external calls | [guidelines/backend.md](guidelines/backend.md) |
 | Component styling | [guidelines/tailwind-styling.md](guidelines/tailwind-styling.md) |
 | Hooks, utilities, API handlers, feature logic | [guidelines/solid.md](guidelines/solid.md) |
+| Test files, or any change adding/modifying tests | [guidelines/testing.md](guidelines/testing.md) |
 | Any change | [guidelines/code-organization.md](guidelines/code-organization.md) |
 | `.ts` / `.tsx` files | [guidelines/typescript-patterns.md](guidelines/typescript-patterns.md) |
 | `.py` files, or `pyproject.toml`/`requirements.txt` present | [guidelines/python.md](guidelines/python.md) |

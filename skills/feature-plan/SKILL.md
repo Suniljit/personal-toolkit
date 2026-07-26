@@ -138,7 +138,7 @@ Only list edge cases that aren't obvious or need special handling.
 - ...
 
 ## Testing
-What to test and why it matters — skip anything that just proves the language works.
+What to test and why it matters — favor asserting on output over implementation calls (see `guidelines/testing.md`). Skip anything that just proves the language works.
 - ...
 ```
 
