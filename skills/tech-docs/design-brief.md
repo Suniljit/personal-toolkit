@@ -21,6 +21,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **UI component library** — buttons, form inputs, cards, navigation bars, modals, toasts, dropdowns — states each needs (default/hover/disabled/error)
 - **Screen layout templates** — grids for the screen types found in `app-flow.md` (dashboards, forms, detail views, empty states)
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Brand:** with no references yet, don't invent a palette from nothing — propose 2-3 named directions (e.g. "minimal/neutral", "bold/saturated") and let the user pick before generating tokens.
+- **Design tokens:** beyond success/warning/error, check for `info` and `disabled` semantic colors, and ask whether dark mode is in scope before finalizing the palette.
+- **Component library:** sanity-check against the common set — buttons, inputs, cards, nav, modals, toasts, dropdowns, tables, pagination, avatars, badges — and flag any the screen map implies but the user didn't mention.
+- **Layout templates:** confirm at least one responsive breakpoint (mobile vs. desktop) and the loading/empty/error variant per template, not just the happy-path layout.
+
 Lead each question with your recommended answer. If the user has existing brand references (screenshots, a style guide, a competitor's look), ask for them before guessing.
 
 When the system feels complete, confirm:
@@ -89,4 +95,4 @@ Save to `docs/blueprint/design-brief.md`. Add or update its row in the root `IND
 `docs/blueprint/design-brief.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/design-brief.md`. Next: `/tech-docs tdd` if not already done, then `/tech-docs data-schema`."*
+> *"Saved to `docs/blueprint/design-brief.md`."*

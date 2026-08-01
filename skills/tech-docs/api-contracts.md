@@ -21,6 +21,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Status codes & error handling** — standard error payload shape (e.g. RFC 7807), status codes used, validation error layout
 - **Authentication & headers** — mechanism (Bearer token, API key, cookie), custom headers
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Endpoints:** for every list endpoint, confirm pagination, filtering, and sorting params up front — retrofitting them later is a breaking change.
+- **Request/response schemas:** decide a versioning strategy (URL path, header) before the first endpoint ships, even if v1 is the only version today.
+- **Errors:** use one consistent error envelope across every endpoint — don't let the shape vary by resource.
+- **Auth:** cover token refresh/expiry behavior and rate-limit headers, not just the initial auth mechanism.
+
 Lead each question with your recommended answer. Walk the data schema's tables one at a time — each table typically becomes a resource's CRUD set — rather than asking the user to list endpoints cold.
 
 When the contract feels complete, confirm:
@@ -74,4 +80,4 @@ Save to `docs/blueprint/api-contracts.md`. Add or update its row in the root `IN
 `docs/blueprint/api-contracts.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/api-contracts.md`. Next: `/tech-docs nfr` if not already done."*
+> *"Saved to `docs/blueprint/api-contracts.md`."*

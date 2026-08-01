@@ -21,6 +21,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Screen-by-screen map** — every view, modal, slide-over, and contextual action reachable from the loops above
 - **State & edge logic** — what each interactive control does, loading states, empty states, error states
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Onboarding:** check whether social auth, guest/anonymous mode, or invite-only signup fits the persona from the PRD — don't default to email/password if the persona suggests otherwise.
+- **Core loops:** note each loop's frequency (daily habit vs. one-time setup) — high-frequency loops deserve shortcuts (quick actions, keyboard shortcuts) that low-frequency ones don't need.
+- **Screen map:** cross-check against commonly-missed screens — settings/profile, notifications center, help/support, search results, empty-account first-run — before declaring the map complete.
+- **Edge logic:** cover first-use empty states, error recovery (retry vs. dead-end), and concurrent-edit conflicts, not just the loading/empty/error triad per screen.
+
 Lead each question with your recommended answer. Walk the PRD's must-haves one at a time rather than asking about the whole app at once.
 
 When the map feels complete, confirm:
@@ -86,4 +92,4 @@ Save to `docs/blueprint/app-flow.md`. Add or update its row in the root `INDEX.m
 `docs/blueprint/app-flow.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/app-flow.md`. Next: `/tech-docs design-brief` or `/tech-docs tdd` (either order)."*
+> *"Saved to `docs/blueprint/app-flow.md`."*

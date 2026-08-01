@@ -20,6 +20,11 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Tech stack selection** — frontend framework, backend runtime, database engine(s), caching layer, hosting platform
 - **Third-party tools & services** — external APIs, auth provider (e.g. Auth0, Clerk), payment gateway, email/notification service
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Architecture:** let expected scale (traffic, team size, release cadence) drive monolith-vs-microservices — recommend a monolith by default unless the PRD's scope or team structure argues otherwise.
+- **Tech stack:** favor what the existing codebase or team already knows over a "better" unfamiliar choice, unless the user explicitly wants to introduce something new.
+- **Third-party services:** for each vendor considered, flag lock-in risk, cost at the scale implied by the PRD's success metrics, and data residency if the app handles regulated data.
+
 Lead each question with your recommended answer. Check the existing codebase for a stack already in use before asking — don't relitigate a choice that's already made.
 
 For each **key technical decision** — hard to reverse, surprising without context, a real trade-off — `/domain-modeling` records it as an ADR under `docs/adr/` as it surfaces, rather than writing decisions inline here.
@@ -87,4 +92,4 @@ Save to `docs/blueprint/tdd.md`. Add or update its row in the root `INDEX.md`'s 
 `docs/blueprint/tdd.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/tdd.md`. Next: `/tech-docs data-schema`, and `/tech-docs nfr` once the schema and API are settled."*
+> *"Saved to `docs/blueprint/tdd.md`."*

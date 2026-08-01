@@ -21,6 +21,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Indexes & constraints** — primary keys, unique indexes, composite indexes for known query patterns, check constraints
 - **Data lifecycle strategy** — soft vs. hard deletes, auditing fields (`created_at`, `updated_at`, `deleted_at`), migration strategy
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Entities:** derive the initial list from nouns in the PRD's must-haves and user stories, then ask what's implied but unnamed (e.g. an "Order" implies an "OrderItem").
+- **Relationships:** for every N:M relationship, confirm a junction table rather than modeling it as two 1:N's; for every FK, decide the cascade rule (cascade / restrict / set-null) explicitly rather than defaulting.
+- **Indexes:** derive candidate indexes from the query patterns in `app-flow.md`'s core loops, not just from primary/foreign keys.
+- **Lifecycle:** if the data includes PII or payment info, flag soft-delete and audit-trail requirements now — they're expensive to retrofit.
+
 Lead each question with your recommended answer. Derive the entity list from the PRD's must-haves first, then ask what's missing — don't ask the user to enumerate from scratch.
 
 When the schema feels complete, confirm:
@@ -78,4 +84,4 @@ Save to `docs/blueprint/data-schema.md`. Add or update its row in the root `INDE
 `docs/blueprint/data-schema.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/data-schema.md`. Next: `/tech-docs api-contracts`."*
+> *"Saved to `docs/blueprint/data-schema.md`."*

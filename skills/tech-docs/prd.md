@@ -22,6 +22,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **User stories** — one per must-have feature, as `Given / When / Then`
 - **Success metrics (KPIs)** — concrete and measurable, tied to the goals above
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Feature scope:** sanity-check the must-have list against the categories a product like this usually needs — auth/onboarding, the core workflow itself, search/filter, notifications, admin/reporting, settings — and ask about any category conspicuously absent.
+- **Success metrics:** anchor KPIs to a framework (AARRR for growth-stage products, HEART for usability-stage) rather than inventing ad hoc numbers; tie each metric back to a goal from the Problem Statement.
+- **Persona:** check for a role split (e.g. Admin vs. End User) even when the user describes only one persona — permissions gaps are a common PRD blind spot.
+- **Scope boundary:** for every must-have, ask "what's the smallest version that ships" — an item sitting in Nice-to-haves is often a must-have's edge case in disguise, not a separate feature.
+
 Lead each question with your recommended answer. Explore the codebase or existing docs before asking anything they'd already answer there.
 
 When scope feels resolved, confirm:
@@ -83,4 +89,4 @@ Save to `docs/blueprint/prd.md`. Add or update its row in the root `INDEX.md`'s 
 `docs/blueprint/prd.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/prd.md`. Next: `/tech-docs app-flow`."*
+> *"Saved to `docs/blueprint/prd.md`."*

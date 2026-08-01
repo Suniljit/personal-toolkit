@@ -21,6 +21,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **DevOps & deployment pipeline** — local/staging/production setup, CI/CD steps, testing gates (unit, integration, e2e), rollback procedure
 - **Observability & reliability** — structured logging strategy, error reporting target, telemetry, uptime expectation
 
+**Considerations** — ground recommendations in these rather than guessing:
+- **Performance targets:** set numbers relative to the expected user count and traffic pattern from the PRD, not generic industry defaults.
+- **Security & compliance:** derive compliance scope from what `data-schema.md` actually stores (PII, payment, health data) rather than asking in the abstract.
+- **DevOps:** confirm how many environments (local/staging/prod, or more) and whether feature flags are in scope before designing the pipeline.
+- **Observability:** tie alerting thresholds back to the performance targets above — an alert with no corresponding target is noise.
+
 Lead each question with your recommended answer. Ground targets in the architecture from the TDD — don't propose a caching-layer SLA if the TDD names no cache.
 
 When the strategy feels complete, confirm:
@@ -83,4 +89,4 @@ Save to `docs/blueprint/nfr.md`. Add or update its row in the root `INDEX.md`'s 
 `docs/blueprint/nfr.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it — suite complete once all seven rows exist.
 
 Confirm:
-> *"Saved to `docs/blueprint/nfr.md`. Suite complete — all seven docs are in `docs/blueprint/`."*
+> *"Saved to `docs/blueprint/nfr.md`."*

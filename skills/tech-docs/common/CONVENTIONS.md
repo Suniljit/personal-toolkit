@@ -75,6 +75,8 @@ Create the table if it doesn't exist yet. Add or update only the row for the doc
 
 Every flow's interview step is a `/grilling` session, run with `/domain-modeling` alongside it — not just to keep terminology precise, but to record any ADR-worthy decision the moment it surfaces, in whichever flow it comes up in.
 
+Each flow's Step 2 pairs its interview topics with a Considerations list — concrete checklists, frameworks, and common blind spots for that document type. Draw each recommended answer from that list before asking, not from a generic default; it's what turns "lead with your recommendation" into a specific, defensible one instead of a guess.
+
 ## Related section
 
 Every generated doc ends with:
