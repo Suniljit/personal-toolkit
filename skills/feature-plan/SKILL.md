@@ -66,13 +66,6 @@ ASCII diagram — what changes, what it touches, how data flows.
                      └──────────────┘
 ```
 
-## Key Files
-Phase ties each file to the implementation phase that touches it — keeps commit grouping unambiguous later, without needing to re-read diffs.
-
-| File | What changes | Phase |
-|---|---|---|
-| `path/to/file.ts` | Add new handler | Phase 1 |
-
 ## Code Shape
 _Optional — include only when interface design is non-obvious or worth locking in early._
 
@@ -116,12 +109,19 @@ Notes:
 - Flag any log lines that should feed an alert or dashboard metric
 
 ## Implementation Plan
-Phases small enough to be a single commit.
+Phases small enough to be a single commit. Each phase lists the files it touches, then its tasks — keeps commit grouping unambiguous later, without needing to re-read diffs.
 
 ### Phase 1: [Name]
+| File | What changes |
+|---|---|
+| `path/to/file.ts` | Add new handler |
+
 - [ ] Task
 
 ### Phase 2: [Name]
+| File | What changes |
+|---|---|
+
 - [ ] Task
 
 ## Risks & Unknowns
