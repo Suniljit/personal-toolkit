@@ -1,6 +1,7 @@
 ---
 name: commit-git
-description: Stage files and create git commits. Use when the user wants to commit, stage changes, or generate a commit message — even if they just say "commit this" or "save my changes."
+description: Stage files and create git commits.
+disable-model-invocation: true
 ---
 
 # Git Commit Skill

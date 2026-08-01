@@ -2,9 +2,8 @@
 name: slide-outline
 description: >
   Turn a finished slide-planning discussion into a slide-by-slide outline and a
-  context file for later amendment sessions. Trigger on: "turn this into a slide
-  outline", "write up the deck outline", "generate the outline and context files",
-  or once a /grilling or /grill-with-docs session about slide content has settled.
+  context file for later amendment sessions.
+disable-model-invocation: true
 ---
 
 # Slide Outline

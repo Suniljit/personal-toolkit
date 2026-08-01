@@ -1,7 +1,8 @@
 ---
 name: create-pr
 description: >
-  Creates GitHub Pull Requests via the GitHub CLI. Trigger when the user wants to open/create/submit a PR, push a branch for review, or mentions "stacked branches", "PR to a specific branch", "PR summary", or provides a spec/ticket to PR against. Analyzes the git diff (always, regardless of whether specs are given), shows a summary for approval, pushes the branch, then creates the PR.
+  Creates GitHub Pull Requests via the GitHub CLI. 
+disable-model-invocation: true
 ---
 
 # PR Creator Skill

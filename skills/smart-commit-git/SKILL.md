@@ -1,6 +1,7 @@
 ---
 name: smart-commit-git
-description: Group all changed files into logically sequenced commits with meaningful messages. Use when the user says "smart commit", "group my changes into commits", "commit everything intelligently", "batch commit", or has many changed files to commit in a logical order. Always use this skill for multi-file grouped commits — don't handle from scratch.
+description: Group all changed files into logically sequenced commits with meaningful messages. 
+disable-model-invocation: true
 ---
 
 # Git Smart Commit Skill

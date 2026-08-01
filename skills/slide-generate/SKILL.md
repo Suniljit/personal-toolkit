@@ -2,9 +2,8 @@
 name: slide-generate
 description: >
   Generate a deck's slides as HTML, one slide at a time, iterating with the user until
-  each is approved before moving to the next. Trigger on: "generate the HTML slides",
-  "build slide <n>", "make the deck", "let's start building the slides" — once
-  outline.md and context.md exist.
+  each is approved before moving to the next.
+disable-model-invocation: true
 ---
 
 # Slide Generate
