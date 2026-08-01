@@ -1,14 +1,6 @@
----
-name: wiki-lint
-description: >
-  Health-check a project's LLM wiki for contradictions, orphaned pages, and
-  stale claims — auto-fixing unambiguous cases and reporting the rest.
-disable-model-invocation: true
----
+# Wiki — lint flow
 
-# Wiki Lint
-
-Read [`../wiki-common/SCHEMA.md`](../wiki-common/SCHEMA.md) first for page frontmatter and `index.md`/`log.md` conventions.
+Read [`common/SCHEMA.md`](common/SCHEMA.md) first for page frontmatter and `index.md`/`log.md` conventions.
 
 ## Step 1 — Locate the wiki
 

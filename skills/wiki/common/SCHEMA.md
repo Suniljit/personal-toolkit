@@ -1,6 +1,6 @@
 # LLM Wiki Schema
 
-Shared conventions for `wiki-ingest`, `wiki-add`, `wiki-query`, and `wiki-lint`. Every one of those skills reads this file before touching a project's wiki — it's the single source of truth for layout and format. Don't restate these conventions inside the individual skills; link back here.
+Shared conventions for the `wiki` skill's ingest, add, query, and lint flows. Every one of those flows reads this file before touching a project's wiki — it's the single source of truth for layout and format. Don't restate these conventions inside the individual flow files; link back here.
 
 ## Layout
 
@@ -43,7 +43,7 @@ timestamp: 2026-07-19T10:00:00Z   # last-updated, ISO 8601
 - **reference** — durable facts, specs, API shapes
 - **summary** — a digest of a source or a filed query answer
 
-`timestamp` is what `wiki-lint` uses to decide which of two conflicting claims is newer.
+`timestamp` is what the lint flow uses to decide which of two conflicting claims is newer.
 
 ## Page Contents block
 
@@ -64,7 +64,7 @@ title: Authentication Flow
 <page content follows, one `##` per Contents entry>
 ```
 
-This is what lets `/wiki-query` reason down to the right *section* of a shortlisted page by reading just this block — not the whole file, and not a duplicate copy in the index.
+This is what lets the query flow reason down to the right *section* of a shortlisted page by reading just this block — not the whole file, and not a duplicate copy in the index.
 
 ## index.md format
 
@@ -72,7 +72,7 @@ Flat catalog: one entry per page, page-level only. Cheap to read in full on ever
 
 ```markdown
 # Wiki Index
-> Run /wiki-ingest to keep this current. Run /wiki-query to ask questions against the wiki.
+> Run /wiki ingest to keep this current. Run /wiki query to ask questions against the wiki.
 
 ## <Category>
 
@@ -89,7 +89,7 @@ Append-only, one entry per skill run:
 ## [2026-07-19] ingest | Source Title
 - created: topic-a.md
 - updated: topic-b.md (added section on X)
-- flagged: contradicts topic-c.md on Y — left for /wiki-lint
+- flagged: contradicts topic-c.md on Y — left for /wiki lint
 ```
 
 Use `ingest`, `add`, `query`, or `lint` as the operation tag so entries are greppable by kind.
@@ -112,6 +112,6 @@ Managed via `scripts/wiki_diff.py` — never hand-edit.
 
 - `scripts/wiki_diff.py check --raw wiki/raw/ --manifest wiki/manifest.json` — prints JSON `{"new": [...], "changed": [...], "removed": [...]}` for files in `wiki/raw/` not yet reflected in the manifest (new file, or hash changed since last ingest). Pure hash comparison — no LLM judgment involved in "what's new". Stdlib-only — run directly with `python3`, no venv needed.
 - `scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <page1,page2>` — call once a source file has actually been synthesized into pages, to update its manifest entry. Marking per-file (not per-batch) means a mid-run failure doesn't falsely mark unprocessed files as done. Also stdlib-only.
-- `scripts/wiki_convert.py <file> [--out <path>]` — converts a non-text source (PDF, DOCX, PPTX, XLSX, etc.) to Markdown via MarkItDown. Only needed for extensions that aren't already `.md`/`.txt`. This one has a real dependency, so it runs through `wiki-common`'s own `.venv` via `uv run --project <path-to-wiki-common> python scripts/wiki_convert.py <file>` — see the README's setup section for creating that venv once. If the venv or MarkItDown is missing, the command fails with an explicit setup instruction; don't attempt to parse binary formats without it.
+- `scripts/wiki_convert.py <file> [--out <path>]` — converts a non-text source (PDF, DOCX, PPTX, XLSX, etc.) to Markdown via MarkItDown. Only needed for extensions that aren't already `.md`/`.txt`. This one has a real dependency, so it runs through `common/`'s own `.venv` via `uv run --project common python scripts/wiki_convert.py <file>` — see the README's setup section for creating that venv once. If the venv or MarkItDown is missing, the command fails with an explicit setup instruction; don't attempt to parse binary formats without it.
 
-`wiki-common` carries its own `pyproject.toml` + `.venv`, isolated from any target project's own Python environment — the wiki-ingest pipeline never touches or assumes anything about the project it's ingesting into.
+`common/` carries its own `pyproject.toml` + `.venv`, isolated from any target project's own Python environment — the ingest flow never touches or assumes anything about the project it's ingesting into.

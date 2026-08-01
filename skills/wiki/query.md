@@ -1,18 +1,10 @@
----
-name: wiki-query
-description: >
-  Answer a question from a project's LLM wiki with citations, optionally
-  filing the synthesized answer back as a wiki page.
-disable-model-invocation: true
----
+# Wiki — query flow
 
-# Wiki Query
-
-Read [`../wiki-common/SCHEMA.md`](../wiki-common/SCHEMA.md) first for the `index.md`/page conventions.
+Read [`common/SCHEMA.md`](common/SCHEMA.md) first for the `index.md`/page conventions.
 
 ## Step 1 — Locate the wiki
 
-Find `wiki/index.md` at the project root. If it doesn't exist, tell the user there's no wiki yet and suggest `/wiki-ingest`.
+Find `wiki/index.md` at the project root. If it doesn't exist, tell the user there's no wiki yet and suggest `/wiki ingest`.
 
 ## Step 2 — Shortlist from the flat index
 
@@ -28,11 +20,11 @@ For the remaining candidates, read the specific sections the Contents block poin
 
 ## Step 5 — Synthesize with citations
 
-Answer the question, citing the specific page (and section, where relevant) each claim came from. If pages disagree, say so rather than picking one silently — that's a job for `/wiki-lint`, not for this skill to paper over.
+Answer the question, citing the specific page (and section, where relevant) each claim came from. If pages disagree, say so rather than picking one silently — that's a job for the lint flow, not for this flow to paper over.
 
 ## Step 6 — Offer to file the answer
 
-If the synthesis is a genuinely new page-worthy artifact (not just a quick lookup), ask: "File this as a new/updated wiki page?" Never file automatically. If the user says yes, hand the answer to [`../wiki-add/SKILL.md`](../wiki-add/SKILL.md) as the ad-hoc content to add.
+If the synthesis is a genuinely new page-worthy artifact (not just a quick lookup), ask: "File this as a new/updated wiki page?" Never file automatically. If the user says yes, hand the answer to [`add.md`](add.md) as the ad-hoc content to add.
 
 ## Completion criterion
 
