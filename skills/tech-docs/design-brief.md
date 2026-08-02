@@ -1,14 +1,14 @@
 # Tech Docs — Design Brief flow
 
-Read [`common/CONVENTIONS.md`](common/CONVENTIONS.md) first for the `docs/blueprint/` layout and shared conventions.
+Read [`common/CONVENTIONS.md`](common/CONVENTIONS.md) first for the `docs/design/` layout and shared conventions.
 
-Write the Design Brief & UI System document to `docs/blueprint/design-brief.md`.
+Write the Design Brief & UI System document to `docs/design/design-brief.md`.
 
 ---
 
 ## Step 1 — Read the PRD and App Flow
 
-Read `docs/blueprint/prd.md` and `docs/blueprint/app-flow.md`. If either is missing, stop and say so — component and layout choices are driven by the persona (PRD) and the screen map (App Flow); run those flows first.
+Read `docs/design/prd.md` and `docs/design/app-flow.md`. If either is missing, stop and say so — component and layout choices are driven by the persona (PRD) and the screen map (App Flow); run those flows first.
 
 ---
 
@@ -30,69 +30,25 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 Lead each question with your recommended answer. If the user has existing brand references (screenshots, a style guide, a competitor's look), ask for them before guessing.
 
 When the system feels complete, confirm:
-> *"I think we have the design system. Saving to `docs/blueprint/design-brief.md` — ready?"*
+> *"I think we have the design system. Saving to `docs/design/design-brief.md` — ready?"*
 
 ---
 
 ## Step 3 — Generate the doc
 
-```markdown
----
-doc_type: design-brief
-status: draft
-depends_on: [docs/blueprint/prd.md, docs/blueprint/app-flow.md]
-last_updated: YYYY-MM-DD
----
+Read [`templates/design-brief.md`](templates/design-brief.md) and fill in every section.
 
-# [Product / Feature Name] — Design Brief & UI System
-
-## Look & Feel / Brand Identity
-Tone, visual direction, mood, references.
-
-## Design Tokens
-
-### Color Palette
-| Token | Hex | Usage |
-|---|---|---|
-| `primary` | | |
-| `success` | | |
-| `warning` | | |
-| `error` | | |
-
-### Typography
-| Token | Font | Weight | Size | Line height |
-|---|---|---|---|---|
-
-### Spacing & Grid
-Base unit, scale, breakpoints (mobile, desktop).
-
-## UI Component Library
-| Component | States | Notes |
-|---|---|---|
-| Button | default / hover / disabled | |
-
-## Screen Layout Templates
-One subsection per template, referencing the screen types in `app-flow.md`.
-
-### [Template name — e.g. Dashboard]
-Grid/layout description or ASCII sketch.
-
-## Related
-- [PRD](prd.md) — persona this system designs for
-- [App Flow](app-flow.md) — screens these templates lay out
-```
-
-Apply the overflow rule from CONVENTIONS.md once the component library passes ~8 components with real state/variant detail — split each into `docs/blueprint/design-brief/<component-slug>.md`.
+Apply the overflow rule from CONVENTIONS.md once the component library passes ~8 components with real state/variant detail — split each into `docs/design/design-brief/<component-slug>.md`.
 
 ---
 
 ## Step 4 — Save
 
-Save to `docs/blueprint/design-brief.md`. Add or update its row in the root `INDEX.md`'s **Blueprint** table per CONVENTIONS.md.
+Save to `docs/design/design-brief.md`. Add or update its row in the root `INDEX.md`'s **Design** table per CONVENTIONS.md.
 
 ## Completion criterion
 
-`docs/blueprint/design-brief.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
+`docs/design/design-brief.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/design-brief.md`."*
+> *"Saved to `docs/design/design-brief.md`."*

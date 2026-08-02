@@ -1,14 +1,14 @@
 # Tech Docs — TDD flow
 
-Read [`common/CONVENTIONS.md`](common/CONVENTIONS.md) first for the `docs/blueprint/` layout and shared conventions.
+Read [`common/CONVENTIONS.md`](common/CONVENTIONS.md) first for the `docs/design/` layout and shared conventions.
 
-Write the Technical Design Document to `docs/blueprint/tdd.md`. This is the second anchor — Data Schema, API Contracts, and NFR all read it.
+Write the Technical Design Document to `docs/design/tdd.md`. This is the second anchor — Data Schema, API Contracts, and NFR all read it.
 
 ---
 
 ## Step 1 — Read the PRD and App Flow
 
-Read `docs/blueprint/prd.md` and `docs/blueprint/app-flow.md`. If either is missing, stop and say so — the architecture is chosen to serve the scope and flows they define; run those flows first.
+Read `docs/design/prd.md` and `docs/design/app-flow.md`. If either is missing, stop and say so — the architecture is chosen to serve the scope and flows they define; run those flows first.
 
 ---
 
@@ -30,54 +30,13 @@ Lead each question with your recommended answer. Check the existing codebase for
 For each **key technical decision** — hard to reverse, surprising without context, a real trade-off — `/domain-modeling` records it as an ADR under `docs/adr/` as it surfaces, rather than writing decisions inline here.
 
 When the design feels complete, confirm:
-> *"I think we have the technical design. Saving to `docs/blueprint/tdd.md` — ready?"*
+> *"I think we have the technical design. Saving to `docs/design/tdd.md` — ready?"*
 
 ---
 
 ## Step 3 — Generate the doc
 
-```markdown
----
-doc_type: tdd
-status: draft
-depends_on: [docs/blueprint/prd.md, docs/blueprint/app-flow.md]
-last_updated: YYYY-MM-DD
----
-
-# [Product / Feature Name] — Technical Design Document
-
-## Architecture Overview
-Monolith / microservices / serverless; frontend vs. backend layout; communication channels.
-
-```
-[Client] ──► [API Gateway] ──► [Service] ──► [DB]
-```
-
-## Tech Stack Selection
-| Layer | Choice |
-|---|---|
-| Frontend framework | |
-| Backend runtime | |
-| Database | |
-| Caching | |
-| Hosting | |
-
-## Third-Party Tools & Services
-| Service | Purpose | Provider |
-|---|---|---|
-| Auth | | |
-| Payments | | |
-| Email/notifications | | |
-
-## Key Technical Decisions (ADRs)
-| ADR | Decision |
-|---|---|
-| [ADR-001](../adr/0001-....md) | ... |
-
-## Related
-- [PRD](prd.md) — scope this architecture serves
-- [App Flow](app-flow.md) — flows this architecture supports
-```
+Read [`templates/tdd.md`](templates/tdd.md) and fill in every section.
 
 This doc rarely needs the overflow split — ADR detail already lives in `docs/adr/` (owned by `/domain-modeling`), so the table above stays a pointer, not inline content, regardless of how many ADRs accumulate.
 
@@ -85,11 +44,11 @@ This doc rarely needs the overflow split — ADR detail already lives in `docs/a
 
 ## Step 4 — Save
 
-Save to `docs/blueprint/tdd.md`. Add or update its row in the root `INDEX.md`'s **Blueprint** table per CONVENTIONS.md.
+Save to `docs/design/tdd.md`. Add or update its row in the root `INDEX.md`'s **Design** table per CONVENTIONS.md.
 
 ## Completion criterion
 
-`docs/blueprint/tdd.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
+`docs/design/tdd.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
 
 Confirm:
-> *"Saved to `docs/blueprint/tdd.md`."*
+> *"Saved to `docs/design/tdd.md`."*

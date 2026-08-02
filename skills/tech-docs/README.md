@@ -22,10 +22,10 @@ Seven documents, one concern each, generated in sequence via `/tech-docs <flow>`
 
 ## Where the docs live
 
-All seven are written to `docs/blueprint/`, indexed from the project root's `INDEX.md`. See [common/CONVENTIONS.md](common/CONVENTIONS.md) for the exact layout, frontmatter, and how large docs split into overflow files.
+All seven are written to `docs/design/`, indexed from the project root's `INDEX.md`. See [common/CONVENTIONS.md](common/CONVENTIONS.md) for the exact layout, frontmatter, and how large docs split into overflow files.
 
 ## Picking where to start
 
 - Nothing exists yet → start at 1, `/tech-docs prd`.
-- `docs/blueprint/` already has some docs → check the root `INDEX.md`'s **Blueprint** table, find the first doc in the sequence above that isn't written yet whose dependencies already exist, and run that flow.
+- `docs/design/` already has some docs → check the root `INDEX.md`'s **Design** table, find the first doc in the sequence above that isn't written yet whose dependencies already exist, and run that flow.
 - You know which doc you want → run its flow directly. If its dependencies don't exist yet, the flow says so and points you at the right one to start with instead.
