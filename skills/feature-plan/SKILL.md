@@ -136,6 +136,7 @@ Only list edge cases that aren't obvious or need special handling.
 
 ## Docs to Update
 - ...
+- `INDEX.md` — only if this feature adds, removes, or repurposes a top-level folder or file
 
 ## Testing
 What to test and why it matters — favor asserting on output over implementation calls (see `guidelines/testing.md`). Skip anything that just proves the language works.

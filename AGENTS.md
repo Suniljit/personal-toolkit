@@ -90,9 +90,13 @@ Also align with any accepted ADRs in [docs/adr](docs/adr/) and domain user stori
 3. Make small, direct changes that satisfy the guidelines without speculative abstraction.
 4. Verify with tests or focused checks matching the change.
 
+## Repo Navigation
+
+Read `INDEX.md` at the project root before working in an unfamiliar part of the repo — it summarizes what each top-level folder/file covers. When a change adds, removes, or repurposes a folder or file, update `INDEX.md` to match.
+
 ## Documentation
 
-Project docs live in `docs/`. Refer to `INDEX.md` in the project root to understand the docs folder structure and navigate it. After any code changes, update relevant docs to reflect the new state. For any key architectural decision made, create an ADR in `docs/adr/`.
+Project docs live in `docs/`. After any code changes, update relevant docs to reflect the new state. For any key architectural decision made, create an ADR in `docs/adr/`.
 
 ## LLM API Usage
 
