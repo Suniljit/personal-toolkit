@@ -8,4 +8,6 @@ Implement the work described by the user in the spec or tickets.
 
 Run typechecking regularly, single test files regularly, and the full test suite and linter once at the end.
 
+If the spec is organized into phases, commit at the end of each phase before starting the next.
+
 Once done, invoke /code-review with the fixed point set to the merge-base between the current branch and the repo's default branch, and the spec source set to whatever spec/ticket this implementation was based on.
