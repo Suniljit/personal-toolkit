@@ -1,10 +1,7 @@
 ---
 name: tech-docs
 description: >
-  Seven-document technical documentation suite — PRD, App Flow, Design Brief,
-  TDD, Data Schema, API Contracts, NFR. Branch selected by the first word of
-  the invocation (prd | app-flow | design-brief | tdd | data-schema |
-  api-contracts | nfr).
+  prd | app-flow | design-brief | tdd | data-schema | api-contracts | nfr - first word picks the flow. Seven-document technical documentation suite — PRD, App Flow, Design Brief, TDD, Data Schema, API Contracts, NFR. 
 disable-model-invocation: true
 ---
 
