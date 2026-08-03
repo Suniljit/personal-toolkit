@@ -19,7 +19,7 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Problem statement & goals** — why this exists, the pain point, the business objective
 - **Target persona** — primary users, their needs, roles/permissions (e.g. Admin vs. End User)
 - **Feature scope** — must-haves (MVP), nice-to-haves (later phase), and out-of-scope (explicit, to block scope creep)
-- **User stories** — `Given / When / Then`, each tagged with the must-have feature it belongs to (a feature can cover several stories)
+- **User stories** — `As a / I want / so that` plus `Given / When / Then` acceptance criteria, each tagged with the must-have feature it belongs to (a feature can cover several stories)
 - **Success metrics (KPIs)** — concrete and measurable, tied to the goals above
 
 **Considerations** — ground recommendations in these rather than guessing:

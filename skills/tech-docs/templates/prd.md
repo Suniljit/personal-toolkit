@@ -32,6 +32,7 @@ Why this exists, the pain point, the business objective.
 
 ### [Story title]
 **Feature:** [Feature name]
+**As a** [persona], **I want** [goal], **so that** [benefit]
 **Given** ... **When** ... **Then** ...
 
 ## Success Metrics (KPIs)
