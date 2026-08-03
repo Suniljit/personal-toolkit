@@ -36,7 +36,7 @@ When the design feels complete, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/tdd.md`](templates/tdd.md) and fill in every section.
+Read [`templates/tdd.md`](templates/tdd.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 This doc rarely needs the overflow split — ADR detail already lives in `docs/adr/` (owned by `/domain-modeling`), so the table above stays a pointer, not inline content, regardless of how many ADRs accumulate.
 

@@ -37,7 +37,7 @@ When scope feels resolved, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/prd.md`](templates/prd.md) and fill in every section.
+Read [`templates/prd.md`](templates/prd.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 Apply the overflow rule from CONVENTIONS.md if user stories exceed ~8 or the doc passes ~400 lines — keep the summary table in `prd.md`, move each `### [Story title]` section to `docs/design/prd/<story-slug>.md`.
 

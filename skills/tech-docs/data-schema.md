@@ -36,7 +36,7 @@ When the schema feels complete, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/data-schema.md`](templates/data-schema.md) and fill in every section.
+Read [`templates/data-schema.md`](templates/data-schema.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 Apply the overflow rule from CONVENTIONS.md once there are more than ~8 tables — keep the ER diagram and the table-of-tables in `data-schema.md`, move each `### [table_name]` section to `docs/design/data-schema/<table>.md`.
 

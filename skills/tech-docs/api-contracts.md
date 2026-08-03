@@ -36,7 +36,7 @@ When the contract feels complete, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/api-contracts.md`](templates/api-contracts.md) and fill in every section.
+Read [`templates/api-contracts.md`](templates/api-contracts.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 Apply the overflow rule from CONVENTIONS.md once there are more than ~8 endpoints — keep the summary table, error format, and auth section in `api-contracts.md`, move each `### [METHOD] /path` section to `docs/design/api-contracts/<resource>.md`.
 

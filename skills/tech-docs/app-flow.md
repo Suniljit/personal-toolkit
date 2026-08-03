@@ -36,7 +36,7 @@ When the map feels complete, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/app-flow.md`](templates/app-flow.md) and fill in every section.
+Read [`templates/app-flow.md`](templates/app-flow.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 Apply the overflow rule from CONVENTIONS.md once there are more than ~8 screens or loops carrying real state/edge detail — split each into `docs/design/app-flow/<flow-slug>.md`, keep the summary table and diagrams in `app-flow.md`.
 

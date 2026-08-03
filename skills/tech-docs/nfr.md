@@ -36,7 +36,7 @@ When the strategy feels complete, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/nfr.md`](templates/nfr.md) and fill in every section.
+Read [`templates/nfr.md`](templates/nfr.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 This doc rarely needs the overflow split from CONVENTIONS.md — apply it only if a section (e.g. per-environment pipeline detail) genuinely passes ~400 lines.
 

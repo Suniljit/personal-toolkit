@@ -83,6 +83,10 @@ Each flow's Step 2 pairs its interview topics with a Considerations list — con
 
 Each doc records only its own interview topics — never write in material that belongs to a different doc, even when the user volunteers it unprompted. When the user drifts (e.g. naming a database engine or a caching layer while grilling for the PRD), don't record it: name the doc it belongs to, park it there for later ("that's TDD territory — I'll bring it up when we get to `/tech-docs tdd`"), and re-ask the current question. Same treatment for detail that's on-topic but too granular for the doc's altitude (e.g. a specific SQL column type in the PRD's feature scope) — push back, and re-ask at the altitude the doc actually needs.
 
+## Beyond the template
+
+`templates/<flow>.md` is a floor, not a ceiling — the minimum sections a doc of that type carries, not the maximum. When Step 2's grilling surfaces a topic squarely in scope for this doc (per Staying on scope above) but with nowhere to go in the template, add a new section for it rather than forcing it into a section that doesn't fit, or dropping it. Match the template's altitude, heading style, and table-vs-prose conventions for whatever section you add.
+
 ## Related section
 
 Every generated doc ends with:

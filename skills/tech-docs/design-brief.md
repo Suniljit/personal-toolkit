@@ -36,7 +36,7 @@ When the system feels complete, confirm:
 
 ## Step 3 — Generate the doc
 
-Read [`templates/design-brief.md`](templates/design-brief.md) and fill in every section.
+Read [`templates/design-brief.md`](templates/design-brief.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
 
 Apply the overflow rule from CONVENTIONS.md once the component library passes ~8 components with real state/variant detail — split each into `docs/design/design-brief/<component-slug>.md`.
 
