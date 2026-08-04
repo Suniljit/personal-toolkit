@@ -81,6 +81,7 @@ Apply the scoped guidance below only when changed files match its scope:
 | Any change | [guidelines/code-organization.md](guidelines/code-organization.md) |
 | `.ts` / `.tsx` files | [guidelines/typescript-patterns.md](guidelines/typescript-patterns.md) |
 | `.py` files, or `pyproject.toml`/`requirements.txt` present | [guidelines/python.md](guidelines/python.md) |
+| LLM API/SDK calls, or prompt definitions | [guidelines/llm-prompting.md](guidelines/llm-prompting.md) |
 
 Also align with any accepted ADRs in [docs/adr](docs/adr/) and domain user stories in [docs/user_stories](docs/user_stories/) when behavior changes.
 
@@ -97,10 +98,6 @@ Read `INDEX.md` at the project root before working in an unfamiliar part of the 
 ## Documentation
 
 Project docs live in `docs/`. After any code changes, update relevant docs to reflect the new state. For any key architectural decision made, create an ADR in `docs/adr/`.
-
-## LLM API Usage
-
-- Always set a token limit when coding any LLM API calls, using the correct parameter name for that SDK (e.g. `max_tokens` for Anthropic, `max_completion_tokens` for OpenAI)
 
 ## Sub-Agents
 
