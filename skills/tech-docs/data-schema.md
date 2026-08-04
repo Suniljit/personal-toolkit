@@ -16,7 +16,7 @@ Read `docs/design/prd.md` (for the entities implied by feature scope) and `docs/
 
 Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in CONVENTIONS.md), covering, per entity:
 
-- **Data models & tables** — entity names, fields/attributes, data types, nullability, defaults
+- **Data models & tables** — entity names, fields/attributes, data types, nullability, defaults, and the `FR-` features each table serves
 - **Relationships** — foreign keys, cardinality (1:1, 1:N, N:M), cascading rules
 - **Indexes & constraints** — primary keys, unique indexes, composite indexes for known query patterns, check constraints
 - **Data lifecycle strategy** — soft vs. hard deletes, auditing fields (`created_at`, `updated_at`, `deleted_at`), migration strategy

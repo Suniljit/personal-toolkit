@@ -8,14 +8,16 @@ last_updated: YYYY-MM-DD
 # [Product / Feature Name] — Data Schema & Model Specification
 
 ## Entity-Relationship Overview
-```
-[User] 1───N [Order] N───1 [Product]
+```mermaid
+erDiagram
+  USER ||--o{ ORDER : places
+  PRODUCT ||--o{ ORDER : "appears in"
 ```
 
 ## Tables
-| Table | Summary |
-|---|---|
-| `users` | ... |
+| Table | Implements | Summary |
+|---|---|---|
+| `users` | `FR-01` | ... |
 
 ### `[table_name]`
 | Field | Type | Nullable | Default | Notes |

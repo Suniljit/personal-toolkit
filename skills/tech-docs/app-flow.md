@@ -18,7 +18,7 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 
 - **Onboarding & authentication flow** — sign-up, login, password recovery, MFA, initial setup/tour
 - **Core feature loops** — the primary workflows step by step, one loop per must-have feature from the PRD (e.g. browse → checkout → confirmation)
-- **Screen-by-screen map** — every view, modal, slide-over, and contextual action reachable from the loops above
+- **Screen-by-screen map** — every view, modal, slide-over, and contextual action reachable from the loops above, each with its route/deep link and the `US-` stories it serves
 - **State & edge logic** — what each interactive control does, loading states, empty states, error states
 
 **Considerations** — ground recommendations in these rather than guessing:

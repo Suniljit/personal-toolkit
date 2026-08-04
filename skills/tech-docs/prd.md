@@ -19,12 +19,12 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Problem statement & goals** — why this exists, the pain point, the business objective
 - **Target persona** — primary users, their needs, roles/permissions (e.g. Admin vs. End User)
 - **Feature scope** — must-haves (MVP), nice-to-haves (later phase), and out-of-scope (explicit, to block scope creep)
-- **User stories** — `As a / I want / so that` plus `Given / When / Then` acceptance criteria, each tagged with the must-have feature it belongs to (a feature can cover several stories)
+- **User stories** — `As a / I want / so that` plus `Given / When / Then` acceptance criteria, each tagged with the `FR-` feature it implements (a feature can cover several stories)
 - **Success metrics (KPIs)** — concrete and measurable, tied to the goals above
 
 **Considerations** — ground recommendations in these rather than guessing:
 - **Feature scope:** sanity-check the must-have list against the categories a product like this usually needs — auth/onboarding, the core workflow itself, search/filter, notifications, admin/reporting, settings — and ask about any category conspicuously absent.
-- **Success metrics:** anchor KPIs to a framework (AARRR for growth-stage products, HEART for usability-stage) rather than inventing ad hoc numbers; tie each metric back to a goal from the Problem Statement.
+- **Success metrics:** anchor KPIs to a framework (AARRR for growth-stage products, HEART for usability-stage) rather than inventing ad hoc numbers; tie each metric back to a goal from the Problem Statement. For each one, pin down the instrumentation — the event or query that actually produces the number — since a KPI nobody can compute is the most common PRD defect.
 - **Persona:** check for a role split (e.g. Admin vs. End User) even when the user describes only one persona — permissions gaps are a common PRD blind spot.
 - **Scope boundary:** for every must-have, ask "what's the smallest version that ships" — an item sitting in Nice-to-haves is often a must-have's edge case in disguise, not a separate feature.
 

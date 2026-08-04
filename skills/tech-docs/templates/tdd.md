@@ -10,8 +10,20 @@ last_updated: YYYY-MM-DD
 ## Architecture Overview
 Monolith / microservices / serverless; frontend vs. backend layout; communication channels.
 
+```mermaid
+flowchart LR
+  Client --> Gateway[API Gateway] --> Service --> DB[(Database)]
 ```
-[Client] ──► [API Gateway] ──► [Service] ──► [DB]
+
+### Key Flows
+One `sequenceDiagram` per flow whose ordering across components isn't obvious from the diagram above (auth handshake, payment capture, async job).
+
+```mermaid
+sequenceDiagram
+  Client->>Service: request
+  Service->>DB: query
+  DB-->>Service: rows
+  Service-->>Client: response
 ```
 
 ## Tech Stack Selection

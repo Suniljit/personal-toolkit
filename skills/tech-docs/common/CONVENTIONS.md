@@ -42,6 +42,33 @@ last_updated: YYYY-MM-DD
 
 This is what makes the suite searchable without reading every file end to end: `grep doc_type docs/design/*.md` alone answers "which doc is which" and "what feeds what" — an agent orients from the frontmatter, not by opening seven files.
 
+## Traceability IDs
+
+Requirements carry **stable IDs**, so downstream docs cite a requirement rather than a whole document. Two docs mint IDs; the rest reference them.
+
+| Prefix | Minted in | Covers |
+|---|---|---|
+| `FR-01` | `prd.md` | A must-have feature |
+| `US-01` | `prd.md` | A user story under a feature |
+| `NFR-01` | `nfr.md` | A non-functional requirement |
+
+Every downstream item — screen, table, endpoint, component, layout — carries an **Implements** field naming the IDs it serves (comma-separated, or `—` for genuinely cross-cutting infrastructure). That chain is what answers "what breaks if `FR-03` changes?" with a `grep FR-03 docs/design/` instead of a full read of seven files.
+
+IDs are permanent: assign the next unused number, never renumber, and never reuse a retired one. When a requirement is dropped, keep its row and mark it `withdrawn` rather than deleting it — downstream docs and commits may already cite it.
+
+## Diagrams
+
+Every diagram is a **Mermaid** fenced block (` ```mermaid `) — it renders in GitHub, GitLab, and most editors, and diffs line by line in review. Pick the type by what's being shown:
+
+| Showing | Type |
+|---|---|
+| Architecture, journeys, pipelines | `flowchart` (`TD` or `LR`) |
+| Entities and cardinality | `erDiagram` |
+| Cross-service or multi-actor exchanges | `sequenceDiagram` |
+| A screen's or record's states | `stateDiagram-v2` |
+
+Keep node labels short and the direction consistent within a doc.
+
 ## Progressive disclosure — the overflow rule
 
 A doc stays a **router**: a summary table or list of every item (screen, table, endpoint, component), one line each, plus whatever cross-cutting material — diagrams, flows, principles — every reader needs regardless of which item they care about.

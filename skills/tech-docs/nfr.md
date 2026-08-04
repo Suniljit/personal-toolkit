@@ -19,12 +19,14 @@ Run a `/grilling` session, with `/domain-modeling` alongside it (see Grilling in
 - **Performance targets** — latency limits (e.g. API response time < 200ms), throughput, initial load time
 - **Security & compliance** — encryption (in-transit, at-rest), authentication rules, access control (RBAC), compliance mandates (e.g. SOC 2, GDPR, HIPAA)
 - **DevOps & deployment pipeline** — local/staging/production setup, CI/CD steps, testing gates (unit, integration, e2e), rollback procedure
+- **Accessibility** — conformance target (e.g. WCAG 2.2 AA) and how it's verified (automated CI checks, manual keyboard and screen-reader passes)
 - **Observability & reliability** — structured logging strategy, error reporting target, telemetry, uptime expectation
 
 **Considerations** — ground recommendations in these rather than guessing:
 - **Performance targets:** set numbers relative to the expected user count and traffic pattern from the PRD, not generic industry defaults.
 - **Security & compliance:** derive compliance scope from what `data-schema.md` actually stores (PII, payment, health data) rather than asking in the abstract.
 - **DevOps:** confirm how many environments (local/staging/prod, or more) and whether feature flags are in scope before designing the pipeline.
+- **Accessibility:** recommend WCAG 2.2 AA as the default target — it's what public-sector procurement and the European Accessibility Act expect — and settle verification, not just the target, since an unverified conformance claim is a liability rather than an asset.
 - **Observability:** tie alerting thresholds back to the performance targets above — an alert with no corresponding target is noise.
 
 Lead each question with your recommended answer. Ground targets in the architecture from the TDD — don't propose a caching-layer SLA if the TDD names no cache.

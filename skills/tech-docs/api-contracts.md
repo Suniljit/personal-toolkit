@@ -34,21 +34,31 @@ When the contract feels complete, confirm:
 
 ---
 
-## Step 3 — Generate the doc
+## Step 3 — Write the OpenAPI spec
+
+Write `docs/design/api-contracts/openapi.yaml` — OpenAPI 3.1, covering every endpoint agreed in Step 2: paths, operations, parameters, request and response schemas, status codes, and security schemes. Model shared shapes (the error envelope, pagination envelope, each resource) as `components/schemas` entries and `$ref` them rather than repeating shapes per operation.
+
+This is the contract's source of truth — it's what tooling reads and what code is generated or validated against. The markdown doc in Step 4 describes it; it doesn't duplicate it.
+
+---
+
+## Step 4 — Generate the doc
 
 Read [`templates/api-contracts.md`](templates/api-contracts.md) and fill in every section — it's a floor, not a ceiling (see Beyond the template in CONVENTIONS.md).
+
+Keep it to what the spec holds poorly: auth model, versioning and deprecation policy, cross-cutting conventions, error taxonomy, and the endpoint summary table. Per-endpoint request and response schemas stay in `openapi.yaml` — the `### [METHOD] /path` sections carry the intent and the non-obvious behavior, not a second copy of the field lists.
 
 Apply the overflow rule from CONVENTIONS.md once there are more than ~8 endpoints — keep the summary table, error format, and auth section in `api-contracts.md`, move each `### [METHOD] /path` section to `docs/design/api-contracts/<resource>.md`.
 
 ---
 
-## Step 4 — Save
+## Step 5 — Save
 
 Save to `docs/design/api-contracts.md`. Add or update its row in the root `INDEX.md`'s **Design** table per CONVENTIONS.md.
 
 ## Completion criterion
 
-`docs/design/api-contracts.md` exists with every section filled (no placeholders) and `INDEX.md` has a current row for it.
+`docs/design/api-contracts.md` and `docs/design/api-contracts/openapi.yaml` both exist, every endpoint in the doc's summary table has a matching path in the spec, every section is filled (no placeholders), and `INDEX.md` has a current row for the doc.
 
 Confirm:
 > *"Saved to `docs/design/api-contracts.md`."*

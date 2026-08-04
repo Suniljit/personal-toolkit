@@ -17,7 +17,9 @@ Why this exists, the pain point, the business objective.
 ## Feature Scope
 
 ### Must-haves (MVP)
-- ...
+| ID | Feature | Summary |
+|---|---|---|
+| `FR-01` | | |
 
 ### Nice-to-haves
 - ...
@@ -26,17 +28,18 @@ Why this exists, the pain point, the business objective.
 - ...
 
 ## User Stories & Acceptance Criteria
-| User Story | Feature | Summary |
-|---|---|---|
-| [Story title](#story-title) | Feature name | One-line gist |
+| ID | User Story | Implements | Summary |
+|---|---|---|---|
+| `US-01` | [Story title](#story-title) | `FR-01` | One-line gist |
 
-### [Story title]
-**Feature:** [Feature name]
+### `US-01` — [Story title]
+**Implements:** `FR-01`
 **As a** [persona], **I want** [goal], **so that** [benefit]
 **Given** ... **When** ... **Then** ...
 
 ## Success Metrics (KPIs)
-| Metric | Target | How measured |
-|---|---|---|
+| Metric | Target | Measures | How measured |
+|---|---|---|---|
+| | | `FR-01` | Event/query that produces the number |
 
 ## Related
