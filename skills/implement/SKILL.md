@@ -2,11 +2,10 @@
 name: implement
 description: "Implement a piece of work based on a spec or set of tickets."
 disable-model-invocation: true
+argument-hint: "Specify a spec to implement and a base branch to perform code review against."
 ---
 
-Implement the work described by the user in the spec or tickets.
-
-First, commit the spec/ticket file itself if it isn't already → verify: `git status` clean.
+Implement the work described by the user in the spec.
 
 Run typechecking and single test files regularly.
 
