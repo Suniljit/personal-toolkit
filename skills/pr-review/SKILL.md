@@ -1,98 +1,68 @@
 ---
 name: pr-review
-description: Review a pull request or branch using git.
-disable-model-invocation: true
+description: Review a GitHub pull request by number via `gh` — runs a Standards sub-agent against this repo's coding standards and smell baseline, and a Spec sub-agent that reverse-engineers a spec from the diff for human review, then aggregates both into a merge recommendation. Use when the user wants a PR reviewed, gives a PR number, or asks "review PR #X".
+disable-model-invocation: 
+argument-hint: "Provide a PR number and a base branch (default: main)."
 ---
 
-# PR Review Skill
+Two-axis review of a pull request, identified by number via `gh`:
 
-## Step 0: Resolve branch
+- **Standards** — does the diff conform to this repo's documented coding standards and the smell baseline?
+- **Spec** — reverse-engineered from the diff itself: what was this PR trying to do, and does the code actually do it?
 
-If given a PR number: `gh pr view <number> --json headRefName,title,body` → use `headRefName`. If `gh` fails, ask. Otherwise use `HEAD`.
+Both axes run as **parallel sub-agents**. The two reports feed a single **merge recommendation** at the end — the reason to review a PR is to decide whether to merge it, so the axes converge instead of staying separate.
 
-Never check out or switch the current branch — work entirely off remote refs.
+## Process
 
-## Step 1: Get the diff
+### 1. Resolve the PR and diff
 
 ```bash
+gh pr view <number> --json headRefName,baseRefName,title,body,url
 git fetch origin
-git diff origin/main...origin/<headRefName>
-git log origin/main...origin/<headRefName> --oneline
 ```
 
-If resolved from `HEAD` (no PR number given), diff `origin/main...HEAD` instead.
+Base branch: whatever the user specified, else `main`. This may differ from the PR's own declared base — the user's stated base wins.
 
-Base defaults to `origin/main`; override if user said "against X". Stop if branch missing or diff empty.
-
-## Step 2: Deliver the review
-
-Plain text, no emoticons. Direct and specific: cite file and line for every claim, skip sections that don't apply, and cut anything that doesn't carry signal.
-
-### Summary
-1–2 sentences: what and why.
-
-### How It Works
-**Approach** — one plain-language sentence.
-**Structure** — ASCII diagram of changed components.
-**Walkthrough** — key changes explained conversationally. Skip trivial ones.
-
-### Behavioral Changes
-For each meaningful change:
-
-**[Label]**
-Before: `[old behavior]`
-After: `[new behavior]`
-Impact: one sentence.
-
-Pure refactor or docs-only? Say so in one sentence, skip this section.
-
-### Issues Found
-If none: "No issues found."
-
-`CRITICAL` — bug, security, data loss. Blocks merge.
-`WARNING` — edge case, performance, maintainability.
-`SUGGESTION` — style or minor improvement.
-
-For each issue, write the explanation so that a junior engineer can immediately understand the problem and fix it:
-- **What**: State the problem in plain English. Avoid jargon unless you define it.
-- **Why it matters**: One sentence on the real-world consequence (crash, data loss, slowness, etc.).
-- **How to fix**: A concrete, actionable step or code snippet. Show the fix, don't just describe it.
-
-Example of a good issue explanation:
-> `WARNING` — `src/auth.js`, line 42
-> **What:** The password is compared using `==` instead of a constant-time comparison function.
-> **Why it matters:** Regular string comparison can leak timing information that attackers use to guess passwords byte-by-byte.
-> **Fix:** Replace `password == stored` with `crypto.timingSafeEqual(Buffer.from(password), Buffer.from(stored))`.
-
-Example of a bad issue explanation (too vague):
-> `WARNING` — `src/auth.js`, line 42: Insecure comparison.
-
-### Manual Review Checklist
-Skip if nothing qualifies. For each item:
-
-**File:** `path/to/file.ext` (lines X–Y)
-**Why:** ...
-**Check:** ...
-
-Consider: business logic needing external context, third-party APIs, auth/credentials, irreversible DB ops, feature flags, test coverage gaps.
-
-### Watch Out For
-One paragraph: the thing a reviewer could easily miss.
-
-### Questions for the Author
-Skip if everything is clear. Each question should be paste-ready — addressed to the author, with file, line, and snippet inline.
-
-**File:** `path/to/file.ext`, line N
-**Snippet:**
-```lang
-[relevant snippet]
+```bash
+git diff origin/<base>...origin/<headRefName>
+git log origin/<base>..origin/<headRefName> --oneline
 ```
-**Question:** [Question to the author.]
 
-### Merge Recommendation
+Never check out or switch the current branch — work entirely off remote refs. Stop and tell the user if the PR, branch, or diff can't be resolved (bad number, `gh` not authenticated, empty diff).
+
+### 2. Identify the standards sources
+
+Anything in the repo that documents how code should be written (`CODING_STANDARDS.md`, `CONTRIBUTING.md`, etc.), plus the smell baseline at [`../code-review/SMELLS.md`](../code-review/SMELLS.md) — always in force, repo docs override it where they conflict.
+
+### 3. Spawn both sub-agents in parallel
+
+Send a single message with two `Agent` tool calls, `general-purpose` subagent for both.
+
+**Standards sub-agent prompt** — include:
+
+- The diff command, commit list, and PR number.
+- The standards-source files from step 2, plus the path `skills/code-review/SMELLS.md`.
+- The brief: "Report — per file/hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file + rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations (documented-standard breaches) from judgement calls (baseline smells are always judgement calls). Skip anything tooling enforces. Under 400 words."
+
+**Spec sub-agent prompt** — include:
+
+- The diff command and commit list (not the PR title/body yet).
+- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of `skills/feature-plan/template.md` (read that file first), filling in what the diff supports and omitting sections the template marks optional when nothing applies. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words, code-block the spec."
+- The fetched `title` and `body` from step 1.
+
+### 4. Aggregate
+
+Present under `## Standards`, `## Reverse-Engineered Spec`, and `## Findings` headings — the first two are the sub-agent reports near-verbatim; `## Findings` is your own synthesis across both (a Standards violation and a Spec mismatch can be the same underlying bug, and this is where that connection gets made).
+
+For each finding in `## Findings`, use the format: file + line range, what's wrong, why it breaks something (concrete failure mode, not "could be an issue"), and a recommended fix concrete enough to hand directly to a PR that fixes it.
+
+### 5. Merge recommendation
 
 `APPROVE` / `APPROVE WITH NOTES` / `REQUEST CHANGES` / `BLOCK`
 
-**Safe to approve?** One sentence; call out any CRITICAL/WARNING issues.
-**What could break?** Specific system or flow. "Nothing" if clean.
-**Blockers:** (skip if APPROVE) What must be fixed before merge.
+`APPROVE` requires certainty — only use it when you can state affirmatively that nothing in the diff breaks, not merely that you found no issues. If any finding leaves a real doubt about behavior, correctness, or scope, that's `APPROVE WITH NOTES` at best.
+
+- **APPROVE** — nothing breaks. State why you're sure, in one sentence.
+- **APPROVE WITH NOTES** — safe to merge, but list what to watch or clean up later.
+- **REQUEST CHANGES** — one or more findings must be fixed first. List them (reuse the `## Findings` entries), each specific enough to be the whole brief for a follow-up PR.
+- **BLOCK** — the PR shouldn't merge as-is even after minor fixes (wrong approach, missing scope, breaks something structurally). State what's fundamentally wrong.
