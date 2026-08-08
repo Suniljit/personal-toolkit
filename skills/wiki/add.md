@@ -1,6 +1,6 @@
 # Wiki — add flow
 
-Read [`common/SCHEMA.md`](common/SCHEMA.md) first for the `wiki/raw/`/`wiki/` layout and conventions.
+Read [`common/SCHEMA.md`](common/SCHEMA.md) first for the `wiki/raw/`/`wiki/pages/` layout and conventions.
 
 Ad-hoc info still becomes a `wiki/raw/` source, then flows through the normal ingest flow — one code path for every write into the wiki, so the manifest stays the single source of truth for what's been processed.
 

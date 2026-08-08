@@ -1,14 +1,14 @@
 # Wiki — query flow
 
-Read [`common/SCHEMA.md`](common/SCHEMA.md) first for the `index.md`/page conventions.
+Read [`common/SCHEMA.md`](common/SCHEMA.md) first for the `WIKI_INDEX.md`/page conventions.
 
 ## Step 1 — Locate the wiki
 
-Find `wiki/index.md` at the project root. If it doesn't exist, tell the user there's no wiki yet and suggest `/wiki ingest`.
+Find `wiki/WIKI_INDEX.md` at the project root. If it doesn't exist, tell the user there's no wiki yet and suggest `/wiki ingest`.
 
 ## Step 2 — Shortlist from the flat index
 
-Read `index.md` in full (it's flat and cheap) to shortlist candidate pages by title/type/tags/summary. Don't open any page yet.
+Read `WIKI_INDEX.md` in full (it's flat and cheap) to shortlist candidate pages by title/type/tags/summary. Don't open any page yet.
 
 ## Step 3 — Narrow with each candidate's Contents block
 

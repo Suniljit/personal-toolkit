@@ -19,13 +19,13 @@ wiki/
         │
         │  /wiki ingest  (scripted hash-diff decides what's new — no LLM guessing)
         ▼
-  index.md      ← flat catalog: title, type, tags, one-line summary per page
-  log.md        ← append-only history of every ingest/add/query/lint run
-  manifest.json ← {file: hash, ingested_at, pages_touched} — the diff's memory
-  *.md          ← wiki pages (OKF-style frontmatter + a per-page Contents block)
+  pages/*.md     ← wiki pages (OKF-style frontmatter + a per-page Contents block)
+  WIKI_INDEX.md  ← flat catalog: title, type, tags, one-line summary per page
+  log.md         ← append-only history of every ingest/add/query/lint run
+  manifest.json  ← {file: hash, ingested_at, pages_touched} — the diff's memory
 ```
 
-`wiki add` and `wiki query`'s "file this back" path both write into `wiki/raw/` and then run the same ingest flow — there's exactly one way pages get created or changed, which is what makes `wiki lint` and the manifest trustworthy. Querying and linting read `wiki/` but always skip `wiki/raw/` — that's ingestion input, not a wiki page.
+`wiki add` and `wiki query`'s "file this back" path both write into `wiki/raw/` and then run the same ingest flow — there's exactly one way pages get created or changed, which is what makes `wiki lint` and the manifest trustworthy. Querying and linting read `wiki/pages/` only — `wiki/raw/` is ingestion input, never a wiki page, and living in its own folder keeps that distinction structural rather than a rule to remember.
 
 ## One-time setup
 
@@ -47,9 +47,9 @@ Do this once wherever the `wiki` skill lives — every project's `wiki ingest` f
 
 ## Design choices worth knowing
 
-- **No vectors, no Obsidian, no graph view.** Navigation is `index.md` plus grep — sufficient at the scale of project documentation, and it means zero embedding infrastructure to run or pay for.
+- **No vectors, no Obsidian, no graph view.** Navigation is `WIKI_INDEX.md` plus grep — sufficient at the scale of project documentation, and it means zero embedding infrastructure to run or pay for.
 - **"What's new" is a hash diff, not an LLM guess.** `scripts/wiki_diff.py` compares SHA-256 hashes in `manifest.json` against what's currently in `wiki/raw/` — deterministic, and it also catches *edited* files, not just new ones.
-- **Section-level detail is progressively disclosed, not stuffed into the index.** `index.md` stays flat and cheap to read in full no matter how large the wiki gets; each page carries its own section-level outline (one-line gists per heading) in a Contents block at the top. `wiki query` shortlists from the flat index, then peeks at a candidate's Contents block before deciding whether to read the rest — the same reasoning-down idea behind [PageIndex](https://github.com/VectifyAI/PageIndex)'s reasoning-based retrieval, without duplicating each page's own headers into a second, ever-growing file.
+- **Section-level detail is progressively disclosed, not stuffed into the index.** `WIKI_INDEX.md` stays flat and cheap to read in full no matter how large the wiki gets; each page carries its own section-level outline (one-line gists per heading) in a Contents block at the top. `wiki query` shortlists from the flat index, then peeks at a candidate's Contents block before deciding whether to read the rest — the same reasoning-down idea behind [PageIndex](https://github.com/VectifyAI/PageIndex)'s reasoning-based retrieval, without duplicating each page's own headers into a second, ever-growing file.
 - **Pages carry an [OKF](https://github.com/google/knowledge-catalog)-subset frontmatter** (`type`, `title`, `description`, `tags`, `timestamp`) — cheap to add, and gives the wiki a portable, standardized shape if the format gains traction, without buying into any heavier tooling.
 - **Ingest never resolves contradictions** — it notes them and moves on; only `wiki lint` decides, and even lint only auto-resolves the unambiguous cases (orphans, single-candidate stale claims). Anything requiring judgment about which claim is *true* is always left for you.
 

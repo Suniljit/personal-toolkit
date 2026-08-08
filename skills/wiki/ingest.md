@@ -1,10 +1,10 @@
 # Wiki — ingest flow
 
-Read [`common/SCHEMA.md`](common/SCHEMA.md) first — it defines the `wiki/raw/`/`wiki/` layout, page frontmatter, `index.md`/`log.md` formats, and the two shared scripts. This is the only flow that writes wiki pages, `index.md`, and `log.md` directly; `add.md` and `query.md` both delegate here.
+Read [`common/SCHEMA.md`](common/SCHEMA.md) first — it defines the `wiki/raw/`/`wiki/pages/` layout, page frontmatter, `WIKI_INDEX.md`/`log.md` formats, and the two shared scripts. This is the only flow that writes wiki pages, `WIKI_INDEX.md`, and `log.md` directly; `add.md` and `query.md` both delegate here.
 
 ## Step 1 — Locate and scaffold
 
-Find `wiki/` at the project root, and `wiki/raw/` inside it. If `wiki/` or `wiki/raw/` is missing, create it, along with an empty `index.md`, `log.md`, and `manifest.json` (`{}`). If `wiki/` isn't already in `.gitignore`, add it (or, if the project already tracks `wiki/`, add `wiki/raw/` and `wiki/manifest.json` instead — those two stay ignored regardless).
+Find `wiki/` at the project root, and `wiki/raw/` and `wiki/pages/` inside it. If any of these is missing, create it, along with an empty `WIKI_INDEX.md`, `log.md`, and `manifest.json` (`{}`). If `wiki/` isn't already in `.gitignore`, add it (or, if the project already tracks `wiki/`, add `wiki/raw/` and `wiki/manifest.json` instead — those two stay ignored regardless).
 
 ## Step 2 — Find what's new
 
@@ -24,13 +24,13 @@ For every file in `new` + `changed`:
    ```
    If this fails because the venv doesn't exist yet, tell the user to run the one-time setup in `common/README.md` (`uv venv .venv --python 3.13 && uv sync`) and stop — don't attempt to parse binary formats yourself.
 2. **Extract and integrate**: read the converted text, decide which wiki pages it touches — creating new pages or updating existing ones. A single source often touches several pages (entity pages, concept pages, cross-references), not just one.
-3. **Write pages** using the frontmatter and Contents-block conventions in SCHEMA.md — the per-section outline with one-line gists lives at the top of the page itself, not in `index.md`. Update `timestamp` and the Contents block on any page you touch.
+3. **Write pages** into `wiki/pages/`, using the frontmatter and Contents-block conventions in SCHEMA.md — the per-section outline with one-line gists lives at the top of the page itself, not in `WIKI_INDEX.md`. Update `timestamp` and the Contents block on any page you touch.
 4. **Check for contradictions**: if new content conflicts with a claim already on an existing page, don't silently overwrite it — keep both, note the conflict in `log.md`, and leave resolution to the lint flow.
-5. **Update `index.md`**: for every page created or updated, refresh its flat entry (title, type, tags, one-line summary) per SCHEMA.md's format — no section-level detail here, that's what keeps the index cheap to read in full as the wiki grows.
+5. **Update `WIKI_INDEX.md`**: for every page created or updated, refresh its flat entry (title, type, tags, one-line summary) per SCHEMA.md's format — no section-level detail here, that's what keeps the index cheap to read in full as the wiki grows.
 6. **Append to `log.md`**: one entry per source file, tagged `ingest`, listing pages created/updated and any contradictions flagged.
 7. **Mark it done**:
    ```bash
-   python3 common/scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <comma-separated wiki page paths>
+   python3 common/scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <comma-separated wiki/pages/ paths>
    ```
    Mark per-file, immediately after that file's pages are written — so a failure partway through the batch doesn't falsely mark unprocessed files as done.
 

@@ -9,17 +9,18 @@ At the target project's root:
 ```
 wiki/
   raw/                      immutable source files — never edited by any skill
-  index.md                  flat catalog of every wiki page (see below)
+  pages/                    wiki pages, flat, kebab-case filenames
+    <topic>.md
+  WIKI_INDEX.md             flat catalog of every wiki page (see below)
   log.md                    append-only ingest history
   manifest.json             {relpath: {hash, ingested_at, pages_touched}} for every wiki/raw/ file processed
-  <topic>.md                wiki pages, flat, kebab-case filenames
 ```
 
-`wiki/raw/` and `wiki/manifest.json` are local working state, not source — add them to the project's `.gitignore` if not already present, even if `wiki/` itself ends up tracked. `wiki/index.md`, `wiki/log.md`, and the pages under `wiki/` are the artifact worth keeping; whether those are committed is the user's call per project (default: the whole `wiki/` directory is gitignored until the user opts in).
+`wiki/raw/` and `wiki/manifest.json` are local working state, not source — add them to the project's `.gitignore` if not already present, even if `wiki/` itself ends up tracked. `wiki/WIKI_INDEX.md`, `wiki/log.md`, and the pages under `wiki/pages/` are the artifact worth keeping; whether those are committed is the user's call per project (default: the whole `wiki/` directory is gitignored until the user opts in).
 
-Querying and linting operate over `wiki/` but must never treat `wiki/raw/` as a page — it's ingestion input, not wiki content.
+Querying and linting operate over `wiki/pages/` only — `wiki/raw/` is ingestion input, never a page, and lives outside that folder for exactly this reason.
 
-No vector DB, no embeddings, no Obsidian, no graph viewer. Navigation is `index.md` plus grep.
+No vector DB, no embeddings, no Obsidian, no graph viewer. Navigation is `WIKI_INDEX.md` plus grep.
 
 ## Page frontmatter (OKF subset)
 
@@ -47,7 +48,7 @@ timestamp: 2026-07-19T10:00:00Z   # last-updated, ISO 8601
 
 ## Page Contents block
 
-Right after the frontmatter, every page carries a short outline of its own sections — PageIndex-inspired, but disclosed progressively: it lives on the page it describes, not duplicated in `index.md`.
+Right after the frontmatter, every page carries a short outline of its own sections — PageIndex-inspired, but disclosed progressively: it lives on the page it describes, not duplicated in `WIKI_INDEX.md`.
 
 ```markdown
 ---
@@ -66,9 +67,9 @@ title: Authentication Flow
 
 This is what lets the query flow reason down to the right *section* of a shortlisted page by reading just this block — not the whole file, and not a duplicate copy in the index.
 
-## index.md format
+## WIKI_INDEX.md format
 
-Flat catalog: one entry per page, page-level only. Cheap to read in full on every run, however large the wiki gets — the section-level detail lives in each page's own Contents block, not here.
+Flat catalog: one entry per page, page-level only. Cheap to read in full on every run, however large the wiki gets — the section-level detail lives in each page's own Contents block, not here. Lives in `wiki/` itself (not `wiki/pages/`) — it's an index over the pages, not one of them, same tier as `log.md` and `manifest.json`. Named `WIKI_INDEX.md`, not `index.md`, to avoid colliding with a project's own root `INDEX.md`.
 
 ```markdown
 # Wiki Index
@@ -76,7 +77,7 @@ Flat catalog: one entry per page, page-level only. Cheap to read in full on ever
 
 ## <Category>
 
-- [Page Title](topic-file.md) — type: concept · tags: auth, security — one-line page summary
+- [Page Title](pages/topic-file.md) — type: concept · tags: auth, security — one-line page summary
 ```
 
 Categories are loose groupings the agent maintains (e.g. by `type` or by subject area) — not a fixed enum.
@@ -101,7 +102,7 @@ Use `ingest`, `add`, `query`, or `lint` as the operation tag so entries are grep
   "raw/some-doc.pdf": {
     "hash": "sha256:...",
     "ingested_at": "2026-07-19T10:00:00Z",
-    "pages_touched": ["wiki/authentication-flow.md"]
+    "pages_touched": ["wiki/pages/authentication-flow.md"]
   }
 }
 ```
