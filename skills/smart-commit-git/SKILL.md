@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Git Smart Commit Skill
 
-Scans changed files, lets the user select which to include, reads each to understand its purpose, groups them into logically sequenced commits, confirms the plan, then executes.
+Scans all changed files, reads each to understand its purpose, groups them into logically sequenced commits, presents the plan immediately, confirms, then executes.
 
 ---
 
@@ -35,28 +35,18 @@ fi
 [ -z "$BASE" ] && git status --short
 ```
 
-Combine and deduplicate committed + uncommitted changes:
+Combine and deduplicate committed + uncommitted changes — every file found here goes into the plan, no selection step:
 
 ```bash
 git diff --name-status $BASE HEAD   # committed on this branch
 git status --short                  # uncommitted
 ```
 
-Present a numbered list and ask which to include (`all`, `1,3,5`, `1-5`, or a single number):
-
-```
-I found the following changed files:
-
-  1. src/auth/jwt.py         (modified)
-  2. src/auth/refresh.py     (new file)
-  ...
-
-Which files would you like to include?
-```
+If no changed files are found, tell the user and stop.
 
 ---
 
-## Step 2: Read each selected file
+## Step 2: Read each changed file
 
 ```bash
 git diff $BASE -- <file>          # modified tracked files
@@ -68,23 +58,19 @@ git diff --cached -- <file>       # staged files
 
 ## Step 3: Group into logical commits
 
-Sequence commits in this order:
+Sequence commits in this priority ladder — lower priority number commits first, unless a Notes exception below says otherwise:
 
-| Priority | Group | Examples |
-|---|---|---|
-| 1 | Plans / specs | `PLAN.md`, `SPEC.md`, `architecture.*`, any file under a `specs/` (or similarly named specs/plans) directory — e.g. `specs/feat-add-csv-export.md` |
-| 2 | Config / environment | `*.config.*`, `settings.*`, `pyproject.toml`, `Dockerfile` |
-| 3 | Data models / migrations | `models/`, `migrations/`, `schema.sql` |
-| 4 | Core logic / features | Services, controllers, utilities — grouped by sub-feature |
-| 5 | API / interfaces | Routes, endpoints, views, serializers |
-| 6 | Tests | Group with feature if closely related, otherwise batch |
-| 7 | CI / build / tooling | `.github/`, `Makefile`, `scripts/` |
-| 8 | Docs | `docs/`, `*.md` (non-README) |
-| 9 | README | Always last |
-
-**Plans/specs detection rule:** any changed/new file whose path matches `*/specs/*.md`, `*/spec/*.md`, `*/plans/*.md`, or `*/plan/*.md` (regardless of repo location) is treated as Priority 1 — Plans/specs, and must always be the first commit in the plan. Filenames typically follow a `<type>-<slug>.md` pattern (e.g. `feat-add-csv-export.md`, `fix-login-timeout.md`), but the directory match takes precedence over the filename pattern.
-
-Config changes required by a feature go just before or with that feature. Tests for a specific feature can be grouped with it.
+| Priority | Group | Examples | Notes |
+|---|---|---|---|
+| 1 | Plans / specs | `PLAN.md`, `SPEC.md`, `architecture.*`, any file under a `specs/` (or similarly named specs/plans) directory — e.g. `specs/feat-add-csv-export.md` | |
+| 2 | Config / environment | `*.config.*`, `settings.*`, `pyproject.toml`, `Dockerfile` | If required by a specific feature, move with that feature's commit instead of here |
+| 3 | Data models / migrations | `models/`, `migrations/`, `schema.sql` | |
+| 4 | Core logic / features | Services, controllers, utilities | Grouped by sub-feature, not as one giant commit |
+| 5 | API / interfaces | Routes, endpoints, views, serializers | |
+| 6 | Tests | Test files for the features above | Group with the feature it covers when closely related; otherwise batch separately here |
+| 7 | CI / build / tooling | `.github/`, `Makefile`, `scripts/` | |
+| 8 | Docs | `docs/`, `*.md` (non-README) | |
+| 9 | README | `README.md` | Always last |
 
 ---
 
@@ -153,14 +139,14 @@ Types: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`
 | Situation | Action |
 |---|---|
 | File unchanged vs branch base | Tell user; exclude |
-| Single file selected | Still show plan and confirm |
+| No changed files found | Tell user; stop — nothing to plan |
+| Single changed file | Still show plan and confirm |
 | All files one logical unit | Single commit is fine |
 | Binary files | Write message from filename/path |
 | Detached HEAD | Warn before committing |
 | Unresolved merge conflicts | Warn; don't commit |
 | Stacked branches | Use `@{upstream}` or nearest ancestor — never `main` directly; only show files changed on current branch |
 | Ambiguous base | Show detected base commit and ask user to confirm |
-| Invalid selection number | Flag it; ask to re-select |
 
 ---
 

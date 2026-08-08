@@ -16,13 +16,13 @@ git rev-parse --show-toplevel
 
 All later commands run against `<root>`.
 
-### Step 2: Identify files (skip if files are explicit in the request)
+### Step 2: Identify files
 
 ```bash
 git -C <root> status --short
 ```
 
-Show a numbered list of changed/untracked files and ask the user to select by number(s), range, or "all". Wait for their reply before continuing.
+Take every changed and untracked file — do not ask the user to select a subset. If the request names specific files, use those instead.
 
 ### Step 3: Inspect the changes
 
@@ -85,10 +85,10 @@ Wait for an explicit yes ("yes", "ok", "go ahead", "ship it"). Ambiguous = no; s
 ### Step 6: Stage and commit
 
 ```bash
-# Stage specified files
+# Stage the files identified in Step 2
 git -C <root> add -- <file1> <file2> ...
 
-# Or stage everything if no files were specified
+# Or, if no files were named in the request, stage everything
 git -C <root> add -A
 
 git -C <root> commit -m "<subject>" -m "<body>"
@@ -107,12 +107,11 @@ git -C <root> log --oneline -1
 | Detached HEAD | Warn before committing |
 | Nothing to commit after staging | Tell the user |
 | Amend requested | Use `--amend`; still confirm new message first |
-| Invalid number selection | Point it out; ask to re-select |
 
 ## Constraints
 
 - Commit only after the explicit approval gated in Step 5.
-- Stage exactly the files the user selected in Step 2 (or all changes if none specified).
+- Stage exactly the files identified in Step 2 (all changes, unless the request named specific files).
 - Commit locally; push only when explicitly asked.
 - Touch only files that are part of the commit — leave `.gitignore` and anything else untouched.
 - Use `git` directly — no third-party libraries.
