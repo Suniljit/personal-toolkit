@@ -3,6 +3,7 @@ name: create-pr
 description: >
   Creates GitHub Pull Requests via the GitHub CLI. 
 disable-model-invocation: true
+argument-hint: "Specify a target branch, else defaults to 'main'."
 ---
 
 # PR Creator Skill

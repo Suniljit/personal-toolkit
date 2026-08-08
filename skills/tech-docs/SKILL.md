@@ -1,8 +1,9 @@
 ---
 name: tech-docs
 description: >
-  prd | app-flow | design-brief | tdd | data-schema | api-contracts | nfr - first word picks the flow. Seven-document technical documentation suite — PRD, App Flow, Design Brief, TDD, Data Schema, API Contracts, NFR. 
+  Seven-document technical documentation suite — PRD, App Flow, Design Brief, TDD, Data Schema, API Contracts, NFR. 
 disable-model-invocation: true
+argument-hint: "prd | app-flow | design-brief | tdd | data-schema | api-contracts | nfr"
 ---
 
 # Tech Docs

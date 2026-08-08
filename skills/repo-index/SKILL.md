@@ -1,8 +1,9 @@
 ---
 name: repo-index
 description: >
-  build | lint - first word picks the flow. Root INDEX.md, the repo's navigation map: survey the tree to write it, or check it for drift since the last indexed commit.
+  Root INDEX.md, the repo's navigation map: survey the tree to write it, or check it for drift since the last indexed commit.
 disable-model-invocation: true
+argument-hint: "build | lint"
 ---
 
 # Repo Index
@@ -61,6 +62,7 @@ git status --porcelain
 3. **Reduce to structural drift.** Most changed paths move nothing on the map. A path drifts the map only when it:
    - adds, removes, or renames a top-level folder or root file
    - adds or removes a known doc home, or a file inside one
+   - adds, removes, or renames a `docs/` subfolder (known or not — every `docs/` subfolder gets its own section per [`template.md`](template.md)), or a document inside one
    - lands inside a folder whose map line **enumerates** its contents (skills, commands, packages), changing that enumeration
    - repurposes a folder, so its existing line now misdescribes it
 

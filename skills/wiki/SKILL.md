@@ -1,10 +1,10 @@
 ---
 name: wiki
 description: >
-  ingest | add | query | lint — first word picks the flow. Project LLM
-  wiki: ingest source files, add ad-hoc notes, query with citations, or
-  lint for contradictions.
+  Project LLM wiki: ingest source files, add ad-hoc notes, query with citations, 
+  or lint for contradictions.
 disable-model-invocation: true
+argument-hint: "ingest | add | query | lint"
 ---
 
 # Wiki
