@@ -4,7 +4,7 @@ Fill and write to the project root as `INDEX.md`. Drop any section the repo has 
 
 ## Depth
 
-Under `## Folders`, give a child folder its own row — full path from repo root — when it's entered on its own terms: separately owned, or holding a distinct kind of thing. Keep descending while that stays true. A monorepo's `packages/<pkg>/src/` earns three rows (`packages/`, `packages/<pkg>/`, `packages/<pkg>/src/`); a flat `utils/` earns one. Stop at the depth where the reader can pick a destination; below that they can read the tree themselves. Sort rows so each child immediately follows its parent.
+`## Folders` is a nested bullet list, indentation mirroring the tree — a child folder nests under its parent bullet, named by its own segment (not the full path; the nesting already supplies that). Give a folder its own bullet when it's entered on its own terms: separately owned, or holding a distinct kind of thing. Keep descending while that stays true. A monorepo's `packages/<pkg>/src/` earns three nested bullets (`packages/`, then `<pkg>/`, then `src/`); a flat `utils/` earns one. Stop at the depth where the reader can pick a destination; below that they can read the tree themselves.
 
 ## Docs sections
 
@@ -24,11 +24,10 @@ High-level map of this repo — what each top-level folder and root file covers.
 
 ## Folders
 
-| Folder | Description |
-|---|---|
-| `<folder>/` | <what lives here, and what a reader comes here for. Where the folder holds many peers, name them.> |
-| `<folder>/<child>/` | <one line> |
-| `<folder>/<child>/<grandchild>/` | <one line> |
+- `<folder>/` — <what lives here, and what a reader comes here for. Where the folder holds many peers, name them.>
+- `<folder>/` — <one line>
+  - `<child>/` — <one line>
+    - `<grandchild>/` — <one line>
 
 ## Root files
 
