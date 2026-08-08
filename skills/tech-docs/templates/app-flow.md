@@ -2,6 +2,9 @@
 doc_type: app-flow
 status: draft
 depends_on: [docs/design/prd.md]
+related:
+  - path: prd.md
+    why: persona and feature scope these flows implement
 last_updated: YYYY-MM-DD
 ---
 
@@ -39,6 +42,3 @@ Per screen or control: loading, empty, and error states, and what each action do
 - **Empty:** ...
 - **Error:** ...
 - **[Control] click:** ...
-
-## Related
-- [PRD](prd.md) — persona and feature scope these flows implement

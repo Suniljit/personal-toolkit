@@ -2,6 +2,11 @@
 doc_type: data-schema
 status: draft
 depends_on: [docs/design/prd.md, docs/design/tdd.md]
+related:
+  - path: prd.md
+    why: feature scope these entities support
+  - path: tdd.md
+    why: database engine this schema targets
 last_updated: YYYY-MM-DD
 ---
 
@@ -28,7 +33,3 @@ erDiagram
 
 ## Data Lifecycle Strategy
 Soft vs. hard deletes, auditing fields, migration strategy.
-
-## Related
-- [PRD](prd.md) — feature scope these entities support
-- [TDD](tdd.md) — database engine this schema targets

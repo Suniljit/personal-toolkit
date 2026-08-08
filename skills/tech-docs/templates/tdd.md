@@ -2,6 +2,11 @@
 doc_type: tdd
 status: draft
 depends_on: [docs/design/prd.md, docs/design/app-flow.md]
+related:
+  - path: prd.md
+    why: scope this architecture serves
+  - path: app-flow.md
+    why: flows this architecture supports
 last_updated: YYYY-MM-DD
 ---
 
@@ -46,7 +51,3 @@ sequenceDiagram
 | ADR | Decision |
 |---|---|
 | [ADR-001](../adr/0001-....md) | ... |
-
-## Related
-- [PRD](prd.md) — scope this architecture serves
-- [App Flow](app-flow.md) — flows this architecture supports

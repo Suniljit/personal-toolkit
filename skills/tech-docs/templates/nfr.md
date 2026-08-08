@@ -2,6 +2,11 @@
 doc_type: nfr
 status: draft
 depends_on: [docs/design/tdd.md]
+related:
+  - path: tdd.md
+    why: architecture these targets and controls apply to
+  - path: design-brief.md
+    why: token-level accessibility constraints (once it exists)
 last_updated: YYYY-MM-DD
 ---
 
@@ -45,7 +50,3 @@ flowchart LR
 | `NFR-11` | Error reporting target | |
 | `NFR-12` | Telemetry | |
 | `NFR-13` | Uptime expectation | |
-
-## Related
-- [TDD](tdd.md) — architecture these targets and controls apply to
-- [Design Brief](design-brief.md) — token-level accessibility constraints (once it exists)

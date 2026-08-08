@@ -2,6 +2,7 @@
 doc_type: prd
 status: draft
 depends_on: []
+related: []
 last_updated: YYYY-MM-DD
 ---
 
@@ -41,5 +42,3 @@ Why this exists, the pain point, the business objective.
 | Metric | Target | Measures | How measured |
 |---|---|---|---|
 | | | `FR-01` | Event/query that produces the number |
-
-## Related

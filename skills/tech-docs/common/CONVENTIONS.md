@@ -34,11 +34,22 @@ Every generated doc opens with:
 doc_type: prd
 status: draft
 depends_on: []
+related: []
 last_updated: YYYY-MM-DD
 ---
 ```
 
 `doc_type` is one of `prd`, `app-flow`, `design-brief`, `tdd`, `data-schema`, `api-contracts`, `nfr`. `depends_on` lists the `docs/design/*.md` paths this doc was written against, so it's clear what to reread if an upstream doc changes. `status` is `draft` until the user says it's final.
+
+`related` lists every other doc this one is meaningfully connected to — bare filenames (docs live together in `docs/design/`), each with a one-line `why`:
+
+```yaml
+related:
+  - path: prd.md
+    why: problem, scope, and personas this doc builds on
+```
+
+Populate it with docs actually read (its `depends_on`) plus, once they exist, docs that depend on this one. Keeping the link in frontmatter rather than a body section is what lets a link checker lint every `related[].path` across the suite without parsing prose.
 
 This is what makes the suite searchable without reading every file end to end: `grep doc_type docs/design/*.md` alone answers "which doc is which" and "what feeds what" — an agent orients from the frontmatter, not by opening seven files.
 
@@ -114,13 +125,3 @@ Each doc records only its own interview topics — never write in material that 
 
 `templates/<flow>.md` is a floor, not a ceiling — the minimum sections a doc of that type carries, not the maximum. When Step 2's grilling surfaces a topic squarely in scope for this doc (per Staying on scope above) but with nowhere to go in the template, add a new section for it rather than forcing it into a section that doesn't fit, or dropping it. Match the template's altitude, heading style, and table-vs-prose conventions for whatever section you add.
 
-## Related section
-
-Every generated doc ends with:
-
-```markdown
-## Related
-- [PRD](prd.md) — problem, scope, and personas this doc builds on
-```
-
-Docs live together in `docs/design/`, so links are bare filenames. Link only docs actually read (its `depends_on`) plus, once they exist, docs that depend on this one.
