@@ -1,7 +1,7 @@
 ---
 name: pr-review
 description: Review a GitHub pull request by number via `gh` — runs a Standards sub-agent against this repo's coding standards and smell baseline, and a Spec sub-agent that reverse-engineers a spec from the diff for human review, then aggregates both into a merge recommendation. Use when the user wants a PR reviewed, gives a PR number, or asks "review PR #X".
-disable-model-invocation: 
+disable-model-invocation: true
 argument-hint: "Provide a PR number and a base branch (default: main)."
 ---
 
@@ -47,7 +47,7 @@ Send a single message with two `Agent` tool calls, `general-purpose` subagent fo
 **Spec sub-agent prompt** — include:
 
 - The diff command and commit list (not the PR title/body yet).
-- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of `skills/feature-plan/template.md` (read that file first), filling in what the diff supports and omitting sections the template marks optional when nothing applies. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words, code-block the spec."
+- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of `skills/pr-review/spec-template.md` (read that file first), filling in only what the diff supports and omitting sections the template marks optional when nothing applies. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words, code-block the spec."
 - The fetched `title` and `body` from step 1.
 
 ### 4. Aggregate
