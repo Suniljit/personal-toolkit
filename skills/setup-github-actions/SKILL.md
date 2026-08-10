@@ -1,6 +1,7 @@
 ---
 name: setup-github-actions
-description: Set up a GitHub Actions workflow that lints, type-checks, and tests every PR, and makes those checks required before merge — across any mix of languages (Python, TypeScript/JS, Rust, Go, ...) found in the repo. Use when the user wants CI on pull requests, a GitHub Actions lint/typecheck/test workflow, or required status checks before merge/approval.
+description: Set up a GitHub Actions workflow that lints, type-checks, and tests every PR.
+disable-model-invocation: true
 ---
 
 # Setup GitHub Actions CI

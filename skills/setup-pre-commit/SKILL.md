@@ -1,6 +1,7 @@
 ---
 name: setup-pre-commit
-description: Set up git hooks with the pre-commit framework — commit-time linting and push-time type checking/tests, across any mix of languages (Python, TypeScript/JS, Rust, Go, ...) found in the repo. Use when the user wants to add pre-commit hooks, configure the `pre-commit` library, or add commit-time formatting/lint or push-time typecheck/test automation.
+description: Set up git hooks with the pre-commit framework — commit-time linting and push-time type checking/tests.
+disable-model-invocation: true
 ---
 
 # Setup Pre-Commit Hooks
