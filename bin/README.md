@@ -75,7 +75,10 @@ For example, an old real copy at `~/.claude/skills/code-review` gets moved to
 Running install/update again when everything's already correctly linked is a
 no-op — nothing gets backed up twice.
 
-## Adding a new skill
+Skills `update` prunes because they were deleted from this repo are backed
+up the same way, not hard-deleted, so nothing is unrecoverable.
+
+## Adding or removing a skill
 
 Drop a new folder with a `SKILL.md` into `skills/` in this repo, commit it,
 then run `./bin/toolkit.sh update -y` (or `install` again for a specific
@@ -83,6 +86,15 @@ target). `update` remembers every scope+agent combination you've installed to
 before (recorded in `~/.personal-toolkit/installs.json`) and re-syncs all of
 them, so the new skill gets symlinked everywhere automatically — you don't
 need to re-specify `--global`/`--project`/`--agent` each time.
+
+`update` also prunes deletions: if you delete a skill's folder from this repo
+and commit it, the next `update` removes its stale symlink from every
+installed target too (moved to a timestamped backup, same as any other
+replaced path — see Conflicts below). Only symlinks pointing back into this
+repo's `skills/` are touched, so anything you've dropped straight into an
+agent's `skills/` folder outside this toolkit is left alone. This pruning
+only happens on `update`; a scoped `install --skill NAME` never removes
+other skills.
 
 ## State files (not tracked in git)
 
