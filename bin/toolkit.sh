@@ -18,6 +18,7 @@ BASE_DIR=""
 INSTALLED=()
 ALREADY=()
 BACKED_UP=()
+REMOVED=()
 
 BOLD=""; DIM=""; RESET=""; GREEN=""; CYAN=""; YELLOW=""; RED=""
 
@@ -280,6 +281,28 @@ do_install_for_agent() {
   done
 }
 
+prune_stale_skills() {
+  local agent="$1"
+  local base; base="$(agent_base_dir "$agent")"
+  local skills_dir="$base/skills"
+  [[ -d "$skills_dir" ]] || return 0
+
+  local entry name target rel backup_dest
+  while IFS= read -r entry; do
+    name="$(basename "$entry")"
+    target="$(readlink "$entry")"
+    [[ "$target" == "$REPO_DIR/skills/"* ]] || continue
+    contains "$name" "${DISCOVERED_SKILLS[@]}" && continue
+
+    rel="${entry#"$HOME"/}"
+    [[ "$rel" == "$entry" ]] && rel="${entry#/}"
+    backup_dest="$BACKUP_TS_DIR/$rel"
+    mkdir -p "$(dirname "$backup_dest")"
+    mv "$entry" "$backup_dest"
+    REMOVED+=("$entry -> $backup_dest")
+  done < <(find "$skills_dir" -mindepth 1 -maxdepth 1 -type l 2>/dev/null)
+}
+
 print_summary() {
   printf '\n%sSummary%s\n' "$BOLD$CYAN" "$RESET"
   printf '\n%sInstalled/updated (%d)%s\n' "$BOLD" "${#INSTALLED[@]}" "$RESET"
@@ -290,6 +313,10 @@ print_summary() {
   if [[ ${#BACKED_UP[@]} -gt 0 ]]; then
     printf '\n%sBacked up (%d)%s\n' "$YELLOW" "${#BACKED_UP[@]}" "$RESET"
     for item in "${BACKED_UP[@]}"; do printf '  - %s\n' "$item"; done
+  fi
+  if [[ ${#REMOVED[@]} -gt 0 ]]; then
+    printf '\n%sRemoved (stale) (%d)%s\n' "$YELLOW" "${#REMOVED[@]}" "$RESET"
+    for item in "${REMOVED[@]}"; do printf '  - %s\n' "$item"; done
   fi
 }
 
@@ -381,6 +408,7 @@ PYEOF
     local agent
     for agent in "${SELECTED_AGENTS[@]}"; do
       do_install_for_agent "$agent"
+      prune_stale_skills "$agent"
     done
   done <<< "$entries"
 
