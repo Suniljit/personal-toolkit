@@ -2,11 +2,6 @@
 doc_type: api-contracts
 status: draft
 depends_on: [docs/design/data-schema.md, docs/design/tdd.md]
-related:
-  - path: data-schema.md
-    why: entities these payloads serialize
-  - path: tdd.md
-    why: protocol and auth provider this contract implements
 last_updated: YYYY-MM-DD
 ---
 
@@ -41,3 +36,7 @@ Standard error payload shape (e.g. RFC 9457 `application/problem+json`) and the 
 **Request:** query params / path variables / body schema
 **Response:** payload schema
 **Errors:** status codes specific to this endpoint
+
+## Related
+- [Data Schema](data-schema.md) — entities these payloads serialize
+- [TDD](tdd.md) — protocol and auth provider this contract implements

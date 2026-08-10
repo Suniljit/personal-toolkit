@@ -2,13 +2,6 @@
 doc_type: design-brief
 status: draft
 depends_on: [docs/design/prd.md, docs/design/app-flow.md]
-related:
-  - path: prd.md
-    why: persona this system designs for
-  - path: app-flow.md
-    why: screens these templates lay out
-  - path: nfr.md
-    why: accessibility conformance target these constraints serve (once it exists)
 last_updated: YYYY-MM-DD
 ---
 
@@ -64,3 +57,8 @@ flowchart TD
 ```
 
 Grid, breakpoint behavior, and the loading/empty/error variant.
+
+## Related
+- [PRD](prd.md) — persona this system designs for
+- [App Flow](app-flow.md) — screens these templates lay out
+- [NFR](nfr.md) — accessibility conformance target these constraints serve (once it exists)
