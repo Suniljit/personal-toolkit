@@ -47,7 +47,7 @@ Send a single message with two `Agent` tool calls, `general-purpose` subagent fo
 **Spec sub-agent prompt** — include:
 
 - The diff command and commit list (not the PR title/body yet).
-- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of `skills/pr-review/spec-template.md` (read that file first), filling in only what the diff supports and omitting sections the template marks optional when nothing applies. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words, code-block the spec."
+- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of `skills/pr-review/spec-template.md` (read that file first), filling in only what the diff supports and omitting sections the template marks optional when nothing applies. This output is read in an agent desktop app, not a markdown file — follow the template's plain-text formatting, no markdown syntax. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words."
 - The fetched `title` and `body` from step 1.
 
 ### 4. Aggregate

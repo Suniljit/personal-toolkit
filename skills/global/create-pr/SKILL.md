@@ -42,16 +42,22 @@ git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 
 ## Step 2: Generate PR summary
 
-Show this and ask: **"Does this look good? Say OK to create the PR, or tell me what to change."**
+Output is read in an agent desktop app, not a markdown renderer — do not use markdown syntax (no `**bold**`, `#` headers, or backticks). Use plain text with line breaks and indentation to structure it, then ask: "Does this look good? Say OK to create the PR, or tell me what to change."
 
-Focus on **what changed and why** from the actual code diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns. If a spec was provided, use it to explain the *why* behind changes the diff shows; the diff still governs what's listed under Changes.
+Focus on what changed and why from the actual code diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns. If a spec was provided, use it to explain the why behind changes the diff shows; the diff still governs what's listed under Changes.
+
+Render in this shape:
 
 ```
-**Branch:** `<current>` → `<target>`
-**Title:** <imperative, ~50 chars>
-**Description:** <2–5 sentences: what changed, why, notable decisions>
-**Changes:**
-- <file/area>: <what changed, functionally>
+Branch: <current> → <target>
+Title: <imperative, ~50 chars>
+
+Description:
+<2–5 sentences: what changed, why, notable decisions>
+
+Changes:
+  <file/area>: <what changed, functionally>
+  <file/area>: <what changed, functionally>
 ```
 
 ---

@@ -25,7 +25,7 @@ Done when you have a map of `directory → language(s)` covering every top-level
 
 ### 2. Install pre-commit
 
-Check if `pre-commit` is already on PATH (`pre-commit --version`). If not, install it — prefer `pipx install pre-commit`, falling back to `pip install pre-commit` or `brew install pre-commit` if `pipx` isn't available.
+Never install via `brew`. Add `pre-commit` as a dev dependency in the repo's `pyproject.toml` (create one if none exists) and install it through the repo's Python package manager — `uv add --dev pre-commit` for `uv`, `poetry add --group dev pre-commit` for `poetry`, otherwise a `[dependency-groups] dev = [...]` entry installed with `pip install -e ".[dev]"` or equivalent. Match whichever manager the repo already uses.
 
 ### 3. Write `.pre-commit-config.yaml`
 
