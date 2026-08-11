@@ -32,22 +32,24 @@ Never check out or switch the current branch — work entirely off remote refs. 
 
 ### 2. Identify the standards sources
 
-Anything in the repo that documents how code should be written (`CODING_STANDARDS.md`, `CONTRIBUTING.md`, etc.), plus the smell baseline at [`../code-review/SMELLS.md`](../code-review/SMELLS.md) — always in force, repo docs override it where they conflict.
+Anything in the repo that documents how code should be written (`CODING_STANDARDS.md`, `CONTRIBUTING.md`, etc.), plus the smell baseline at [`SMELLS.md`](SMELLS.md) — always in force, repo docs override it where they conflict.
 
 ### 3. Spawn both sub-agents in parallel
+
+This skill may be installed globally rather than living in the reviewed repo, so a subagent can't resolve `SMELLS.md` or `spec-template.md` from a repo-relative guess. Resolve both to absolute paths against *this skill's own base directory* (given to you at invocation) before including them in either prompt below.
 
 Send a single message with two `Agent` tool calls, `general-purpose` subagent for both.
 
 **Standards sub-agent prompt** — include:
 
 - The diff command, commit list, and PR number.
-- The standards-source files from step 2, plus the path `skills/code-review/SMELLS.md`.
+- The standards-source files from step 2, plus the absolute path to this skill's `SMELLS.md`.
 - The brief: "Report — per file/hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file + rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations (documented-standard breaches) from judgement calls (baseline smells are always judgement calls). Skip anything tooling enforces. Under 400 words."
 
 **Spec sub-agent prompt** — include:
 
 - The diff command and commit list (not the PR title/body yet).
-- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of `skills/pr-review/spec-template.md` (read that file first), filling in only what the diff supports and omitting sections the template marks optional when nothing applies. This output is read in an agent desktop app, not a markdown file — follow the template's plain-text formatting, no markdown syntax. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words."
+- The brief: "Read the diff and reverse-engineer the spec this PR is implementing, before looking at the PR title or description — infer intent from the code itself so the spec isn't just a restatement of the author's framing. Write it in the structure of the spec template at [absolute path] (read that file first), filling in only what the diff supports and omitting sections the template marks optional when nothing applies. This output is read in an agent desktop app, not a markdown file — follow the template's plain-text formatting, no markdown syntax. Then compare against the actual PR title/body [supplied below] and flag any mismatch between stated intent and what the code does. Mark anything you inferred rather than observed directly with `[inferred]`. Under 500 words."
 - The fetched `title` and `body` from step 1.
 
 ### 4. Aggregate
