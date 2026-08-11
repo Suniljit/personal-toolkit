@@ -1,6 +1,6 @@
 interface:
   display_name: "Review PR"
-  short_description: "Review a pull request."
+  short_description: "Args: PR number and base branch (default: main). Review a pull request."
   default_prompt: "Provide a PR number and a base branch (default: main)."
 policy:
   allow_implicit_invocation: false
