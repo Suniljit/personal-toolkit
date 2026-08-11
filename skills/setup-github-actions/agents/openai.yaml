@@ -1,0 +1,5 @@
+interface:
+  display_name: "Setup GitHub Actions"
+  short_description: "Setup GitHub Actions for a repository."
+policy:
+  allow_implicit_invocation: false

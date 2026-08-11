@@ -1,0 +1,5 @@
+interface:
+  display_name: "Explain Code"
+  short_description: "Explain the functionality of a code snippet."
+policy:
+  allow_implicit_invocation: false

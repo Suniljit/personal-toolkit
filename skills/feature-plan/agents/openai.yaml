@@ -1,0 +1,5 @@
+interface:
+  display_name: "Feature Plan"
+  short_description: "Plan and outline new features."
+policy:
+  allow_implicit_invocation: false

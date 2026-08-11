@@ -1,0 +1,5 @@
+interface:
+  display_name: "Slide Generate"
+  short_description: "Generate slides for a presentation"
+policy:
+  allow_implicit_invocation: false

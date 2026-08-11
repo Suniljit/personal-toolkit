@@ -1,0 +1,5 @@
+interface:
+  display_name: "Smart Commit Git"
+  short_description: "Make smart commits to a Git repository"
+policy:
+  allow_implicit_invocation: false

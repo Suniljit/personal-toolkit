@@ -1,0 +1,5 @@
+interface:
+  display_name: "Slide Outline"
+  short_description: "Create an outline for a presentation"
+policy:
+  allow_implicit_invocation: false

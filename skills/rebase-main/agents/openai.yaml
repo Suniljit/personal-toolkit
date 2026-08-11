@@ -1,0 +1,6 @@
+interface:
+  display_name: "Rebase Main"
+  short_description: "Rebase to the main branch with the latest changes."
+  default_prompt: "Provide a target branch (default: origin/main)."
+policy:
+  allow_implicit_invocation: false
