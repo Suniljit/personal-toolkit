@@ -89,14 +89,15 @@ parse_args() {
 }
 
 discover_skills() {
+  local scope="$1"
   local file name
   DISCOVERED_SKILLS=()
   while IFS= read -r file; do
-    name="${file#"$REPO_DIR"/skills/}"
+    name="${file#"$REPO_DIR"/skills/"$scope"/}"
     name="${name%/SKILL.md}"
     DISCOVERED_SKILLS+=("$name")
-  done < <(find "$REPO_DIR/skills" -mindepth 2 -maxdepth 2 -name SKILL.md -type f | sort)
-  [[ ${#DISCOVERED_SKILLS[@]} -gt 0 ]] || die "no skills found in $REPO_DIR/skills"
+  done < <(find "$REPO_DIR/skills/$scope" -mindepth 2 -maxdepth 2 -name SKILL.md -type f | sort)
+  [[ ${#DISCOVERED_SKILLS[@]} -gt 0 ]] || die "no skills found in $REPO_DIR/skills/$scope"
 }
 
 read_key() {
@@ -277,7 +278,7 @@ do_install_for_agent() {
   [[ ${#skills[@]} -eq 0 ]] && skills=("${DISCOVERED_SKILLS[@]}")
   for skill in "${skills[@]}"; do
     contains "$skill" "${DISCOVERED_SKILLS[@]}" || die "unknown skill: $skill"
-    backup_and_link "$REPO_DIR/skills/$skill" "$base/skills/$skill"
+    backup_and_link "$REPO_DIR/skills/$SCOPE/$skill" "$base/skills/$skill"
   done
 }
 
@@ -291,7 +292,7 @@ prune_stale_skills() {
   while IFS= read -r entry; do
     name="$(basename "$entry")"
     target="$(readlink "$entry")"
-    [[ "$target" == "$REPO_DIR/skills/"* ]] || continue
+    [[ "$target" == "$REPO_DIR/skills/$SCOPE/"* ]] || continue
     contains "$name" "${DISCOVERED_SKILLS[@]}" && continue
 
     rel="${entry#"$HOME"/}"
@@ -360,8 +361,8 @@ PYEOF
 }
 
 cmd_install() {
-  discover_skills
   prompt_scope
+  discover_skills "$SCOPE"
   prompt_agents
   BASE_DIR="$([[ "$SCOPE" == "global" ]] && printf '%s' "$HOME" || printf '%s' "$PWD")"
   BACKUP_TS_DIR="$BACKUP_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
@@ -381,7 +382,6 @@ cmd_update() {
   printf '%sUpdating toolkit:%s %s\n' "$CYAN" "$RESET" "$REPO_DIR"
   git -C "$REPO_DIR" pull --ff-only
 
-  discover_skills
   BACKUP_TS_DIR="$BACKUP_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
 
   [[ -f "$MANIFEST" ]] || { printf 'No prior installs recorded in %s\n' "$MANIFEST"; return 0; }
@@ -404,6 +404,7 @@ PYEOF
     BASE_DIR="$base"
     IFS=',' read -r -a SELECTED_AGENTS <<< "$agents_csv"
     SELECTED_SKILLS=()
+    discover_skills "$SCOPE"
     printf '\n%sRe-syncing%s %s (%s)\n' "$BOLD" "$RESET" "$BASE_DIR" "$SCOPE"
     local agent
     for agent in "${SELECTED_AGENTS[@]}"; do

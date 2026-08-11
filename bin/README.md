@@ -5,6 +5,11 @@ opencode, and Codex — globally (`~`) or into a single project — via symlinks
 so this repo stays the single source of truth and edits here are instantly
 live everywhere they're installed.
 
+`skills/` is split into `skills/global/` and `skills/project/`. Which one is
+used follows the install scope: `--global` only discovers and links
+`skills/global/*`, `--project` only discovers and links `skills/project/*`.
+`--skill NAME` filters within whichever set the scope selected.
+
 ## Commands
 
 ```bash
@@ -56,10 +61,12 @@ For each selected agent, `install` symlinks three things into `<base>`
 a different name (`CLAUDE.md`), since a symlink's name doesn't have to match
 its target's.
 
-Each skill is symlinked individually (`skills/<name>`, not the whole
-`skills/` folder), so any host-specific skill that isn't part of this repo —
-e.g. something you've dropped straight into `~/.opencode/skills/` — is left
-alone.
+The `skills` source depends on scope: `--global` links from
+`skills/global/<name>`, `--project` links from `skills/project/<name>`. Either
+way the link target in the agent's directory is flat (`skills/<name>`, no
+`global`/`project` segment). Each skill is symlinked individually, not the
+whole folder, so any host-specific skill that isn't part of this repo — e.g.
+something you've dropped straight into `~/.opencode/skills/` — is left alone.
 
 ## Conflicts
 
@@ -80,21 +87,25 @@ up the same way, not hard-deleted, so nothing is unrecoverable.
 
 ## Adding or removing a skill
 
-Drop a new folder with a `SKILL.md` into `skills/` in this repo, commit it,
-then run `./bin/toolkit.sh update -y` (or `install` again for a specific
-target). `update` remembers every scope+agent combination you've installed to
-before (recorded in `~/.personal-toolkit/installs.json`) and re-syncs all of
-them, so the new skill gets symlinked everywhere automatically — you don't
-need to re-specify `--global`/`--project`/`--agent` each time.
+Drop a new folder with a `SKILL.md` into `skills/global/<name>/` (installed
+with `--global`) or `skills/project/<name>/` (installed with `--project`) in
+this repo, commit it, then run `./bin/toolkit.sh update -y` (or `install`
+again for a specific target). `update` remembers every scope+agent
+combination you've installed to before (recorded in
+`~/.personal-toolkit/installs.json`) and re-syncs all of them, so the new
+skill gets symlinked everywhere automatically — you don't need to re-specify
+`--global`/`--project`/`--agent` each time.
 
 `update` also prunes deletions: if you delete a skill's folder from this repo
 and commit it, the next `update` removes its stale symlink from every
 installed target too (moved to a timestamped backup, same as any other
-replaced path — see Conflicts below). Only symlinks pointing back into this
-repo's `skills/` are touched, so anything you've dropped straight into an
-agent's `skills/` folder outside this toolkit is left alone. This pruning
-only happens on `update`; a scoped `install --skill NAME` never removes
-other skills.
+replaced path — see Conflicts below). Pruning is scoped: a project-scope
+`update` only prunes symlinks pointing back into `skills/project/`, a
+global-scope `update` only prunes symlinks pointing back into
+`skills/global/` — each scope leaves the other's skills, and anything you've
+dropped straight into an agent's `skills/` folder outside this toolkit,
+alone. This pruning only happens on `update`; a scoped `install --skill NAME`
+never removes other skills.
 
 ## State files (not tracked in git)
 
