@@ -8,7 +8,7 @@ argument-hint: "Specify a target branch, else defaults to 'main'."
 
 # Ship PR Skill
 
-Runs commit → push → PR end to end with no approval gates. Unlike `commit-git` / `smart-commit-git` / `create-pr`, this skill never stops to confirm messages, grouping, or the PR body — it decides and executes.
+Runs commit → push → PR end to end with no approval gates.
 
 ## Step 1: Discover changed files
 
