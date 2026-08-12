@@ -45,7 +45,17 @@ Decide for yourself whether one commit or several is right — don't default to 
 | 8 | Docs | `docs/`, `*.md` (non-README) |
 | 9 | README | Always last |
 
-Write each commit message in Conventional Commits format: `<type>(<scope>): <summary>` (≤72 chars, imperative), types `feat fix refactor docs style test chore perf ci build`. Add a body only when the WHY is non-obvious.
+Write each commit message in Conventional Commits format:
+
+```
+<type>(<scope>): <summary>          ← ≤72 chars, imperative mood
+
+<body — explain WHY if non-obvious>
+```
+
+Types: `feat` `fix` `refactor` `docs` `style` `test` `chore` `perf` `ci` `build`
+
+Avoid vague summaries ("update files"). Don't mention filenames in the subject unless they are the point (e.g. `docs: update README`). Add a body only when the WHY is non-obvious.
 
 ## Step 4: Commit
 
@@ -79,7 +89,20 @@ git diff <target>...HEAD --name-status
 gh pr create --base <target> --title "<title>" --body "<description>"
 ```
 
-Write the title (imperative, ~50 chars) and a body (what changed and why, referencing the commits from Step 3) from the diff — same standard as a human-reviewed PR, just without pausing for approval. Print the PR URL when done.
+Focus on what changed and why from the actual diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns. Write the title and body in this shape:
+
+```
+Title: <imperative, ~50 chars>
+
+Description:
+<2–5 sentences: what changed, why, notable decisions>
+
+Changes:
+  <file/area>: <what changed, functionally>
+  <file/area>: <what changed, functionally>
+```
+
+Same standard as a human-reviewed PR, just without pausing for approval. Print the PR URL when done.
 
 ## Edge cases
 
