@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ship PR"
+  short_description: "Args: Specify target branch. Commit changes, push, and open a PR"
+  default_prompt: "Specify the target branch."
+policy:
+  allow_implicit_invocation: false
