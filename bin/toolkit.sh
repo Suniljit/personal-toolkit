@@ -49,12 +49,12 @@ usage() {
 Usage: bin/toolkit.sh <command> [options]
 
 Commands:
-  install     Guided install of AGENTS.md/CLAUDE.md, guidelines/, and skills/
+  install     Guided install of skills/ (--global also installs AGENTS.md/CLAUDE.md and guidelines/)
   update      git pull + re-run install for every previously-installed target
 
 Options:
-  --global               Install into $HOME
-  --project               Install into the current directory
+  --global               Install into $HOME (AGENTS.md/CLAUDE.md, guidelines/, skills/)
+  --project               Install into the current directory (skills/ only)
   --agent NAME            Select an agent host (claude, opencode, codex); repeatable
   --skill NAME             Select one skill; repeatable (default: all)
   -y                        Confirm without prompting
@@ -268,10 +268,12 @@ backup_and_link() {
 do_install_for_agent() {
   local agent="$1"
   local base; base="$(agent_base_dir "$agent")"
-  local agents_file; agents_file="$(agent_agents_file "$agent")"
 
-  backup_and_link "$REPO_DIR/AGENTS.md" "$agents_file"
-  backup_and_link "$REPO_DIR/guidelines" "$base/guidelines"
+  if [[ "$SCOPE" == "global" ]]; then
+    local agents_file; agents_file="$(agent_agents_file "$agent")"
+    backup_and_link "$REPO_DIR/AGENTS.md" "$agents_file"
+    backup_and_link "$REPO_DIR/guidelines" "$base/guidelines"
+  fi
 
   local skill
   local skills=("${SELECTED_SKILLS[@]}")
