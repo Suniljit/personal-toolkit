@@ -12,25 +12,29 @@ Two-axis review of a pull request, identified by number via `gh`:
 
 Both axes run as **parallel sub-agents**. The two reports feed a single **merge recommendation** at the end — the reason to review a PR is to decide whether to merge it, so the axes converge instead of staying separate.
 
-This is a review, not a fix or a test run: read the diff, report findings, recommend a merge decision. Never run the test suite, never edit files, never check out the PR branch.
+This is a review, not a fix or a test run: read the diff, report findings, recommend a merge decision. Never run the test suite, never edit files, never check out the PR branch — the review will not modify the working tree or switch branches.
 
 ## Process
 
-### 1. Resolve the PR and diff
+### 1. Resolve PR metadata and refs
+
+This step needs network access. In a sandboxed environment, request network escalation before the first `gh` or `git fetch` command below. The fetch may update local remote-tracking refs but must not check out, edit, stage, or commit anything.
+
+Run these as separate commands, stopping on failure. Target branch is always the PR's own `baseRefName` — never ask the user for a base or default to `main`. Fetch only the two refs needed, and pull the head via `pull/<number>/head` into a dedicated remote-tracking ref — this is what makes fork PRs work, since `origin/<headRefName>` doesn't resolve when the PR originates from a fork:
 
 ```bash
-gh pr view <number> --json headRefName,baseRefName,title,body,url
-git fetch origin
+gh pr view <number> --json headRefName,baseRefName,title,body,url,headRepositoryOwner
+git fetch origin <baseRefName> pull/<number>/head:refs/remotes/origin/pr-<number>
+git rev-parse --verify origin/<baseRefName>
+git rev-parse --verify refs/remotes/origin/pr-<number>
 ```
-
-Target branch is always the PR's own `baseRefName` — never ask the user for a base or default to `main`.
 
 ```bash
-git diff origin/<baseRefName>...origin/<headRefName>
-git log origin/<baseRefName>..origin/<headRefName> --oneline
+git diff origin/<baseRefName>...refs/remotes/origin/pr-<number>
+git log origin/<baseRefName>..refs/remotes/origin/pr-<number> --oneline
 ```
 
-Never check out or switch the current branch — work entirely off remote refs. Stop and tell the user if the PR, branch, or diff can't be resolved (bad number, `gh` not authenticated, empty diff).
+Never check out or switch the current branch — work entirely off remote refs. If GitHub access or fetching is unavailable, stop and report that the review is blocked by network access or unresolved remote refs — do not retry the same command in a lower-permission context. Also stop if the PR, branch, or diff can't be resolved for another reason (bad number, empty diff).
 
 ### 2. Identify the standards sources
 
@@ -42,7 +46,7 @@ Send a single message with two `Agent` tool calls, `general-purpose` subagent fo
 
 **Standards sub-agent prompt** — include:
 
-- The diff command, commit list, and PR number.
+- The diff command, commit list, and PR number (with the `pr-<number>` ref, so it can rerun the diff itself if needed).
 - The standards-source files from step 2, plus the full Smell Baseline text below (paste it in — the sub-agent has no access to this skill file).
 - The brief: "Report — per file/hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file + rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations (documented-standard breaches) from judgement calls (baseline smells are always judgement calls). Skip anything tooling enforces. Under 400 words."
 
