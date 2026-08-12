@@ -1,5 +1,5 @@
 ---
-name: commit-git
+name: git-commit
 description: Stage files and create git commits.
 disable-model-invocation: true
 ---
