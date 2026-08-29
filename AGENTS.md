@@ -60,6 +60,10 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+## Personal overlay
+
+When `.agent-personal/` exists at the repo root, read its files before starting work — they hold this user's project-specific rules, environment fixes, and preferences that don't belong in the shared guidelines (a CLI at a non-standard path, a local workaround, a personal convention). Treat them as an extension of this file; where they conflict with it, the personal file wins. Add to it with `/capture-lessons`.
+
 ## Code Quality
 
 Required on every changed file:

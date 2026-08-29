@@ -1,0 +1,6 @@
+interface:
+  display_name: "Capture Lessons"
+  short_description: "Turn session friction into durable agent rules"
+  default_prompt: "a specific friction to capture (optional)"
+policy:
+  allow_implicit_invocation: false
