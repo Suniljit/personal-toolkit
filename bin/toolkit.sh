@@ -273,6 +273,10 @@ do_install_for_agent() {
     local agents_file; agents_file="$(agent_agents_file "$agent")"
     backup_and_link "$REPO_DIR/AGENTS.md" "$agents_file"
     backup_and_link "$REPO_DIR/guidelines" "$base/guidelines"
+    case "$agent" in
+      claude)   backup_and_link "$REPO_DIR/agents/claude" "$base/agents" ;;
+      opencode) backup_and_link "$REPO_DIR/agents/opencode" "$base/agent" ;;
+    esac
   fi
 
   local skill

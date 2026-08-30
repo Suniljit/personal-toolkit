@@ -48,18 +48,26 @@ need to do this once per project; after that, `update` re-syncs it too.
 
 ## What gets linked
 
-For each selected agent, `install` symlinks three things into `<base>`
+For each selected agent, `install` symlinks these into `<base>`
 (`$HOME` for `--global`, the current directory for `--project`):
 
-| Agent | AGENTS file | guidelines | skills |
-|---|---|---|---|
-| claude | `<base>/.claude/CLAUDE.md` | `<base>/.claude/guidelines` | `<base>/.claude/skills/<name>` |
-| opencode | `<base>/.opencode/AGENTS.md` | `<base>/.opencode/guidelines` | `<base>/.opencode/skills/<name>` |
-| codex | `<base>/.codex/AGENTS.md` | `<base>/.codex/guidelines` | `<base>/.codex/skills/<name>` |
+| Agent | AGENTS file | guidelines | skills | agents |
+|---|---|---|---|---|
+| claude | `<base>/.claude/CLAUDE.md` | `<base>/.claude/guidelines` | `<base>/.claude/skills/<name>` | `<base>/.claude/agents` → `agents/claude` |
+| opencode | `<base>/.opencode/AGENTS.md` | `<base>/.opencode/guidelines` | `<base>/.opencode/skills/<name>` | `<base>/.opencode/agent` → `agents/opencode` |
+| codex | `<base>/.codex/AGENTS.md` | `<base>/.codex/guidelines` | `<base>/.codex/skills/<name>` | — |
 
 `AGENTS.md` is always the source file — Claude's copy is just symlinked under
 a different name (`CLAUDE.md`), since a symlink's name doesn't have to match
 its target's.
+
+The `agents` column is subagent definitions (`--global` only), symlinked as a
+whole folder like `guidelines`. It's host-specific — Claude and opencode use
+different frontmatter and different `model` slugs — so the repo keeps one
+subdir per host (`agents/claude`, `agents/opencode`) and each host links its
+own. Codex has no subagent primitive and gets nothing. Today this is just
+`code-reviewer`, spawned by the `code-review` skill so that review runs on a
+cheap model instead of the implementing one.
 
 The `skills` source depends on scope: `--global` links from
 `skills/global/<name>`, `--project` links from `skills/project/<name>`. Either
