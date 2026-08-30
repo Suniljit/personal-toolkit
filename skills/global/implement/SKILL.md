@@ -2,6 +2,8 @@
 name: implement
 description: "Implement a piece of work based on a spec or set of tickets."
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "Specify a spec to implement and a base branch to perform code review against."
 ---
 

@@ -2,6 +2,8 @@
 name: setup-github-actions
 description: Set up a GitHub Actions workflow that lints, type-checks, and tests every PR.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 ---
 
 # Setup GitHub Actions CI

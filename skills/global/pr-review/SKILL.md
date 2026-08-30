@@ -2,6 +2,8 @@
 name: pr-review
 description: Review a GitHub pull request by number via `gh` — runs a Standards sub-agent against this repo's coding standards and smell baseline, and a Spec sub-agent that reverse-engineers a spec from the diff for human review, then aggregates both into a merge recommendation. Diffs against the PR's own target branch. Use when the user wants a PR reviewed, gives a PR number, or asks "review PR #X".
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "Provide a PR number."
 ---
 
@@ -58,7 +60,7 @@ Send a single message with two `Agent` tool calls, `general-purpose` subagent fo
 
 ### 4. Aggregate
 
-Present under `## Standards`, `## Reverse-Engineered Spec`, and `## Findings` headings — the first two are the sub-agent reports near-verbatim; `## Findings` is your own synthesis across both (a Standards violation and a Spec mismatch can be the same underlying bug, and this is where that connection gets made).
+Present under `## Reverse-Engineered Spec`, `## Standards`, and `## Findings` headings — spec first, so the reader knows what the PR is trying to do before weighing the code against it. The first two are the sub-agent reports near-verbatim; `## Findings` is your own synthesis across both (a Standards violation and a Spec mismatch can be the same underlying bug, and this is where that connection gets made).
 
 For each finding in `## Findings`, use the format: file + line range, what's wrong, why it breaks something (concrete failure mode, not "could be an issue"), and a recommended fix concrete enough to hand directly to a PR that fixes it.
 

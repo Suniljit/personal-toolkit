@@ -2,6 +2,8 @@
 name: rebase-main
 description: Rebase the current branch onto a target branch (default origin/main) and force-push with lease. Use when the user wants to rebase onto main, sync a branch with upstream, or clean up history before opening a PR.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "Provide a target branch (default: origin/main)."
 ---
 

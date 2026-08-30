@@ -4,6 +4,8 @@ description: >
   Project LLM wiki: ingest source files, add ad-hoc notes, query with citations, 
   or lint for contradictions.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "ingest | add | query | lint"
 ---
 

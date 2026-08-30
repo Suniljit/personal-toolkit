@@ -19,7 +19,7 @@ wiki/
         │
         │  /wiki ingest  (scripted hash-diff decides what's new — no LLM guessing)
         ▼
-  pages/*.md     ← wiki pages (OKF-style frontmatter + a per-page Contents block)
+  pages/*.md     ← wiki pages (OKF v0.2 frontmatter + a per-page Contents block)
   WIKI_INDEX.md  ← flat catalog: title, type, tags, one-line summary per page
   log.md         ← append-only history of every ingest/add/query/lint run
   manifest.json  ← {file: hash, ingested_at, pages_touched} — the diff's memory
@@ -50,7 +50,7 @@ Do this once wherever the `wiki` skill lives — every project's `wiki ingest` f
 - **No vectors, no Obsidian, no graph view.** Navigation is `WIKI_INDEX.md` plus grep — sufficient at the scale of project documentation, and it means zero embedding infrastructure to run or pay for.
 - **"What's new" is a hash diff, not an LLM guess.** `scripts/wiki_diff.py` compares SHA-256 hashes in `manifest.json` against what's currently in `wiki/raw/` — deterministic, and it also catches *edited* files, not just new ones.
 - **Section-level detail is progressively disclosed, not stuffed into the index.** `WIKI_INDEX.md` stays flat and cheap to read in full no matter how large the wiki gets; each page carries its own section-level outline (one-line gists per heading) in a Contents block at the top. `wiki query` shortlists from the flat index, then peeks at a candidate's Contents block before deciding whether to read the rest — the same reasoning-down idea behind [PageIndex](https://github.com/VectifyAI/PageIndex)'s reasoning-based retrieval, without duplicating each page's own headers into a second, ever-growing file.
-- **Pages carry an [OKF](https://github.com/google/knowledge-catalog)-subset frontmatter** (`type`, `title`, `description`, `tags`, `timestamp`) — cheap to add, and gives the wiki a portable, standardized shape if the format gains traction, without buying into any heavier tooling.
+- **Pages carry an [OKF v0.2](https://github.com/google/knowledge-catalog)-subset frontmatter** — `type`/`title`/`description`/`tags` plus the provenance and trust families (`generated`, `sources`, `status`, `verified`, `stale_after`) — cheap to add, and gives the wiki a portable, standardized shape without buying into any heavier tooling. Per-claim citations are markdown footnotes keyed to `sources[].id`. Attested computations (OKF §10) and usage-based credibility signals are out of scope.
 - **Ingest never resolves contradictions** — it notes them and moves on; only `wiki lint` decides, and even lint only auto-resolves the unambiguous cases (orphans, single-candidate stale claims). Anything requiring judgment about which claim is *true* is always left for you.
 
 See [`SCHEMA.md`](SCHEMA.md) for the exact file formats.

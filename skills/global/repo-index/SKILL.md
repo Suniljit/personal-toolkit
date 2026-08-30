@@ -3,6 +3,8 @@ name: repo-index
 description: >
   Root INDEX.md, the repo's navigation map: survey the tree to write it, or check it for drift since the last indexed commit.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "build | lint"
 ---
 

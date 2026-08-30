@@ -4,7 +4,7 @@ Read [`common/SCHEMA.md`](common/SCHEMA.md) first — it defines the `wiki/raw/`
 
 ## Step 1 — Locate and scaffold
 
-Find `wiki/` at the project root, and `wiki/raw/` and `wiki/pages/` inside it. If any of these is missing, create it, along with an empty `WIKI_INDEX.md`, `log.md`, and `manifest.json` (`{}`). If `wiki/` isn't already in `.gitignore`, add it (or, if the project already tracks `wiki/`, add `wiki/raw/` and `wiki/manifest.json` instead — those two stay ignored regardless).
+Find `wiki/` at the project root, and `wiki/raw/` and `wiki/pages/` inside it. If any of these is missing, create it, along with an empty `WIKI_INDEX.md`, a `log.md` seeded with its `# Wiki Update Log` heading, and `manifest.json` (`{}`). If `wiki/` isn't already in `.gitignore`, add it (or, if the project already tracks `wiki/`, add `wiki/raw/` and `wiki/manifest.json` instead — those two stay ignored regardless).
 
 ## Step 2 — Find what's new
 
@@ -24,10 +24,10 @@ For every file in `new` + `changed`:
    ```
    If this fails because the venv doesn't exist yet, tell the user to run the one-time setup in `common/README.md` (`uv venv .venv --python 3.13 && uv sync`) and stop — don't attempt to parse binary formats yourself.
 2. **Extract and integrate**: read the converted text, decide which wiki pages it touches — creating new pages or updating existing ones. A single source often touches several pages (entity pages, concept pages, cross-references), not just one.
-3. **Write pages** into `wiki/pages/`, using the frontmatter and Contents-block conventions in SCHEMA.md — the per-section outline with one-line gists lives at the top of the page itself, not in `WIKI_INDEX.md`. Update `timestamp` and the Contents block on any page you touch.
-4. **Check for contradictions**: if new content conflicts with a claim already on an existing page, don't silently overwrite it — keep both, note the conflict in `log.md`, and leave resolution to the lint flow.
+3. **Write pages** into `wiki/pages/`, using the frontmatter and Contents-block conventions in SCHEMA.md — the per-section outline with one-line gists lives at the top of the page itself, not in `WIKI_INDEX.md`. On any page you create or touch: set/update `generated` (`at` always; `by` = `wiki/<model-id>`), add this source to the page's `sources` list (rooted at `/raw/<file>`, with the raw file's mtime as `last_modified`), key footnote citations to `sources[].id` for specific claims, and refresh the Contents block. Set `status: draft` only if the content is genuinely incomplete or uncertain; otherwise omit `status`.
+4. **Check for contradictions**: if new content conflicts with a claim already on an existing page, don't silently overwrite it — keep both, note the conflict in `log.md`, and leave resolution to the lint flow. You may mark a page whose claim is now in doubt `status: draft`, but never pick a winner here.
 5. **Update `WIKI_INDEX.md`**: for every page created or updated, refresh its flat entry (title, type, tags, one-line summary) per SCHEMA.md's format — no section-level detail here, that's what keeps the index cheap to read in full as the wiki grows.
-6. **Append to `log.md`**: one entry per source file, tagged `ingest`, listing pages created/updated and any contradictions flagged.
+6. **Append to `log.md`**: one bullet per source file under today's `## YYYY-MM-DD` heading, leading bold word `**Ingest**`, listing pages created/updated and any contradictions flagged — per SCHEMA.md's log.md format.
 7. **Mark it done**:
    ```bash
    python3 common/scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <comma-separated wiki/pages/ paths>

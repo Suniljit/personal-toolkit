@@ -3,6 +3,8 @@ name: feature-plan
 description: >
   Document a feature or fix as an implementation-ready Markdown plan. 
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 ---
 
 # Feature Plan

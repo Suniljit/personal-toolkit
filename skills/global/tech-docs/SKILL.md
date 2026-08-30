@@ -3,6 +3,8 @@ name: tech-docs
 description: >
   Seven-document technical documentation suite — PRD, App Flow, Design Brief, TDD, Data Schema, API Contracts, NFR. 
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "prd | app-flow | design-brief | tdd | data-schema | api-contracts | nfr"
 ---
 

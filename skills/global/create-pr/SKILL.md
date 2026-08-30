@@ -3,6 +3,8 @@ name: create-pr
 description: >
   Creates GitHub Pull Requests via the GitHub CLI. 
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "Specify a target branch, else defaults to 'main'."
 ---
 
@@ -40,31 +42,19 @@ git diff <target>...HEAD -- . ':(exclude)*.lock' ':(exclude)package-lock.json'
 
 ---
 
-## Step 2: Generate PR summary
+## Step 2: Compose the PR content
 
-Output is read in an agent desktop app, not a markdown renderer — do not use markdown syntax (no `**bold**`, `#` headers, or backticks). Use plain text with line breaks and indentation to structure it, then ask: "Does this look good? Say OK to create the PR, or tell me what to change."
+From the diff (and spec, if provided), write:
+- Title: imperative, ~50 chars
+- Body: 2–5 sentences on what changed, why, and notable decisions, then a "Changes" list of `<file/area>: <what changed, functionally>`. Markdown is fine — GitHub renders it.
 
 Focus on what changed and why from the actual code diff — not metadata like commit messages, file/line counts, or commit-by-commit breakdowns. If a spec was provided, use it to explain the why behind changes the diff shows; the diff still governs what's listed under Changes.
 
-Render in this shape:
-
-```
-Branch: <current> → <target>
-Title: <imperative, ~50 chars>
-
-Description:
-<2–5 sentences: what changed, why, notable decisions>
-
-Changes:
-  <file/area>: <what changed, functionally>
-  <file/area>: <what changed, functionally>
-```
+Proceed straight to Step 3 — do not wait for approval.
 
 ---
 
 ## Step 3: Push the branch
-
-On user approval ("ok", "yes", "looks good", "create it"):
 
 ```bash
 git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null

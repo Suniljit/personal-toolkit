@@ -22,7 +22,7 @@ Querying and linting operate over `wiki/pages/` only — `wiki/raw/` is ingestio
 
 No vector DB, no embeddings, no Obsidian, no graph viewer. Navigation is `WIKI_INDEX.md` plus grep.
 
-## Page frontmatter (OKF subset)
+## Page frontmatter (OKF v0.2 subset)
 
 Every wiki page starts with YAML frontmatter:
 
@@ -32,11 +32,21 @@ type: concept        # concept | entity | decision | reference | summary
 title: Authentication Flow
 description: One-sentence description of what this page covers.
 tags: [auth, security]
-timestamp: 2026-07-19T10:00:00Z   # last-updated, ISO 8601
+generated: { by: wiki/<model-id>, at: 2026-07-19T10:00:00Z }   # who wrote this content, when it last meaningfully changed
+sources:                                          # the wiki/raw/ files this page was synthesized from
+  - id: auth-notes
+    resource: /raw/adhoc-2026-07-19-auth-notes.md
+    title: Auth design notes
+    last_modified: 2026-07-18T00:00:00Z           # the raw file's mtime
+status: stable                                    # draft | stable | deprecated — omit ⇒ stable
+verified: { by: human:sunil, at: 2026-07-20T09:00:00Z }   # present only once a human has reviewed the page
+stale_after: 2027-01-01T00:00:00Z                 # optional: page is stale on/after this instant
 ---
 ```
 
-`type` is required; the rest are recommended. Controlled vocabulary for `type`:
+`type` is the only required key; everything else is recommended or optional. Every timestamp is ISO 8601 with an explicit UTC offset (`...Z`).
+
+Controlled vocabulary for `type`:
 
 - **concept** — an idea, mechanism, or process
 - **entity** — a specific person, system, service, or component
@@ -44,7 +54,45 @@ timestamp: 2026-07-19T10:00:00Z   # last-updated, ISO 8601
 - **reference** — durable facts, specs, API shapes
 - **summary** — a digest of a source or a filed query answer
 
-`timestamp` is what the lint flow uses to decide which of two conflicting claims is newer.
+### `generated` (OKF §5.2)
+
+`generated: { by, at }` records how the current content was produced.
+
+- `by` — the actor, per OKF's convention: `wiki/<model-id>` for the ingest agent (e.g. `wiki/claude-sonnet-5`), `human:<id>` for a hand-written page.
+- `at` — the content's last meaningful change. This is what the lint flow compares to decide which of two conflicting claims is newer. (Replaces the v0.1 `timestamp` field.)
+
+### `sources` (OKF §5.1)
+
+The `wiki/raw/` files a page was synthesized from — the page→source backlink that makes citations traceable and lets lint spot a page whose sources have all been removed. Each entry:
+
+- `resource` — required. A path to the raw file, rooted at `wiki/` (`/raw/<file>`).
+- `id` — a stable key. Required when the body cites the source (see below).
+- `title` — human-readable label.
+- `last_modified` — the raw file's mtime, ISO 8601. A recency signal, distinct from `generated.at`.
+
+Per-claim attribution uses a markdown footnote whose label is a `sources[].id`:
+
+```markdown
+Login uses OAuth with PKCE for the SPA client.[^auth-notes]
+
+[^auth-notes]: Auth design notes
+```
+
+The label is the join key into `sources` — keep it stable when the list is reordered.
+
+### `status` (OKF §5.4)
+
+`draft` (content the ingest agent judged incomplete or uncertain), `stable` (default — omit the key), or `deprecated` (superseded; kept for links and history, with a forward link to its replacement). Review state is *not* carried here — an unreviewed page is simply one with no `verified` key.
+
+### `verified` and trust tiers (OKF §5.2–5.3)
+
+A `{ by, at }` event (or a list of them) recording that a human or process has confirmed the page against its sources. Absent until that happens. Consumers derive a trust tier: no `verified` ⇒ **unverified**; `verified` by `process:`/agent actors only ⇒ **machine-confirmed**; `verified` by a `human:<id>` ⇒ **human-reviewed**. The query flow surfaces this tier; it is advisory, never a filter.
+
+### `stale_after` (OKF §5.5)
+
+Optional absolute instant. A page is stale when `now >= stale_after`. Use it on pages whose facts are inherently time-bound.
+
+Not adopted from OKF v0.2: `Attested Computation` and its `runtime`/`executor`/`attester` fields (§10), and the usage-based credibility signals `author`/`usage_count`/`usage_window` (§5.1) — neither fits a prose project wiki built from local files.
 
 ## Page Contents block
 
@@ -69,7 +117,7 @@ This is what lets the query flow reason down to the right *section* of a shortli
 
 ## WIKI_INDEX.md format
 
-Flat catalog: one entry per page, page-level only. Cheap to read in full on every run, however large the wiki gets — the section-level detail lives in each page's own Contents block, not here. Lives in `wiki/` itself (not `wiki/pages/`) — it's an index over the pages, not one of them, same tier as `log.md` and `manifest.json`. Named `WIKI_INDEX.md`, not `index.md`, to avoid colliding with a project's own root `INDEX.md`.
+Flat catalog: one entry per page, page-level only. Cheap to read in full on every run, however large the wiki gets — the section-level detail lives in each page's own Contents block, not here. Lives in `wiki/` itself (not `wiki/pages/`) — it's an index over the pages, not one of them, same tier as `log.md` and `manifest.json`. Named `WIKI_INDEX.md`, not `index.md`, to avoid colliding with a project's own root `INDEX.md`. OKF (§8) reserves `index.md` for a per-directory listing; this is the skill's equivalent, and an OKF consumer that wants a conformant `wiki/pages/index.md` can synthesize one from this file.
 
 ```markdown
 # Wiki Index
@@ -82,18 +130,23 @@ Flat catalog: one entry per page, page-level only. Cheap to read in full on ever
 
 Categories are loose groupings the agent maintains (e.g. by `type` or by subject area) — not a fixed enum.
 
+## Cross-linking
+
+Page-to-page links in a body use a path rooted at `wiki/` — `[customers](/pages/customers.md)` — which stays valid if a page is renamed within `wiki/pages/`. Footnote citations to sources are keyed to `sources[].id`, not written as inline links (see `sources` above). A link to a page that doesn't exist yet is not an error — it marks not-yet-written knowledge, and the lint flow reads it as a hint, not a fault.
+
 ## log.md format
 
-Append-only, one entry per skill run:
+Append-only, newest first, following OKF's `log.md` shape (§9): `## YYYY-MM-DD` date headings, one bullet per change, a leading bold word for the kind.
 
 ```markdown
-## [2026-07-19] ingest | Source Title
-- created: topic-a.md
-- updated: topic-b.md (added section on X)
-- flagged: contradicts topic-c.md on Y — left for /wiki lint
+# Wiki Update Log
+
+## 2026-07-19
+* **Ingest** (Source Title): created [topic-a](/pages/topic-a.md); updated [topic-b](/pages/topic-b.md) — added section on X.
+* **Flag**: [topic-a](/pages/topic-a.md) contradicts [topic-c](/pages/topic-c.md) on Y — left for /wiki lint.
 ```
 
-Use `ingest`, `add`, `query`, or `lint` as the operation tag so entries are greppable by kind.
+Use the flow name (`Ingest`, `Add`, `Query`, `Lint`) as the leading bold word so entries stay greppable by kind.
 
 ## manifest.json format
 

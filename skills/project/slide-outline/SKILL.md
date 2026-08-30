@@ -4,6 +4,8 @@ description: >
   Turn a finished slide-planning discussion into a slide-by-slide outline and a
   context file for later amendment sessions.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 ---
 
 # Slide Outline

@@ -2,6 +2,8 @@
 name: capture-lessons
 description: Scan a rough agent session for friction and propose durable fixes routed to global AGENTS.md, project AGENTS.md, .agent-personal/, or a skill.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 argument-hint: "optional: a specific friction to capture"
 ---
 

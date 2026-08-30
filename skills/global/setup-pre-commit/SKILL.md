@@ -2,6 +2,8 @@
 name: setup-pre-commit
 description: Set up git hooks with the pre-commit framework — commit-time linting and push-time type checking/tests.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 ---
 
 # Setup Pre-Commit Hooks

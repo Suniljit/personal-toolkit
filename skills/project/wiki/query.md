@@ -20,7 +20,7 @@ For the remaining candidates, read the specific sections the Contents block poin
 
 ## Step 5 — Synthesize with citations
 
-Answer the question, citing the specific page (and section, where relevant) each claim came from. If pages disagree, say so rather than picking one silently — that's a job for the lint flow, not for this flow to paper over.
+Answer the question, citing the specific page (and section, where relevant) each claim came from. Where it adds traceability, follow a page's `sources` / footnotes back to the originating `wiki/raw/` file. Note a cited page's trust tier when it's below human-reviewed (no `verified` key ⇒ unverified; `verified` by non-human actors only ⇒ machine-confirmed), and flag any cited page that is `status: deprecated` or past its `stale_after`. If pages disagree, say so rather than picking one silently — that's a job for the lint flow, not for this flow to paper over.
 
 ## Step 6 — Offer to file the answer
 

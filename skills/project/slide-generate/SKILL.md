@@ -4,6 +4,8 @@ description: >
   Generate a deck's slides as HTML, one slide at a time, iterating with the user until
   each is approved before moving to the next.
 disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: "false"
 ---
 
 # Slide Generate

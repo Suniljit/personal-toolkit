@@ -20,7 +20,7 @@ Save it as a new file: `wiki/raw/adhoc-<YYYY-MM-DD>-<kebab-slug-of-topic>.md`, w
 
 ## Step 3 — Ingest it
 
-Run the ingest flow from [`ingest.md`](ingest.md) (Steps 2 onward), scoped to this one new file.
+Run the ingest flow from [`ingest.md`](ingest.md) (Steps 2 onward), scoped to this one new file. The resulting page(s) carry this `adhoc-*.md` file as their `sources` entry like any other raw input. If the user dictated the content and confirms the synthesized page reads correctly, record a `verified: { by: human:<id>, at: <now> }` line on it per SCHEMA.md.
 
 ## Completion criterion
 
