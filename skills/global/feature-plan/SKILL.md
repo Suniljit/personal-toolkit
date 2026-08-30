@@ -61,6 +61,6 @@ Confirm:
 - **Out of Scope ≠ Future Work.** It just means "not here."
 - **No placeholders.** Every section has real content or is explicitly noted as N/A.
 - **Code Shape and Validation Rules are optional.** Include them when they add real clarity; omit them for simple CRUD or UI-only changes.
-- **Logging is always included.** Even simple features should document at minimum their entry/exit and error events. DEBUG-level input/output tracing (functions, LLM calls, DB queries) should be included for non-trivial features.
+- **Logging is always included.** Every event table must have concrete examples of what to log — actual values, not counts. Entry/exit logs must capture inputs and outputs. DEBUG-level logs must show function args, return values, LLM prompts/completions, DB query params and results — the data you'd actually grep to debug the code.
 - **Don't write code.** Output is a plan doc only.
 - **Committed.** The plan lives in `_specs/` and is checked into git alongside the code it describes.

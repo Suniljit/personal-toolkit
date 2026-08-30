@@ -85,21 +85,31 @@ What to test and why it matters — favor asserting on output over implementatio
 ## Logging
 What to capture and why — skip anything that doesn't help with observability, debugging, or auditing.
 
-| Event | Level | Fields | Why |
+| Event | Level | Fields | Example |
 |---|---|---|---|
-| Feature started | `info` | `userId`, `featureId` | Trace entry point |
-| Validation failed | `warn` | `field`, `reason`, `input` | Debug bad requests |
-| External call failed | `error` | `service`, `statusCode`, `duration` | Alert on degradation |
-| Function entry/exit | `debug` | `functionName`, `args`, `returnValue` | Trace data flow through key functions |
-| LLM call request/response | `debug` | `model`, `prompt`, `completion`, `tokens` | Debug prompt/output issues |
-| DB query/result | `debug` | `query`, `params`, `rowCount`/`result` | Debug data access issues |
+| Feature started | `info` | `userId`, `featureId`, `timestamp` | `{userId: "u123", featureId: "feat-export", timestamp: "2026-08-30T14:32Z"}` |
+| Validation failed | `warn` | `field`, `reason`, `input` | `{field: "email", reason: "invalid format", input: "user@"}` |
+| External call failed | `error` | `service`, `statusCode`, `duration`, `error` | `{service: "payment-api", statusCode: 502, duration: 5000, error: "timeout"}` |
+| Function entry | `debug` | `functionName`, `args` | `{functionName: "processOrder", args: {orderId: "ord-456", qty: 3}}` |
+| Function exit | `debug` | `functionName`, `returnValue`, `duration` | `{functionName: "processOrder", returnValue: {status: "approved"}, duration: 45}` |
+| LLM call request | `debug` | `model`, `prompt`, `tokens` | `{model: "gpt-4", tokens: 512, prompt: "summarize the following..."}` |
+| LLM call response | `debug` | `model`, `completion`, `tokens` | `{model: "gpt-4", tokens: 245, completion: "The summary is..."}` |
+| DB query | `debug` | `query`, `params`, `duration` | `{query: "SELECT * FROM orders WHERE user_id = ?", params: ["u123"], duration: 12}` |
+| DB result | `debug` | `query`, `rowCount`, `sample` | `{query: "SELECT * FROM orders...", rowCount: 5, sample: {orderId: "ord-1", total: 99.99}}` |
 
-Notes:
-- Prefer structured logs (JSON) over interpolated strings
-- Include a `correlationId` / `traceId` on every log line where possible
-- Never log PII, secrets, or raw request bodies unless explicitly scrubbed
-- DEBUG-level input/output logs (function args/returns, LLM calls, DB queries) must also be scrubbed of PII/secrets, and should be disabled or sampled in production if volume/cost is a concern
-- Flag any log lines that should feed an alert or dashboard metric
+**Anti-patterns to avoid:**
+- ❌ Logging a count: `{processed: 42}` — useless for debugging
+- ❌ Logging presence only: `{validated: true}` — doesn't help trace the data
+- ❌ Logging without values: `{result: "success"}` — what was the actual result?
+- ❌ Logging redacted data: `{email: "***"}` — defeats the purpose of logs
+
+**Notes:**
+- Prefer structured logs (JSON) over interpolated strings — makes grepping and filtering easier
+- Include a `correlationId` / `traceId` on every log line where possible to link related logs
+- Never log PII, secrets, or raw request bodies unless explicitly scrubbed and approved for the environment
+- DEBUG-level input/output logs (function args/returns, LLM calls, DB queries) must also be scrubbed of PII/secrets
+- DEBUG logs can be disabled or sampled in production if volume/cost is a concern — but in development/staging, they must be fully verbose
+- Flag any log lines that should feed an alert or dashboard metric (e.g., "External call failed" → alert oncall)
 
 ## Edge Cases
 Only list edge cases that aren't obvious or need special handling.
