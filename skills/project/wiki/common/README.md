@@ -27,23 +27,25 @@ wiki/
 
 `wiki add` and `wiki query`'s "file this back" path both write into `wiki/raw/` and then run the same ingest flow — there's exactly one way pages get created or changed, which is what makes `wiki lint` and the manifest trustworthy. Querying and linting read `wiki/pages/` only — `wiki/raw/` is ingestion input, never a wiki page, and living in its own folder keeps that distinction structural rather than a rule to remember.
 
-## One-time setup
+## Python setup
 
 `common/` carries its own `pyproject.toml`. Only `wiki_convert.py` needs it (non-text conversion, via [MarkItDown](https://github.com/microsoft/markitdown)) — `wiki_diff.py` is stdlib-only and runs with plain `python3`, no venv required.
 
+The env lives in the target project's `wiki/.venv`, never in the skill directory — build it once per project, from the project root:
+
 ```bash
-cd common
-uv venv .venv --python 3.13 && uv sync
+UV_PROJECT_ENVIRONMENT="$PWD/wiki/.venv" uv sync --project common --python 3.13
 ```
 
-Do this once wherever the `wiki` skill lives — every project's `wiki ingest` flow shells out to this same venv via `uv run --project common ...`, so it's shared across every project using this skill, not reinstalled per project. If it's missing, the ingest flow will tell you to run it rather than falling back to a global `pip install`.
+`--project common` resolves dependencies from the shared `common/pyproject.toml`; `UV_PROJECT_ENVIRONMENT` puts the resulting env under the project's `wiki/` folder so nothing is written back into the skill. Every `wiki ingest` run reuses it via the same `UV_PROJECT_ENVIRONMENT="$PWD/wiki/.venv" uv run --project common ...` prefix. If it's missing, the ingest flow tells you to run this rather than falling back to a global `pip install`.
 
 ## Setup, per project
 
 1. Make sure the `wiki` skill folder (which bundles `common/` inside it) is available to your agent harness (e.g. copied or symlinked under `~/.claude/skills/` or the project's `.claude/skills/`). The skill's flows reference `common/` by relative path, so it needs to stay nested inside `wiki/`, not moved out.
 2. Drop source material into `wiki/raw/` at the project root — any mix of `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, etc.
-3. Run `/wiki ingest`.
-4. `wiki/` gets added to `.gitignore` automatically on first run — this is local working state, not something to commit. (Karpathy's original recommends git-backing the wiki for free version history; if you want that later, replace the blanket `wiki/` entry with `wiki/raw/` and `wiki/manifest.json` — those two stay ignored regardless, since they're working state, not wiki content.)
+3. If any of those sources are non-text (PDF, DOCX, …), build the conversion env once for this project — see [Python setup](#python-setup) above. Pure `.md`/`.txt` wikis skip this.
+4. Run `/wiki ingest`.
+5. `wiki/` gets added to `.gitignore` automatically on first run — this is local working state, not something to commit. (Karpathy's original recommends git-backing the wiki for free version history; if you want that later, replace the blanket `wiki/` entry with `wiki/raw/`, `wiki/manifest.json`, and `wiki/.venv/` — those stay ignored regardless, since they're working state, not wiki content.)
 
 ## Design choices worth knowing
 

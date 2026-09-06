@@ -14,9 +14,10 @@ wiki/
   WIKI_INDEX.md             flat catalog of every wiki page (see below)
   log.md                    append-only ingest history
   manifest.json             {relpath: {hash, ingested_at, pages_touched}} for every wiki/raw/ file processed
+  .venv/                    per-project Python env for wiki_convert.py, deps from common/pyproject.toml
 ```
 
-`wiki/raw/` and `wiki/manifest.json` are local working state, not source — add them to the project's `.gitignore` if not already present, even if `wiki/` itself ends up tracked. `wiki/WIKI_INDEX.md`, `wiki/log.md`, and the pages under `wiki/pages/` are the artifact worth keeping; whether those are committed is the user's call per project (default: the whole `wiki/` directory is gitignored until the user opts in).
+`wiki/raw/`, `wiki/manifest.json`, and `wiki/.venv/` are local working state, not source — add them to the project's `.gitignore` if not already present, even if `wiki/` itself ends up tracked. `wiki/WIKI_INDEX.md`, `wiki/log.md`, and the pages under `wiki/pages/` are the artifact worth keeping; whether those are committed is the user's call per project (default: the whole `wiki/` directory is gitignored until the user opts in).
 
 Querying and linting operate over `wiki/pages/` only — `wiki/raw/` is ingestion input, never a page, and lives outside that folder for exactly this reason.
 
@@ -166,6 +167,6 @@ Managed via `scripts/wiki_diff.py` — never hand-edit.
 
 - `scripts/wiki_diff.py check --raw wiki/raw/ --manifest wiki/manifest.json` — prints JSON `{"new": [...], "changed": [...], "removed": [...]}` for files in `wiki/raw/` not yet reflected in the manifest (new file, or hash changed since last ingest). Pure hash comparison — no LLM judgment involved in "what's new". Stdlib-only — run directly with `python3`, no venv needed.
 - `scripts/wiki_diff.py mark --raw wiki/raw/ --manifest wiki/manifest.json --file <relpath> --pages <page1,page2>` — call once a source file has actually been synthesized into pages, to update its manifest entry. Marking per-file (not per-batch) means a mid-run failure doesn't falsely mark unprocessed files as done. Also stdlib-only.
-- `scripts/wiki_convert.py <file> [--out <path>]` — converts a non-text source (PDF, DOCX, PPTX, XLSX, etc.) to Markdown via MarkItDown. Only needed for extensions that aren't already `.md`/`.txt`. This one has a real dependency, so it runs through `common/`'s own `.venv` via `uv run --project common python scripts/wiki_convert.py <file>` — see the README's setup section for creating that venv once. If the venv or MarkItDown is missing, the command fails with an explicit setup instruction; don't attempt to parse binary formats without it.
+- `scripts/wiki_convert.py <file> [--out <path>]` — converts a non-text source (PDF, DOCX, PPTX, XLSX, etc.) to Markdown via MarkItDown. Only needed for extensions that aren't already `.md`/`.txt`. This one has a real dependency, so it runs through the project's `wiki/.venv` (deps resolved from `common/pyproject.toml`) via `UV_PROJECT_ENVIRONMENT="$PWD/wiki/.venv" uv run --project common python scripts/wiki_convert.py <file>` — see the README's setup section for creating that venv per project. If the venv or MarkItDown is missing, the command fails with an explicit setup instruction; don't attempt to parse binary formats without it.
 
-`common/` carries its own `pyproject.toml` + `.venv`, isolated from any target project's own Python environment — the ingest flow never touches or assumes anything about the project it's ingesting into.
+`common/` carries only its `pyproject.toml`; each project gets its own `wiki/.venv` built from it, isolated from that project's own Python environment — the ingest flow never touches or assumes anything about the project it's ingesting into, and never writes a venv back into the skill directory.
