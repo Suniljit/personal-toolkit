@@ -1,6 +1,0 @@
-interface:
-  display_name: "PR Review"
-  short_description: "Args: PR number. Review a pull request."
-  default_prompt: "Provide a PR number."
-policy:
-  allow_implicit_invocation: false
