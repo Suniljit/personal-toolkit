@@ -58,50 +58,6 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
----
-
-## Personal overlay
-
-When `.agent-personal/` exists at the repo root, read its files before starting work — they hold this user's project-specific rules, environment fixes, and preferences that don't belong in the shared guidelines (a CLI at a non-standard path, a local workaround, a personal convention). Treat them as an extension of this file; where they conflict with it, the personal file wins. Add to it with `/capture-lessons`.
-
-## Code Quality
-
-Required on every changed file:
-- Avoid security issues.
-- Keep logic understandable, safely typed, maintainable, covered by tests.
-
-Apply the scoped guidance below only when changed files match its scope:
-
-| Scope | File |
-|---|---|
-| Every changed file | [guidelines/security.md](guidelines/security.md) |
-| Every changed file | [guidelines/correctness-maintainability.md](guidelines/correctness-maintainability.md) |
-| API route handlers | [guidelines/architecture.md](guidelines/architecture.md) |
-| React components, Next.js routes/layouts/pages/hooks | [guidelines/react-nextjs.md](guidelines/react-nextjs.md) |
-| API routes, server actions, DB queries, external calls | [guidelines/backend.md](guidelines/backend.md) |
-| Component styling | [guidelines/tailwind-styling.md](guidelines/tailwind-styling.md) |
-| Hooks, utilities, API handlers, feature logic | [guidelines/solid.md](guidelines/solid.md) |
-| Test files, or any change adding/modifying tests | [guidelines/testing.md](guidelines/testing.md) |
-| Any change | [guidelines/code-organization.md](guidelines/code-organization.md) |
-| `.ts` / `.tsx` files | [guidelines/typescript-patterns.md](guidelines/typescript-patterns.md) |
-| `.py` files, or `pyproject.toml`/`requirements.txt` present | [guidelines/python.md](guidelines/python.md) |
-| LLM API/SDK calls, or prompt definitions | [guidelines/llm-prompting.md](guidelines/llm-prompting.md) |
-
-Also align with any accepted ADRs in [docs/adr](docs/adr/) and domain user stories in [docs/user_stories](docs/user_stories/) when behavior changes.
-
-**How to apply:**
-1. Identify change scope from the table above.
-2. Read and apply the required guidelines plus every scoped file that matches.
-3. Make small, direct changes that satisfy the guidelines without speculative abstraction.
-4. Verify with tests or focused checks matching the change.
-
-## Repo Navigation
-
-Read `INDEX.md` at the project root before working in an unfamiliar part of the repo — it summarizes what each top-level folder/file covers. When a change adds, removes, or repurposes a folder or file, update `INDEX.md` to match.
-
-## Documentation
-
-Project docs live in `docs/`. After any code changes, update relevant docs to reflect the new state. For any key architectural decision made, create an ADR in `docs/adr/`.
 
 ## Sub-Agents
 
