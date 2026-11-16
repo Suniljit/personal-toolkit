@@ -65,9 +65,10 @@ The `agents` column is subagent definitions (`--global` only), symlinked as a
 whole folder like `guidelines`. It's host-specific — Claude and opencode use
 different frontmatter and different `model` slugs — so the repo keeps one
 subdir per host (`agents/claude`, `agents/opencode`) and each host links its
-own. Codex has no subagent primitive and gets nothing. Today this is just
+own. Codex has no subagent primitive and gets nothing. Today this is
 `code-reviewer`, spawned by the `code-review` skill so that review runs on a
-cheap model instead of the implementing one.
+cheap model instead of the implementing one, and `explore`, a read-only
+search agent the main agent can delegate to for finding relevant files.
 
 The `skills` source depends on scope: `--global` links from
 `skills/global/<name>`, `--project` links from `skills/project/<name>`. Either
